@@ -10,13 +10,13 @@
 .top{display:flex;align-items:center;gap:14px;margin:0 0 18px}.top img{width:55px;height:55px;object-fit:contain;background:#fff;border-radius:13px;padding:5px}.top a{color:var(--navy);text-decoration:none;font-weight:700;font-size:13px}
 .hero{background:linear-gradient(130deg,var(--navy2),#28618d);color:#fff;padding:27px 30px;border-radius:18px 18px 0 0;box-shadow:0 12px 28px #102d4920}.eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#c9deef;font-weight:bold}.hero h1{font-size:25px;margin:8px 0}.hero p{margin:0;color:#e4edf5;line-height:1.55;font-size:14px}
 .card{background:#fff;padding:25px 30px 30px;border-radius:0 0 18px 18px;box-shadow:0 12px 28px #102d4912;border:1px solid #e5ebf2}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:24px}.tab{border:1px solid var(--line);background:#f8fafc;color:var(--navy);padding:12px 9px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;line-height:1.35}.tab.active{background:var(--navy);border-color:var(--navy);color:#fff}.tab-link{display:flex;align-items:center;justify-content:center;text-decoration:none}.tab-link:hover{background:#e8f0f7}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:24px}.tab{border:1px solid var(--line);background:#f8fafc;color:var(--navy);padding:12px 9px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;line-height:1.35}.tab.active{background:var(--navy);border-color:var(--navy);color:#fff}.tab-link{display:flex;align-items:center;justify-content:center;text-decoration:none}.tab-link:hover{background:#e8f0f7}
 h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:var(--muted);margin:0 0 20px;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.field{margin-bottom:16px}.full{grid-column:1/-1}label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:12px;background:#fff;color:var(--text);font-size:14px;outline:none}textarea{min-height:95px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2563eb16}.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
 .statement{display:flex;align-items:flex-start;gap:10px;padding:14px;background:#f1f6fb;border:1px solid #dce8f3;border-radius:10px;margin:5px 0 18px;font-size:12px;line-height:1.55}.statement input{width:17px;height:17px;margin-top:1px;flex:none}
 .submit{width:100%;border:0;border-radius:10px;padding:14px;background:var(--navy);color:#fff;font-weight:bold;font-size:14px;cursor:pointer}.submit:disabled{opacity:.6;cursor:wait}
 .msg{display:none;padding:13px;border-radius:9px;margin-bottom:16px;font-size:13px;line-height:1.5}.msg.ok{display:block;background:#ecfdf3;color:#166534}.msg.err{display:block;background:#fef2f2;color:#991b1b}
-.note{background:#fff8e8;color:#8a5a00;border:1px solid #f4dfad;padding:12px 14px;border-radius:9px;font-size:12px;line-height:1.5;margin:0 0 18px}.hidden{display:none!important}.footer{text-align:center;color:var(--muted);font-size:11px;margin:18px}
-@media(max-width:650px){body{padding:14px 10px}.hero,.card{padding:22px 18px}.tabs{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.hero h1{font-size:21px}}
+.note{background:#fff8e8;color:#8a5a00;border:1px solid #f4dfad;padding:12px 14px;border-radius:9px;font-size:12px;line-height:1.5;margin:0 0 18px}.loan-frame{display:block;width:100%;height:1650px;border:0;border-radius:12px;background:#f3f6fa}.hidden{display:none!important}.footer{text-align:center;color:var(--muted);font-size:11px;margin:18px}
+@media(max-width:650px){body{padding:14px 10px}.hero,.card{padding:22px 18px}.tabs{grid-template-columns:1fr 1fr}.loan-frame{height:1900px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.hero h1{font-size:21px}}
 </style>
 </head>
 <body>
@@ -29,7 +29,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="tab" data-tab="proposal" type="button">Usulan ATK & Operasional</button>
       <button class="tab" data-tab="maintenance" type="button">Pemeliharaan Aset</button>
       <button class="tab" data-tab="stock" type="button">Kartu Stok / SPB / SBBK</button>
-      <a class="tab tab-link" href="pengguna.html">Formulir Peminjaman ↗</a>
+      <button class="tab" data-tab="borrowing" type="button">Formulir Peminjaman</button>
     </div>
     <div id="message" class="msg"></div>
     <section id="usage">
@@ -73,6 +73,11 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <h2>Kartu Stok, SPB, SBBK & Pemakaian Barang Persediaan</h2><p class="desc">Layanan ini disiapkan untuk terhubung dengan administrasi persediaan BMN.</p>
       <div class="note">Menu ini belum diaktifkan. Sesuai tahapan pengembangan, tautan ke Spreadsheet administrasi persediaan akan ditambahkan setelah alur dan hak akses admin ditetapkan.</div>
     </section>
+    <section id="borrowing" class="hidden">
+      <h2>Formulir Peminjaman BMN</h2>
+      <p class="desc">Isi formulir peminjaman di bawah ini. Formulir ditampilkan langsung dalam menu Pengelolaan Aset dan Persediaan.</p>
+      <iframe class="loan-frame" src="pengguna.html" title="Formulir Peminjaman BMN" loading="lazy"></iframe>
+    </section>
   </main>
   <div class="footer">Sistem Manajemen Barang Milik Negara · Balai POM di Ende</div>
 </div>
@@ -91,7 +96,7 @@ const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth
 $("tanggal").value=today();$("tanggalPemeliharaan").value=today();
 function message(t,type){const m=$("message");m.textContent=t;m.className="msg "+type;m.scrollIntoView({behavior:"smooth",block:"center"});}
 function busy(form,on,label){const b=form.querySelector("button[type=submit]");b.disabled=on;b.textContent=on?"Mengirim data...":label;}
-document.querySelectorAll("button.tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("button.tab").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","stock"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("message").className="msg";}));
+document.querySelectorAll("button.tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("button.tab").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","stock","borrowing"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("message").className="msg";}));
 let refs=null;
 function fill(select,items,placeholder,labelFn){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);(items||[]).forEach(item=>{const o=document.createElement("option");o.value=labelFn?labelFn(item).value:item;o.textContent=labelFn?labelFn(item).label:item;select.appendChild(o);});}
 function updateBarang(){const jenis=$("jenisForm").value;const atk=$("jenisATK").value;const isAtk=jenis==="ATK";$("atkWrap").classList.toggle("hidden",!isAtk);$("jenisATK").required=isAtk;const list=(refs?.daftarBarang||[]).filter(x=>x.jenisForm===jenis&&(!isAtk||x.jenisATK===atk));fill($("namaBarang"),list,isAtk&&!atk?"Pilih jenis ATK terlebih dahulu":"Pilih nama barang",x=>({value:x.namaBarang,label:x.satuan?x.namaBarang+" ("+x.satuan+")":x.namaBarang}));}
