@@ -44,7 +44,7 @@ function setupDatabase() {
       "Tanggal_Pinjam", "Rencana_Kembali", "Status_Pengajuan",
       "Admin_Pemeriksa", "Waktu_Persetujuan", "Waktu_Penyerahan",
       "Kondisi_Saat_Diserahkan", "Tanggal_Dikembalikan",
-      "Kondisi_Saat_Dikembalikan", "Petugas_Penerima", "Catatan"
+      "Kondisi_Saat_Dikembalikan", "Petugas_Penerima", "Catatan", "Foto_Peminjaman_URL"
     ],
 
     Data_Pengguna: [
@@ -1169,6 +1169,11 @@ function ajukanPeminjamanPublik(data) {
     sheet.getRange(1, sheet.getLastColumn() + 1).setValue("NIK");
     headers.push("NIK");
   }
+  if (!headers.includes("Foto_Peminjaman_URL")) {
+    sheet.getRange(1, sheet.getLastColumn() + 1).setValue("Foto_Peminjaman_URL");
+    headers.push("Foto_Peminjaman_URL");
+  }
+  const fotoUrl = simpanDokumentasiPemeliharaan_(data.foto);
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
@@ -1179,7 +1184,7 @@ function ajukanPeminjamanPublik(data) {
       Nama_Peminjam: nama, NIP: nip, Jabatan: jabatan, Instansi: instansi, No_HP: noHp,
       ID_Aset: aset.id, Kode_BMN: aset.kode, Nama_Aset: aset.nama, Keperluan: keperluan,
       Tanggal_Pinjam: tPinjam, Rencana_Kembali: tKembali,
-      Status_Pengajuan: "MENUNGGU PERSETUJUAN", NIK: kategori === "Pegawai Eksternal" ? nik : ""
+      Status_Pengajuan: "MENUNGGU PERSETUJUAN", NIK: kategori === "Pegawai Eksternal" ? nik : "", Foto_Peminjaman_URL: fotoUrl
     };
     sheet.appendRow(headers.map(h => Object.prototype.hasOwnProperty.call(record, h) ? record[h] : ""));
     return { berhasil: true, pesan: "Pengajuan peminjaman berhasil dikirim.", id: idPengajuan };
