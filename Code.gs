@@ -532,6 +532,12 @@ function doPost(e) {
       getDataPenggunaanBarangAdmin: getDataPenggunaanBarangAdmin,
       getDataUsulanATKAdmin: getDataUsulanATKAdmin,
       getDataPemeliharaanAdmin: getDataPemeliharaanAdmin,
+      kirimPemindahanBarang: kirimPemindahanBarang,
+      kirimPelaporanBarangRusak: kirimPelaporanBarangRusak,
+      kirimPelaporanAlatGelasPecah: kirimPelaporanAlatGelasPecah,
+      getDataPemindahanBarangAdmin: getDataPemindahanBarangAdmin,
+      getDataPelaporanBarangRusakAdmin: getDataPelaporanBarangRusakAdmin,
+      getDataPelaporanAlatGelasAdmin: getDataPelaporanAlatGelasAdmin,
       getRingkasanFormPengelolaanAdmin: getRingkasanFormPengelolaanAdmin
     };
 
