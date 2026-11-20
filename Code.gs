@@ -1420,7 +1420,7 @@ function sheetBMN_(nama, header) {
 
 function tanggalISOValidBMN_(v) {
   const s = String(v || "").trim();
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) return false;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
   const d = new Date(s + "T12:00:00");
   return !isNaN(d.getTime()) &&
     Utilities.formatDate(d, Session.getScriptTimeZone(), "yyyy-MM-dd") === s;
