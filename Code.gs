@@ -449,6 +449,26 @@ function logoutAdmin(token) {
    ========================================================= */
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.bmnHealth === "1") {
+    let health = { ok: false, deployment: "BMN-V2", database: false, masterBMN: false };
+    try {
+      const ss = getDatabase();
+      health.database = !!ss;
+      const sh = ss.getSheetByName("Master_BMN");
+      health.masterBMN = !!sh;
+      if (sh) {
+        health.lastRow = sh.getLastRow();
+        health.headers = sh.getLastColumn() ? sh.getRange(1, 1, 1, sh.getLastColumn()).getDisplayValues()[0] : [];
+        const required = ["ID_Aset", "Kode_BMN", "Nama_Aset", "Jenis_BMN", "Status_Aset", "Status_Penggunaan", "Dihapus"];
+        health.missingHeaders = required.filter(h => !health.headers.includes(h));
+      }
+      health.ok = health.database && health.masterBMN && (!health.missingHeaders || health.missingHeaders.length === 0);
+    } catch (err) {
+      health.error = err && err.message ? err.message : String(err);
+    }
+    return ContentService.createTextOutput(JSON.stringify(health)).setMimeType(ContentService.MimeType.JSON);
+  }
+
   const halaman = e && e.parameter ? e.parameter.page : "";
 
   if (halaman === "peminjaman") {
