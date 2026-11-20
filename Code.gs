@@ -88,6 +88,9 @@ function setupDatabase() {
       "Status_Aktif", "Keterangan"
     ],
 
+    Data_Pemindahan_Barang: ["ID_Pemindahan","Waktu_Input","Nama_Penanggung_Jawab_Ruang","NIP","ID_Aset","Nama_Barang_Merk","Jumlah","Kondisi","Ruang_Asal","Ruang_Tujuan","Alasan_Pemindahan","Pernyataan","Status"],
+    Data_Pelaporan_Barang_Rusak: ["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","ID_Aset","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Pernyataan","Status"],
+    Data_Pelaporan_Alat_Gelas_Pecah: ["ID_Pelaporan_Pecah","Waktu_Input","Nama_Pelapor","Tanggal","Nama_Barang","Jumlah_Pecah","Pernyataan","Status"],
     Data_Pemeliharaan_Aset: [
       "ID_Pemeliharaan", "Waktu_Input", "ID_Aset_Pemeliharaan", "Nama_Barang",
       "Tanggal_Pemeliharaan", "Jenis_Pemeliharaan", "Temuan",
