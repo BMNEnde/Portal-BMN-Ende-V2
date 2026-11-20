@@ -1093,10 +1093,14 @@ function ambilAsetTersediaPublik() {
     if (idx[h] === undefined) throw new Error("Kolom " + h + " tidak ditemukan di Master_BMN.");
   });
   return values.slice(1).filter(row => {
-    const deleted = String(row[idx.Dihapus]).toLowerCase();
+    const deleted = String(row[idx.Dihapus] || "").trim().toLowerCase();
+    const statusAset = String(row[idx.Status_Aset] || "").trim().toUpperCase();
+    const statusPenggunaan = String(row[idx.Status_Penggunaan] || "").trim().toUpperCase();
+    // Data lama yang belum memiliki status penggunaan diperlakukan sebagai tersedia,
+    // selama aset aktif dan tidak ditandai telah dihapus.
     return !["true", "ya", "1"].includes(deleted) &&
-      String(row[idx.Status_Aset]).toUpperCase() === "AKTIF" &&
-      String(row[idx.Status_Penggunaan]).toUpperCase() === "TERSEDIA";
+      statusAset === "AKTIF" &&
+      (!statusPenggunaan || statusPenggunaan === "TERSEDIA");
   }).map(row => ({
     id: String(row[idx.ID_Aset] || ""), kode: String(row[idx.Kode_BMN] || ""),
     nama: String(row[idx.Nama_Aset] || ""), jenis: String(row[idx.Jenis_BMN] || "")
