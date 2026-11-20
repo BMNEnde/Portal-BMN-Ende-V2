@@ -941,20 +941,70 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 @media(max-width:420px){.stats-grid{grid-template-columns:1fr}.admin-info{font-size:11px}}
 
 
-    /* Lebar kolom khusus daftar peminjaman */
-    .loan-table{width:100%;min-width:1250px;table-layout:fixed}
+    /* Tata letak tabel peminjaman: jarak kolom, nama, status, dan tombol */
+    .loan-table{
+      width:100%;
+      min-width:1500px;
+      table-layout:fixed;
+      border-collapse:separate;
+      border-spacing:0;
+    }
+    .loan-table th,
+    .loan-table td{
+      padding:15px 17px;
+      vertical-align:middle;
+      line-height:1.45;
+    }
+    .loan-table th{
+      white-space:normal;
+      line-height:1.35;
+      padding-top:16px;
+      padding-bottom:16px;
+    }
     .loan-table th:nth-child(1),.loan-table td:nth-child(1){width:4%}
-    .loan-table th:nth-child(2),.loan-table td:nth-child(2){width:11%}
-    .loan-table th:nth-child(3),.loan-table td:nth-child(3){width:18%;min-width:210px}
+    .loan-table th:nth-child(2),.loan-table td:nth-child(2){width:10%}
+    .loan-table th:nth-child(3),.loan-table td:nth-child(3){width:19%;min-width:250px}
     .loan-table th:nth-child(4),.loan-table td:nth-child(4){width:13%}
     .loan-table th:nth-child(5),.loan-table td:nth-child(5){width:12%}
-    .loan-table th:nth-child(6),.loan-table td:nth-child(6){width:10%}
-    .loan-table th:nth-child(7),.loan-table td:nth-child(7){width:11%}
+    .loan-table th:nth-child(6),.loan-table td:nth-child(6){width:9%}
+    .loan-table th:nth-child(7),.loan-table td:nth-child(7){width:10%}
     .loan-table th:nth-child(8),.loan-table td:nth-child(8){width:12%}
-    .loan-table th:nth-child(9),.loan-table td:nth-child(9){width:9%}
-    .loan-table td:nth-child(3){overflow-wrap:break-word;word-break:normal;line-height:1.45}
-    .loan-table td:nth-child(3) b{display:block;font-size:13px;line-height:1.35;margin-bottom:3px}
-    .loan-table td:nth-child(3) small{display:block;line-height:1.4}
+    .loan-table th:nth-child(9),.loan-table td:nth-child(9){width:11%}
+    .loan-table td:nth-child(3){
+      overflow-wrap:break-word;
+      word-break:normal;
+      line-height:1.5;
+      padding-left:20px;
+      padding-right:20px;
+    }
+    .loan-table td:nth-child(3) b{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.4;
+      margin-bottom:7px;
+    }
+    .loan-table td:nth-child(3) small{
+      display:block;
+      line-height:1.45;
+      color:#718397;
+    }
+    .loan-table td:nth-child(8){white-space:normal}
+    .loan-table td:nth-child(8) .badge{white-space:normal;text-align:center;line-height:1.35}
+    .loan-table td:nth-child(9){white-space:nowrap}
+    .loan-table .action-buttons{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:8px;
+      flex-wrap:nowrap;
+    }
+    .loan-table .action-buttons .btn{
+      flex:0 0 auto;
+      padding:8px 11px;
+      font-size:11px;
+      line-height:1.2;
+    }
 
 </style>
 </head>
