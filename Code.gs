@@ -1493,7 +1493,7 @@ function simpanDokumentasiPemeliharaan_(foto) {
 
 function kirimPemeliharaanAset(data) {
   if (!data || typeof data !== "object") throw new Error("Data formulir tidak valid.");
-  const idAset = String(data.idAset || "").trim();
+  const idAset = String(data.idAsetPemeliharaan || "").trim();
   const tanggal = String(data.tanggalPemeliharaan || "").trim();
   const jenis = String(data.jenisPemeliharaan || "").trim().toUpperCase();
   const temuan = String(data.temuan || "").trim();
