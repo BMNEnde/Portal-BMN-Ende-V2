@@ -1462,7 +1462,7 @@ function simpanDokumentasiPemeliharaan_(foto) {
   if (!foto || typeof foto !== "object") throw new Error("Dokumentasi foto wajib diunggah.");
   const mime = String(foto.mimeType || "").toLowerCase();
   if (!["image/jpeg","image/png","image/webp"].includes(mime)) throw new Error("Foto harus berformat JPG, PNG, atau WEBP.");
-  const base64 = String(foto.base64 || "").replace(/^data:image\\/[a-zA-Z0-9.+-]+;base64,/, "");
+  const base64 = String(foto.base64 || "").replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, "");
   if (!base64 || base64.length > 7 * 1024 * 1024) throw new Error("Ukuran foto terlalu besar. Gunakan foto maksimal sekitar 5 MB.");
   const bytes = Utilities.base64Decode(base64);
   if (bytes.length > 5 * 1024 * 1024) throw new Error("Ukuran foto maksimal 5 MB.");
