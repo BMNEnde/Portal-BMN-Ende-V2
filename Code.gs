@@ -1112,7 +1112,7 @@ function ajukanPeminjamanPublik(data) {
   const jabatan = String(data.jabatan || "").trim();
   const instansi = String(data.instansi || "").trim();
   const noHp = String(data.noHp || "").trim();
-  const idAset = String(data.idAsetPemeliharaan || "").trim();
+  const idAset = String(data.idAset || "").trim();
   const keperluan = String(data.keperluan || "").trim();
   const tanggalPinjam = String(data.tanggalPinjam || "").trim();
   const rencanaKembali = String(data.rencanaKembali || "").trim();
