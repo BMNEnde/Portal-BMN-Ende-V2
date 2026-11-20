@@ -1574,6 +1574,65 @@ function kirimPemeliharaanAset(data) {
   return {berhasil:true,pesan:"Laporan pemeliharaan berhasil dikirim.",id:id,dokumentasi:urlFoto};
 }
 
+
+function asetPilihanFormBMN_(id) {
+  const ref = getReferensiFormPublik();
+  const aset = ref.daftarAset.find(x => x.id === String(id || "").trim());
+  if (!aset) throw new Error("Barang tidak ditemukan pada Master BMN.");
+  return aset;
+}
+
+function kirimPemindahanBarang(data) {
+  if (!data || typeof data !== "object") throw new Error("Data formulir tidak valid.");
+  const nama=String(data.namaPenanggungJawab||"").trim(), nip=String(data.nip||"").trim();
+  const id=String(data.idAset||"").trim(), jumlah=Number(data.jumlah);
+  const kondisi=String(data.kondisi||"").trim().toUpperCase();
+  const asal=String(data.ruangAsal||"").trim(), tujuan=String(data.ruangTujuan||"").trim();
+  const alasan=String(data.alasanPemindahan||"").trim().toUpperCase();
+  const lainnya=String(data.alasanLainnya||"").trim();
+  if(!nama||!nip||!id||!(jumlah>0)||!["BAIK","RUSAK RINGAN","RUSAK BERAT"].includes(kondisi)||!asal||!tujuan||asal===tujuan||!["PENATAAN RUANGAN","KEBUTUHAN OPERASIONAL","LAINNYA"].includes(alasan)||(alasan==="LAINNYA"&&!lainnya)) throw new Error("Mohon lengkapi seluruh data pemindahan dengan benar.");
+  const aset=asetPilihanFormBMN_(id);
+  if(aset.lokasi&&asal!==aset.lokasi) throw new Error("Ruang asal harus sesuai lokasi barang pada Master BMN ("+aset.lokasi+").");
+  const sh=sheetBMN_("Data_Pemindahan_Barang",["ID_Pemindahan","Waktu_Input","Nama_Penanggung_Jawab_Ruang","NIP","ID_Aset","Nama_Barang_Merk","Jumlah","Kondisi","Ruang_Asal","Ruang_Tujuan","Alasan_Pemindahan","Pernyataan","Status"]);
+  const nomor="PDM"+Utilities.formatDate(new Date(),Session.getScriptTimeZone(),"yyyyMMddHHmmss")+Math.floor(100+Math.random()*900);
+  const pernyataan="Dengan ini menyatakan bahwa barang tersebut benar dipindahkan sesuai data di atas dan akan digunakan serta dipelihara dengan penuh tanggung jawab.";
+  sh.appendRow([nomor,new Date(),nama,nip,id,aset.label,jumlah,kondisi,asal,tujuan,alasan==="LAINNYA"?lainnya:alasan,pernyataan,"BARU"]);
+  return {berhasil:true,pesan:"Formulir pemindahan barang berhasil dikirim.",id:nomor};
+}
+
+function kirimPelaporanBarangRusak(data) {
+  if(!data||typeof data!=="object") throw new Error("Data formulir tidak valid.");
+  const tanggal=String(data.tanggal||"").trim(), pelapor=String(data.namaPelapor||"").trim();
+  const id=String(data.idAset||"").trim(), tingkat=String(data.tingkatKerusakan||"").trim().toUpperCase();
+  const detail=String(data.detailKerusakan||"").trim(), lokasi=String(data.lokasiBarang||"").trim();
+  if(!tanggalISOValidBMN_(tanggal)||!pelapor||!id||!["RUSAK RINGAN","RUSAK BERAT"].includes(tingkat)||!detail||!lokasi) throw new Error("Mohon lengkapi seluruh data pelaporan kerusakan.");
+  const aset=asetPilihanFormBMN_(id);
+  if(aset.lokasi&&lokasi!==aset.lokasi) throw new Error("Lokasi barang harus sesuai Master BMN ("+aset.lokasi+").");
+  const foto=simpanDokumentasiPemeliharaan_(data.foto);
+  const sh=sheetBMN_("Data_Pelaporan_Barang_Rusak",["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","ID_Aset","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Pernyataan","Status"]);
+  const nomor="RSK"+Utilities.formatDate(new Date(),Session.getScriptTimeZone(),"yyyyMMddHHmmss")+Math.floor(100+Math.random()*900);
+  const pernyataan="Saya menyatakan bahwa pengaduan ini disampaikan dengan sebenar-benarnya dan dapat dipertanggungjawabkan.";
+  sh.appendRow([nomor,new Date(),new Date(tanggal+"T12:00:00"),pelapor,id,aset.label,tingkat,detail,foto,lokasi,pernyataan,"BARU"]);
+  return {berhasil:true,pesan:"Laporan barang rusak berhasil dikirim.",id:nomor,foto:foto};
+}
+
+function kirimPelaporanAlatGelasPecah(data) {
+  if(!data||typeof data!=="object") throw new Error("Data formulir tidak valid.");
+  const pelapor=String(data.namaPelapor||"").trim(), tanggal=String(data.tanggal||"").trim();
+  const barang=String(data.namaBarang||"").trim(), jumlah=Number(data.jumlahPecah);
+  if(!pelapor||!tanggalISOValidBMN_(tanggal)||!barang||!(jumlah>0)) throw new Error("Mohon lengkapi data pelaporan alat gelas pecah.");
+  if(!getReferensiFormPublik().daftarBarang.some(x=>x.jenisForm==="ALAT GELAS"&&x.namaBarang===barang)) throw new Error("Nama alat gelas tidak ditemukan pada referensi ALAT GELAS.");
+  const sh=sheetBMN_("Data_Pelaporan_Alat_Gelas_Pecah",["ID_Pelaporan_Pecah","Waktu_Input","Nama_Pelapor","Tanggal","Nama_Barang","Jumlah_Pecah","Pernyataan","Status"]);
+  const nomor="GLS"+Utilities.formatDate(new Date(),Session.getScriptTimeZone(),"yyyyMMddHHmmss")+Math.floor(100+Math.random()*900);
+  const pernyataan="Saya bersedia melaporkan setiap kejadian alat gelas yang pecah secara jujur dan bertanggung jawab atas kerusakan yang terjadi akibat penggunaan yang tidak sesuai dengan prosedur.";
+  sh.appendRow([nomor,new Date(),pelapor,new Date(tanggal+"T12:00:00"),barang,jumlah,pernyataan,"BARU"]);
+  return {berhasil:true,pesan:"Laporan alat gelas pecah berhasil dikirim.",id:nomor};
+}
+
+function getDataPemindahanBarangAdmin(token){return dataSheetKeObjekBMN_("Data_Pemindahan_Barang",token);}
+function getDataPelaporanBarangRusakAdmin(token){return dataSheetKeObjekBMN_("Data_Pelaporan_Barang_Rusak",token);}
+function getDataPelaporanAlatGelasAdmin(token){return dataSheetKeObjekBMN_("Data_Pelaporan_Alat_Gelas_Pecah",token);}
+
 function dataSheetKeObjekBMN_(namaSheet, token) {
   wajibAdminBMN_(token);
   const sh = getDatabase().getSheetByName(namaSheet);
