@@ -1496,7 +1496,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
     form.appendChild(input);
     document.body.appendChild(form);
     form.submit();
-    form.remove();
+    window.setTimeout(function(){ if(form.parentNode)form.parentNode.removeChild(form); }, 1500);
   }
 
   function makeRunner(success, failure) {
