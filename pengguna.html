@@ -187,7 +187,7 @@
           <div class="field full"><label for="aset">Pilih Barang yang Dipinjam *</label><select id="aset" required><option value="">Memuat daftar aset...</option></select><div class="hint">Daftar hanya menampilkan aset berstatus aktif dan tersedia.</div></div>
           <div class="field"><label for="tanggalPinjam">Tanggal Peminjaman *</label><input type="date" id="tanggalPinjam" required></div>
           <div class="field"><label for="rencanaKembali">Rencana Pengembalian *</label><input type="date" id="rencanaKembali" required></div>
-          <div class="field full"><label for="keperluan">Keperluan Peminjaman *</label><textarea id="keperluan" required maxlength="1000" placeholder="Jelaskan tujuan penggunaan barang"></textarea></div>
+          <div class="field full"><label for="keperluan">Keperluan Peminjaman *</label><textarea id="keperluan" required maxlength="1000" placeholder="Jelaskan tujuan penggunaan barang"></textarea></div><div class="field full"><label for="fotoPeminjaman">Foto Barang / Kondisi Barang *</label><input id="fotoPeminjaman" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required><div class="hint">Unggah foto barang yang akan dipinjam. JPG, PNG, atau WEBP, maksimal 5 MB.</div></div>
         </div>
         <button type="submit" id="submitButton">Kirim Pengajuan Peminjaman</button>
       </form>
@@ -305,9 +305,7 @@
     }).withFailureHandler(function(err){$('aset').innerHTML='<option value="">Gagal memuat aset</option>';showMessage(err.message||String(err),'error');}).ambilAsetTersediaPublik();
   }
   $('tanggalPinjam').addEventListener('change',function(){$('rencanaKembali').min=this.value;if($('rencanaKembali').value&&$('rencanaKembali').value<this.value)$('rencanaKembali').value=this.value;});
-  $('loanForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    const data={kategori:$('kategori').value,nama:$('nama').value.trim(),nip:$('nip').value.trim(),nik:$('nik').value.trim(),jabatan:$('jabatan').value.trim(),instansi:$('instansi').value.trim(),noHp:$('noHp').value.trim(),idAset:$('aset').value,keperluan:$('keperluan').value.trim(),tanggalPinjam:$('tanggalPinjam').value,rencanaKembali:$('rencanaKembali').value};
+  $('loanForm').addEventListener('submit',async function(e){e.preventDefault();const fotoFile=$('fotoPeminjaman').files[0];if(!fotoFile){showMessage('Foto barang wajib diunggah.','error');return;}if(fotoFile.size>5*1024*1024){showMessage('Ukuran foto maksimal 5 MB.','error');return;}const fotoBase64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=()=>reject(new Error('Foto tidak dapat dibaca.'));reader.readAsDataURL(fotoFile);});const data={kategori:$('kategori').value,nama:$('nama').value.trim(),nip:$('nip').value.trim(),nik:$('nik').value.trim(),jabatan:$('jabatan').value.trim(),instansi:$('instansi').value.trim(),noHp:$('noHp').value.trim(),idAset:$('aset').value,keperluan:$('keperluan').value.trim(),tanggalPinjam:$('tanggalPinjam').value,rencanaKembali:$('rencanaKembali').value,foto:{mimeType:fotoFile.type,base64:fotoBase64}};
     if(data.kategori==='Pegawai Eksternal'&&!/^\d{16}$/.test(data.nik)){showMessage('NIK harus terdiri dari 16 digit.','error');return;}
     if(data.tanggalPinjam<tanggalLokal()){showMessage('Tanggal peminjaman tidak boleh sebelum tanggal pada perangkat saat ini.','error');return;}
     if(data.rencanaKembali<data.tanggalPinjam){showMessage('Rencana pengembalian tidak boleh sebelum tanggal peminjaman.','error');return;}
