@@ -1452,13 +1452,30 @@ function getReferensiFormPublik() {
       }
     });
   }
+  const master = ss.getSheetByName("Master_BMN");
+  const daftarAset = [], daftarLokasi = [];
+  if (master && master.getLastRow() >= 2) {
+    const values = master.getDataRange().getDisplayValues();
+    const h = values[0].map(x => String(x).trim()), ix = {};
+    h.forEach((x,i) => ix[x] = i);
+    values.slice(1).forEach(r => {
+      const id = String(r[ix.ID_Aset] || "").trim();
+      const nama = String(r[ix.Nama_Aset] || "").trim();
+      const lokasi = String(r[ix.Lokasi] || "").trim();
+      const status = String(r[ix.Status_Aset] || "").trim().toUpperCase();
+      const dihapus = String(r[ix.Dihapus] || "").trim().toUpperCase();
+      if (!id || !nama || ["YA","TRUE","1","DIHAPUS"].includes(dihapus)) return;
+      const merk = ix.Merk === undefined ? "" : String(r[ix.Merk] || "").trim();
+      daftarAset.push({id:id,nama:nama,merk:merk,lokasi:lokasi,label:[nama,merk].filter(Boolean).join(" / ")});
+      if (lokasi && !["NONAKTIF","TIDAK AKTIF"].includes(status) && !daftarLokasi.includes(lokasi)) daftarLokasi.push(lokasi);
+    });
+  }
+  const daftarAlatGelas = [...new Set(daftarBarang.filter(x => x.jenisForm === "ALAT GELAS").map(x => x.namaBarang))].sort();
   return {
-    jenisForm: JENIS_FORM_PENGGUNAAN_,
-    jenisATK: jenisATK.sort(),
-    daftarBarang: daftarBarang,
-    daftarPemeliharaan: daftarPemeliharaan,
-    jenisPemeliharaan: ["RUTIN", "PERBAIKAN RINGAN", "DARURAT"],
-    petugasPemeliharaan: PETUGAS_PEMELIHARAAN_
+    jenisForm: JENIS_FORM_PENGGUNAAN_, jenisATK: jenisATK.sort(), daftarBarang: daftarBarang,
+    daftarPemeliharaan: daftarPemeliharaan, daftarAset: daftarAset, daftarLokasi: daftarLokasi.sort(),
+    daftarAlatGelas: daftarAlatGelas,
+    jenisPemeliharaan: ["RUTIN", "PERBAIKAN RINGAN", "DARURAT"], petugasPemeliharaan: PETUGAS_PEMELIHARAAN_
   };
 }
 
