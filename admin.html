@@ -1045,6 +1045,11 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         Laporan
       </div>
 
+      <div class="menu-item" data-page="formulir">
+        <span class="menu-icon">▣</span>
+        Formulir Pengelolaan
+      </div>
+
       <div class="sidebar-bottom">
         <div class="menu-item" id="logoutButton">
           <span class="menu-icon">↪</span>
@@ -1230,6 +1235,16 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         <section id="page-pengembalian" class="hidden">
           <div class="page-heading"><div><h1>Pengembalian</h1><p>Daftar barang yang telah disetujui dan masih dalam masa peminjaman.</p></div><button class="btn btn-light" onclick="muatPengembalian()">↻ Muat Ulang</button></div>
           <div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>No.</th><th>Peminjam</th><th>Barang</th><th>Tanggal Pinjam</th><th>Rencana Kembali</th><th>Keperluan</th><th>Aksi</th></tr></thead><tbody id="returnTableBody"><tr><td colspan="7" class="empty-state">Memuat data...</td></tr></tbody></table></div></div>
+        </section>
+
+        <section id="page-formulir" class="hidden">
+          <div class="page-heading"><div><h1>Formulir Pengelolaan Aset dan Persediaan</h1><p>Daftar pengajuan penggunaan barang, usulan ATK dan operasional, serta pemeliharaan aset.</p></div><button class="btn btn-light" onclick="muatSemuaFormulirAdmin()">↻ Muat Ulang</button></div>
+          <div class="filter-bar" style="display:flex;gap:9px;flex-wrap:wrap;background:#fff;padding:14px;border:1px solid var(--border);border-radius:12px;margin-bottom:16px">
+            <button class="btn btn-primary" data-form-kind="penggunaan" onclick="pilihFormAdmin('penggunaan')">Penggunaan Barang</button>
+            <button class="btn btn-light" data-form-kind="usulan" onclick="pilihFormAdmin('usulan')">Usulan ATK & Operasional</button>
+            <button class="btn btn-light" data-form-kind="pemeliharaan" onclick="pilihFormAdmin('pemeliharaan')">Pemeliharaan Aset</button>
+          </div>
+          <div class="table-wrap"><div class="table-scroll"><table><thead id="formAdminHead"></thead><tbody id="formAdminBody"><tr><td class="empty-state">Memuat data formulir...</td></tr></tbody></table></div><div class="table-footer" id="formAdminCount"></div></div>
         </section>
 
         <section id="page-laporan" class="hidden">
@@ -1751,7 +1766,8 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         "master",
         "peminjaman",
         "pengembalian",
-        "laporan"
+        "laporan",
+        "formulir"
       ];
 
       semuaHalaman.forEach(function(page) {
@@ -1773,7 +1789,8 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         master: "Master BMN",
         peminjaman: "Peminjaman",
         pengembalian: "Pengembalian",
-        laporan: "Laporan"
+        laporan: "Laporan",
+        formulir: "Formulir Pengelolaan"
       };
 
       el("topTitle").textContent = judul[nama] || "BMN";
@@ -1789,6 +1806,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         muatNotifikasiPeminjaman();
       }
       if (nama === "pengembalian") muatPengembalian();
+      if (nama === "formulir") muatSemuaFormulirAdmin();
       if (nama === "laporan") {
         const now = new Date();
         el("reportMonth").value = String(now.getMonth()+1);
@@ -2356,6 +2374,37 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       tampilToast('Menyimpan data pengembalian...');
       google.script.run.withSuccessHandler(function(r){tampilToast((r&&r.pesan)?r.pesan:'Pengembalian berhasil dicatat.');muatPengembalian();muatDashboard();if(typeof muatLaporanBulanan==='function'&&el('reportMonth')&&el('reportYear'))muatLaporanBulanan();}).withFailureHandler(function(e){tampilToast((e&&e.message)?e.message:'Pengembalian gagal disimpan.',true);}).prosesPengembalianPeminjaman(tokenAdmin,id,data.tanggal,data.kondisi,data.petugas.trim(),data.catatan||'');
     }
+    const dataFormAdmin = {penggunaan:[],usulan:[],pemeliharaan:[]};
+    let jenisFormAdminAktif = "penggunaan";
+    const kolomFormAdmin = {
+      penggunaan:["ID_Penggunaan","Waktu_Input","Jenis_Form","Jenis_ATK","Nama_Barang","Nama_Pemakai","Tanggal","Jumlah","Status"],
+      usulan:["ID_Usulan","Waktu_Input","Nama_Pengusul","Nama_Barang","Jumlah","Spesifikasi","Perkiraan_Harga_Satuan","Alasan_Kebutuhan","Status"],
+      pemeliharaan:["ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang","Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan","Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Status"]
+    };
+    function pilihFormAdmin(jenis){
+      jenisFormAdminAktif=jenis;
+      document.querySelectorAll("[data-form-kind]").forEach(b=>{b.classList.toggle("btn-primary",b.dataset.formKind===jenis);b.classList.toggle("btn-light",b.dataset.formKind!==jenis);});
+      tampilkanFormAdmin();
+    }
+    function tampilkanFormAdmin(){
+      const cols=kolomFormAdmin[jenisFormAdminAktif], rows=dataFormAdmin[jenisFormAdminAktif]||[];
+      el("formAdminHead").innerHTML="<tr>"+cols.map(c=>"<th>"+escapeHTML(c.replace(/_/g," "))+"</th>").join("")+"</tr>";
+      if(!rows.length){el("formAdminBody").innerHTML='<tr><td colspan="'+cols.length+'" class="empty-state">Belum ada data formulir yang masuk.</td></tr>';el("formAdminCount").textContent="0 data";return;}
+      el("formAdminBody").innerHTML=rows.map(row=>"<tr>"+cols.map(c=>{
+        const v=row[c];
+        if(c==="Dokumentasi_URL"&&v)return '<td><a href="'+escapeHTML(v)+'" target="_blank" rel="noopener">Lihat Foto</a></td>';
+        return "<td>"+escapeHTML(v==null||v===""?"-":v)+"</td>";
+      }).join("")+"</tr>").join("");
+      el("formAdminCount").textContent="Menampilkan "+rows.length+" data";
+    }
+    function muatSemuaFormulirAdmin(){
+      pilihFormAdmin(jenisFormAdminAktif);
+      [["penggunaan","getDataPenggunaanBarangAdmin"],["usulan","getDataUsulanATKAdmin"],["pemeliharaan","getDataPemeliharaanAdmin"]].forEach(([key,method])=>{
+        google.script.run.withSuccessHandler(rows=>{dataFormAdmin[key]=Array.isArray(rows)?rows:[];if(jenisFormAdminAktif===key)tampilkanFormAdmin();})
+          .withFailureHandler(err=>{if(jenisFormAdminAktif===key)el("formAdminBody").innerHTML='<tr><td class="empty-state">'+escapeHTML(err.message||"Gagal memuat data")+'</td></tr>';tampilToast(err.message||"Gagal memuat data formulir.",true);})[method](tokenAdmin);
+      });
+    }
+
     function muatLaporanBulanan() {
       const bulan=el('reportMonth').value,tahun=el('reportYear').value;
       const body=el('reportTableBody');body.innerHTML='<tr><td colspan="14">Menyiapkan laporan...</td></tr>';
