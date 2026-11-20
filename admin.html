@@ -940,6 +940,22 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 @media(max-width:700px){.sidebar{width:270px}.main{margin-left:0}.topbar{height:66px;padding:0 15px}.content{padding:22px 14px}.page-heading h1{font-size:24px}.stats-grid{grid-template-columns:1fr 1fr;gap:11px}.stat-card{padding:16px;min-height:125px}.stat-card .stat-value{font-size:27px}.login-card{padding:32px 24px}}
 @media(max-width:420px){.stats-grid{grid-template-columns:1fr}.admin-info{font-size:11px}}
 
+
+    /* Lebar kolom khusus daftar peminjaman */
+    .loan-table{width:100%;min-width:1250px;table-layout:fixed}
+    .loan-table th:nth-child(1),.loan-table td:nth-child(1){width:4%}
+    .loan-table th:nth-child(2),.loan-table td:nth-child(2){width:11%}
+    .loan-table th:nth-child(3),.loan-table td:nth-child(3){width:18%;min-width:210px}
+    .loan-table th:nth-child(4),.loan-table td:nth-child(4){width:13%}
+    .loan-table th:nth-child(5),.loan-table td:nth-child(5){width:12%}
+    .loan-table th:nth-child(6),.loan-table td:nth-child(6){width:10%}
+    .loan-table th:nth-child(7),.loan-table td:nth-child(7){width:11%}
+    .loan-table th:nth-child(8),.loan-table td:nth-child(8){width:12%}
+    .loan-table th:nth-child(9),.loan-table td:nth-child(9){width:9%}
+    .loan-table td:nth-child(3){overflow-wrap:break-word;word-break:normal;line-height:1.45}
+    .loan-table td:nth-child(3) b{display:block;font-size:13px;line-height:1.35;margin-bottom:3px}
+    .loan-table td:nth-child(3) small{display:block;line-height:1.4}
+
 </style>
 </head>
 
@@ -1229,7 +1245,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 
         <section id="page-peminjaman" class="hidden">
           <div class="page-heading"><div><h1>Peminjaman & Persetujuan</h1><p>Periksa pengajuan dari formulir publik, lalu setujui atau tolak.</p></div><button class="btn btn-light" onclick="muatPeminjaman()">↻ Muat Ulang</button></div>
-          <div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>No.</th><th>Tanggal Pengajuan</th><th>Peminjam</th><th>Kategori / Identitas</th><th>Barang</th><th>Tanggal Pinjam</th><th>Rencana Kembali</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="loanTableBody"><tr><td colspan="9" class="empty-state">Memuat data...</td></tr></tbody></table></div></div>
+          <div class="table-wrap"><div class="table-scroll"><table class="loan-table"><thead><tr><th>No.</th><th>Tanggal Pengajuan</th><th>Peminjam</th><th>Kategori / Identitas</th><th>Barang</th><th>Tanggal Pinjam</th><th>Rencana Kembali</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="loanTableBody"><tr><td colspan="9" class="empty-state">Memuat data...</td></tr></tbody></table></div></div>
         </section>
 
         <section id="page-pengembalian" class="hidden">
