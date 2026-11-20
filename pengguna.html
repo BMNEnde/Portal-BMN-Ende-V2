@@ -145,7 +145,14 @@
       .header:before{height:36px}
     }
 
+    html.embed-mode body{padding:0;background:#f3f7fa}
+    html.embed-mode .wrap{max-width:none}
+    html.embed-mode .header{display:none}
+    html.embed-mode .card{padding:24px 28px;border-radius:14px;border-top:1px solid #e1eaf0;box-shadow:none}
+    html.embed-mode .footer{display:none}
+    @media(max-width:650px){html.embed-mode .card{padding:20px 15px}}
   </style>
+<script>if(new URLSearchParams(location.search).get("embed")==="1")document.documentElement.classList.add("embed-mode");</script>
 </head>
 <body>
   <main class="wrap">
