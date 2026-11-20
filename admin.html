@@ -1306,6 +1306,9 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
             <button class="btn btn-primary" data-form-kind="penggunaan" onclick="pilihFormAdmin('penggunaan')">Penggunaan Barang</button>
             <button class="btn btn-light" data-form-kind="usulan" onclick="pilihFormAdmin('usulan')">Usulan ATK & Operasional</button>
             <button class="btn btn-light" data-form-kind="pemeliharaan" onclick="pilihFormAdmin('pemeliharaan')">Pemeliharaan Aset</button>
+            <button class="btn btn-light" data-form-kind="pemindahan" onclick="pilihFormAdmin('pemindahan')">Pemindahan Barang</button>
+            <button class="btn btn-light" data-form-kind="rusak" onclick="pilihFormAdmin('rusak')">Barang Rusak</button>
+            <button class="btn btn-light" data-form-kind="pecah" onclick="pilihFormAdmin('pecah')">Alat Gelas Pecah</button>
           </div>
           <div class="table-wrap"><div class="table-scroll"><table><thead id="formAdminHead"></thead><tbody id="formAdminBody"><tr><td class="empty-state">Memuat data formulir...</td></tr></tbody></table></div><div class="table-footer" id="formAdminCount"></div></div>
         </section>
@@ -2437,12 +2440,15 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       tampilToast('Menyimpan data pengembalian...');
       google.script.run.withSuccessHandler(function(r){tampilToast((r&&r.pesan)?r.pesan:'Pengembalian berhasil dicatat.');muatPengembalian();muatDashboard();const bulanEl=el('reportMonth'),tahunEl=el('reportYear');if(typeof muatLaporanBulanan==='function'&&bulanEl&&tahunEl&&/^([1-9]|1[0-2])$/.test(String(bulanEl.value||''))&&/^20[0-9]{2}$/.test(String(tahunEl.value||'')))muatLaporanBulanan();}).withFailureHandler(function(e){tampilToast((e&&e.message)?e.message:'Pengembalian gagal disimpan.',true);}).prosesPengembalianPeminjaman(tokenAdmin,id,data.tanggal,data.kondisi,data.petugas.trim(),data.catatan||'');
     }
-    const dataFormAdmin = {penggunaan:[],usulan:[],pemeliharaan:[]};
+    const dataFormAdmin = {penggunaan:[],usulan:[],pemeliharaan:[],pemindahan:[],rusak:[],pecah:[]};
     let jenisFormAdminAktif = "penggunaan";
     const kolomFormAdmin = {
       penggunaan:["ID_Penggunaan","Waktu_Input","Jenis_Form","Jenis_ATK","Nama_Barang","Nama_Pemakai","Tanggal","Jumlah","Status"],
       usulan:["ID_Usulan","Waktu_Input","Nama_Pengusul","Nama_Barang","Jumlah","Spesifikasi","Perkiraan_Harga_Satuan","Alasan_Kebutuhan","Status"],
-      pemeliharaan:["ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang","Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan","Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Status"]
+      pemeliharaan:["ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang","Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan","Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Status"],
+      pemindahan:["ID_Pemindahan","Waktu_Input","Nama_Penanggung_Jawab_Ruang","NIP","Nama_Barang_Merk","Jumlah","Kondisi","Ruang_Asal","Ruang_Tujuan","Alasan_Pemindahan","Status"],
+      rusak:["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Status"],
+      pecah:["ID_Pelaporan_Pecah","Waktu_Input","Nama_Pelapor","Tanggal","Nama_Barang","Jumlah_Pecah","Status"]
     };
     function pilihFormAdmin(jenis){
       jenisFormAdminAktif=jenis;
@@ -2455,14 +2461,14 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       if(!rows.length){el("formAdminBody").innerHTML='<tr><td colspan="'+cols.length+'" class="empty-state">Belum ada data formulir yang masuk.</td></tr>';el("formAdminCount").textContent="0 data";return;}
       el("formAdminBody").innerHTML=rows.map(row=>"<tr>"+cols.map(c=>{
         const v=row[c];
-        if(c==="Dokumentasi_URL"&&v)return '<td><a href="'+escapeHTML(v)+'" target="_blank" rel="noopener">Lihat Foto</a></td>';
+        if(["Dokumentasi_URL","Foto_URL","Foto_Peminjaman_URL"].includes(c)&&v)return '<td><a href="'+escapeHTML(v)+'" target="_blank" rel="noopener"><img src="'+escapeHTML(v)+'" alt="Foto dokumentasi" style="width:76px;height:58px;object-fit:cover;border-radius:7px;display:block;margin-bottom:5px">Lihat Foto</a></td>';
         return "<td>"+escapeHTML(v==null||v===""?"-":v)+"</td>";
       }).join("")+"</tr>").join("");
       el("formAdminCount").textContent="Menampilkan "+rows.length+" data";
     }
     function muatSemuaFormulirAdmin(){
       pilihFormAdmin(jenisFormAdminAktif);
-      [["penggunaan","getDataPenggunaanBarangAdmin"],["usulan","getDataUsulanATKAdmin"],["pemeliharaan","getDataPemeliharaanAdmin"]].forEach(([key,method])=>{
+      [["penggunaan","getDataPenggunaanBarangAdmin"],["usulan","getDataUsulanATKAdmin"],["pemeliharaan","getDataPemeliharaanAdmin"],["pemindahan","getDataPemindahanBarangAdmin"],["rusak","getDataPelaporanBarangRusakAdmin"],["pecah","getDataPelaporanAlatGelasAdmin"]].forEach(([key,method])=>{
         google.script.run.withSuccessHandler(rows=>{dataFormAdmin[key]=Array.isArray(rows)?rows:[];if(jenisFormAdminAktif===key)tampilkanFormAdmin();})
           .withFailureHandler(err=>{if(jenisFormAdminAktif===key)el("formAdminBody").innerHTML='<tr><td class="empty-state">'+escapeHTML(err.message||"Gagal memuat data")+'</td></tr>';tampilToast(err.message||"Gagal memuat data formulir.",true);})[method](tokenAdmin);
       });
