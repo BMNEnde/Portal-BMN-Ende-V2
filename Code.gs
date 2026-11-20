@@ -82,8 +82,14 @@ function setupDatabase() {
       "Alasan_Kebutuhan", "Pernyataan", "Status"
     ],
 
+    Master_Pemeliharaan: [
+      "ID_Aset_Pemeliharaan", "Nama_Barang", "Kategori", "Merk",
+      "Tipe_Model", "Nomor_Seri", "Lokasi", "Kondisi",
+      "Status_Aktif", "Keterangan"
+    ],
+
     Data_Pemeliharaan_Aset: [
-      "ID_Pemeliharaan", "Waktu_Input", "ID_Aset", "Nama_Barang",
+      "ID_Pemeliharaan", "Waktu_Input", "ID_Aset_Pemeliharaan", "Nama_Barang",
       "Tanggal_Pemeliharaan", "Jenis_Pemeliharaan", "Temuan",
       "Hasil_Pemeliharaan", "Petugas_Pemeliharaan",
       "Dokumentasi_URL", "Pernyataan", "Status"
@@ -1096,7 +1102,7 @@ function ajukanPeminjamanPublik(data) {
   const jabatan = String(data.jabatan || "").trim();
   const instansi = String(data.instansi || "").trim();
   const noHp = String(data.noHp || "").trim();
-  const idAset = String(data.idAset || "").trim();
+  const idAset = String(data.idAsetPemeliharaan || "").trim();
   const keperluan = String(data.keperluan || "").trim();
   const tanggalPinjam = String(data.tanggalPinjam || "").trim();
   const rencanaKembali = String(data.rencanaKembali || "").trim();
@@ -1387,18 +1393,22 @@ function getReferensiFormPublik() {
     });
   }
 
-  const asetSh = ss.getSheetByName("Master_BMN");
-  const daftarAset = [];
+  const asetSh = ss.getSheetByName("Master_Pemeliharaan");
+  const daftarPemeliharaan = [];
   if (asetSh && asetSh.getLastRow() >= 2) {
-    const v = asetSh.getDataRange().getValues();
-    const h = v[0].map(String), ix = {};
-    h.forEach((x,i)=>ix[x]=i);
+    const v = asetSh.getDataRange().getDisplayValues();
+    const h = v[0].map(x => String(x).trim());
+    const ix = {};
+    h.forEach((x,i) => ix[x] = i);
+    const idxId = ix.ID_Aset_Pemeliharaan;
+    const idxNama = ix.Nama_Barang;
+    const idxAktif = ix.Status_Aktif;
     v.slice(1).forEach(r => {
-      const nama = String(r[ix.Nama_Aset] || "").trim();
-      const status = String(r[ix.Status_Aset] || "").toUpperCase();
-      const hapus = String(r[ix.Dihapus] || "").toLowerCase();
-      if (nama && status === "AKTIF" && !["true","ya","1"].includes(hapus)) {
-        daftarAset.push({ id: String(r[ix.ID_Aset] || ""), nama: nama });
+      const id = idxId === undefined ? "" : String(r[idxId] || "").trim();
+      const nama = idxNama === undefined ? "" : String(r[idxNama] || "").trim();
+      const status = idxAktif === undefined ? "AKTIF" : String(r[idxAktif] || "").trim().toUpperCase();
+      if (id && nama && (!status || ["AKTIF","YA","TRUE","1"].includes(status))) {
+        daftarPemeliharaan.push({ id: id, nama: nama });
       }
     });
   }
@@ -1406,7 +1416,7 @@ function getReferensiFormPublik() {
     jenisForm: JENIS_FORM_PENGGUNAAN_,
     jenisATK: jenisATK.sort(),
     daftarBarang: daftarBarang,
-    daftarAset: daftarAset,
+    daftarPemeliharaan: daftarPemeliharaan,
     jenisPemeliharaan: ["RUTIN", "PERBAIKAN RINGAN", "DARURAT"],
     petugasPemeliharaan: PETUGAS_PEMELIHARAAN_
   };
@@ -1494,11 +1504,11 @@ function kirimPemeliharaanAset(data) {
       !temuan || !hasil || !PETUGAS_PEMELIHARAAN_.includes(petugas)) {
     throw new Error("Mohon lengkapi seluruh data pemeliharaan dengan benar.");
   }
-  const aset = getReferensiFormPublik().daftarAset.find(x => x.id === idAset);
+  const aset = getReferensiFormPublik().daftarPemeliharaan.find(x => x.id === idAset);
   if (!aset) throw new Error("Aset tidak ditemukan atau tidak aktif.");
   const urlFoto = simpanDokumentasiPemeliharaan_(data.dokumentasi);
   const sh = sheetBMN_("Data_Pemeliharaan_Aset", [
-    "ID_Pemeliharaan","Waktu_Input","ID_Aset","Nama_Barang",
+    "ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang",
     "Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan",
     "Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Pernyataan","Status"
   ]);
