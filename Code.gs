@@ -1342,8 +1342,11 @@ function prosesPengembalianPeminjaman(token, idPeminjaman, tanggalKembali, kondi
 
 function getLaporanPeminjamanBulanan(token, bulan, tahun) {
   wajibAdminBMN_(token);
-  const b = Number(bulan), y = Number(tahun);
-  if (!(b>=1 && b<=12 && y>=2000)) throw new Error('Periode laporan tidak valid.');
+  const b = Number(String(bulan == null ? "" : bulan).trim());
+  const y = Number(String(tahun == null ? "" : tahun).trim());
+  if (!Number.isInteger(b) || b < 1 || b > 12 || !Number.isInteger(y) || y < 2000 || y > 2100) {
+    throw new Error('Periode laporan tidak valid. Pilih bulan dan isi tahun antara 2000–2100.');
+  }
   const semua = getDaftarPeminjamanAdmin(token);
   const rows = semua.filter(r => {
     if (!r.tanggalPinjam) return false;
