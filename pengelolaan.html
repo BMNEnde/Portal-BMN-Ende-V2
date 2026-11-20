@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<base target="_top"><title>Formulir Pengelolaan BMN | Balai POM di Ende</title>
+<link rel="icon" type="image/png" href="logo-bmn.png.png">
+<style>
+:root{--navy:#173b5e;--navy2:#102d49;--blue:#2563eb;--bg:#f3f6fa;--text:#1e293b;--muted:#64748b;--line:#dbe3ed;--green:#15803d}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}body{margin:0;background:linear-gradient(180deg,#eaf1f8 0,#f5f7fb 320px);color:var(--text);padding:26px 15px}.wrap{max-width:920px;margin:auto}
+.top{display:flex;align-items:center;gap:14px;margin:0 0 18px}.top img{width:55px;height:55px;object-fit:contain;background:#fff;border-radius:13px;padding:5px}.top a{color:var(--navy);text-decoration:none;font-weight:700;font-size:13px}
+.hero{background:linear-gradient(130deg,var(--navy2),#28618d);color:#fff;padding:27px 30px;border-radius:18px 18px 0 0;box-shadow:0 12px 28px #102d4920}.eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#c9deef;font-weight:bold}.hero h1{font-size:25px;margin:8px 0}.hero p{margin:0;color:#e4edf5;line-height:1.55;font-size:14px}
+.card{background:#fff;padding:25px 30px 30px;border-radius:0 0 18px 18px;box-shadow:0 12px 28px #102d4912;border:1px solid #e5ebf2}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:24px}.tab{border:1px solid var(--line);background:#f8fafc;color:var(--navy);padding:12px 9px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;line-height:1.35}.tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:var(--muted);margin:0 0 20px;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.field{margin-bottom:16px}.full{grid-column:1/-1}label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:12px;background:#fff;color:var(--text);font-size:14px;outline:none}textarea{min-height:95px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2563eb16}.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+.statement{display:flex;align-items:flex-start;gap:10px;padding:14px;background:#f1f6fb;border:1px solid #dce8f3;border-radius:10px;margin:5px 0 18px;font-size:12px;line-height:1.55}.statement input{width:17px;height:17px;margin-top:1px;flex:none}
+.submit{width:100%;border:0;border-radius:10px;padding:14px;background:var(--navy);color:#fff;font-weight:bold;font-size:14px;cursor:pointer}.submit:disabled{opacity:.6;cursor:wait}
+.msg{display:none;padding:13px;border-radius:9px;margin-bottom:16px;font-size:13px;line-height:1.5}.msg.ok{display:block;background:#ecfdf3;color:#166534}.msg.err{display:block;background:#fef2f2;color:#991b1b}
+.note{background:#fff8e8;color:#8a5a00;border:1px solid #f4dfad;padding:12px 14px;border-radius:9px;font-size:12px;line-height:1.5;margin:0 0 18px}.hidden{display:none!important}.footer{text-align:center;color:var(--muted);font-size:11px;margin:18px}
+@media(max-width:650px){body{padding:14px 10px}.hero,.card{padding:22px 18px}.tabs{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.hero h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><img src="logo-bmn.png.png" alt="Logo BMN"><a href="index.html">← Kembali ke Portal Layanan BMN</a></div>
+  <header class="hero"><div class="eyebrow">Balai POM di Ende · Layanan Internal</div><h1>Formulir Pengelolaan BMN</h1><p>Gunakan layanan berikut untuk pencatatan penggunaan barang, pengusulan kebutuhan operasional, dan pemeliharaan aset.</p></header>
+  <main class="card">
+    <div class="tabs">
+      <button class="tab active" data-tab="usage" type="button">Penggunaan Barang</button>
+      <button class="tab" data-tab="proposal" type="button">Usulan ATK & Operasional</button>
+      <button class="tab" data-tab="maintenance" type="button">Pemeliharaan Aset</button>
+      <button class="tab" data-tab="stock" type="button">Kartu Stok / SPB / SBBK</button>
+    </div>
+    <div id="message" class="msg"></div>
+    <section id="usage">
+      <h2>Formulir Penggunaan Barang</h2><p class="desc">Pilih jenis barang yang digunakan. Daftar nama barang diambil dari referensi database BMN.</p>
+      <form id="usageForm"><div class="grid">
+        <div class="field full"><label for="jenisForm">Jenis Formulir *</label><select id="jenisForm" required><option value="">Memuat jenis formulir...</option></select></div>
+        <div class="field hidden" id="atkWrap"><label for="jenisATK">Jenis ATK *</label><select id="jenisATK"><option value="">Pilih jenis ATK</option></select></div>
+        <div class="field full"><label for="namaBarang">Nama Barang *</label><select id="namaBarang" required><option value="">Pilih jenis formulir terlebih dahulu</option></select></div>
+        <div class="field"><label for="namaPemakai">Nama Pemakai *</label><input id="namaPemakai" required maxlength="150" placeholder="Masukkan nama lengkap"></div>
+        <div class="field"><label for="tanggal">Tanggal *</label><input id="tanggal" type="date" required></div>
+        <div class="field"><label for="jumlah">Jumlah *</label><input id="jumlah" type="number" min="0.01" step="any" required placeholder="Masukkan jumlah"></div>
+      </div><label class="statement"><input id="pernyataanPenggunaan" type="checkbox" required><span>Saya bersedia menggunakan barang tersebut sesuai dengan kebutuhan dan ketentuan, mencatat setiap pemakaian dengan benar, serta bertanggung jawab atas penggunaan yang tidak sesuai prosedur.</span></label>
+      <button class="submit" type="submit">Kirim Formulir Penggunaan</button></form>
+    </section>
+    <section id="proposal" class="hidden">
+      <h2>Formulir Usulan ATK dan Operasional</h2><p class="desc">Sampaikan kebutuhan barang beserta spesifikasi dan alasan pengadaan.</p>
+      <form id="proposalForm"><div class="grid">
+        <div class="field"><label for="namaPengusul">Nama Pengusul *</label><input id="namaPengusul" required maxlength="150"></div>
+        <div class="field"><label for="barangUsulan">Nama Barang *</label><input id="barangUsulan" required maxlength="200"></div>
+        <div class="field"><label for="jumlahUsulan">Jumlah *</label><input id="jumlahUsulan" type="number" min="0.01" step="any" required></div>
+        <div class="field"><label for="harga">Perkiraan Harga Satuan (Rp) *</label><input id="harga" type="number" min="0" step="1" required></div>
+        <div class="field full"><label for="spesifikasi">Spesifikasi *</label><textarea id="spesifikasi" required placeholder="Tuliskan ukuran, merek/tipe, bahan, atau spesifikasi lain yang diperlukan"></textarea></div>
+        <div class="field full"><label for="alasan">Alasan Kebutuhan Pengadaan *</label><textarea id="alasan" required></textarea></div>
+      </div><label class="statement"><input id="pernyataanUsulan" type="checkbox" required><span>Saya menyatakan bahwa usulan pengadaan ini disampaikan dengan sebenar-benarnya dan dapat dipertanggungjawabkan.</span></label>
+      <button class="submit" type="submit">Kirim Usulan Pengadaan</button></form>
+    </section>
+    <section id="maintenance" class="hidden">
+      <h2>Formulir Pemeliharaan Aset</h2><p class="desc">Catat kegiatan pemeliharaan aset dan unggah dokumentasi foto kondisi atau pekerjaan pemeliharaan.</p>
+      <form id="maintenanceForm"><div class="grid">
+        <div class="field full"><label for="aset">Nama Barang / Aset *</label><select id="aset" required><option value="">Memuat daftar aset...</option></select></div>
+        <div class="field"><label for="tanggalPemeliharaan">Tanggal Pemeliharaan *</label><input id="tanggalPemeliharaan" type="date" required></div>
+        <div class="field"><label for="jenisPemeliharaan">Jenis Pemeliharaan *</label><select id="jenisPemeliharaan" required><option value="">Pilih jenis</option><option>RUTIN</option><option>PERBAIKAN RINGAN</option><option>DARURAT</option></select></div>
+        <div class="field full"><label for="temuan">Temuan *</label><textarea id="temuan" required placeholder="Jelaskan kondisi atau masalah yang ditemukan"></textarea></div>
+        <div class="field full"><label for="hasilPemeliharaan">Hasil Pemeliharaan *</label><textarea id="hasilPemeliharaan" required placeholder="Jelaskan tindakan dan hasil pemeliharaan"></textarea></div>
+        <div class="field"><label for="petugas">Petugas *</label><select id="petugas" required><option value="">Pilih petugas</option><option>Anwar</option><option>Syaiful Abdul Gani</option><option>Viktorimus Sesarius Porkas</option><option>Teknisi</option></select></div>
+        <div class="field"><label for="foto">Dokumentasi Foto *</label><input id="foto" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required><div class="hint">Format JPG, PNG, atau WEBP. Maksimal 5 MB.</div></div>
+      </div><label class="statement"><input id="pernyataanPemeliharaan" type="checkbox" required><span>Saya bersedia menjaga dan memelihara aset yang menjadi tanggung jawab saya dengan melakukan pemeliharaan sesuai ketentuan serta melaporkan apabila terjadi kerusakan.</span></label>
+      <button class="submit" type="submit">Kirim Laporan Pemeliharaan</button></form>
+    </section>
+    <section id="stock" class="hidden">
+      <h2>Kartu Stok, SPB, SBBK & Pemakaian Barang Persediaan</h2><p class="desc">Layanan ini disiapkan untuk terhubung dengan administrasi persediaan BMN.</p>
+      <div class="note">Menu ini belum diaktifkan. Sesuai tahapan pengembangan, tautan ke Spreadsheet administrasi persediaan akan ditambahkan setelah alur dan hak akses admin ditetapkan.</div>
+    </section>
+  </main>
+  <div class="footer">Sistem Manajemen Barang Milik Negara · Balai POM di Ende</div>
+</div>
+<script>
+(function(){
+"use strict";
+const API_URL="https://script.google.com/macros/s/AKfycbxByexTJ4g5MB5chpm9CAnR4YJeq72tDIpvdIX6oGBteKEWTkvdL525Te9yYtz_FTzV/exec";
+const pending=Object.create(null);let sequence=0;
+function clean(id){const p=pending[id];if(!p)return;clearTimeout(p.timer);if(p.frame&&p.frame.parentNode)p.frame.parentNode.removeChild(p.frame);delete pending[id];}
+window.addEventListener("message",function(event){const m=event.data;if(!m||m.__bmnApiResponse!==true||typeof m.id!=="string")return;const p=pending[m.id];if(!p)return;clean(m.id);if(m.ok){if(p.success)p.success(m.result);}else{const e=new Error(m.error||"Permintaan ke server BMN gagal.");if(p.failure)p.failure(e);else console.error(e);}});
+function send(method,args,success,failure){const id="bmn_"+Date.now()+"_"+(++sequence)+"_"+Math.random().toString(36).slice(2);const frame=document.createElement("iframe");frame.name="bmn_api_frame_"+id;frame.setAttribute("aria-hidden","true");frame.style.cssText="position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px";pending[id]={success,failure,frame,timer:setTimeout(function(){const p=pending[id];if(!p)return;clean(id);if(p.failure)p.failure(new Error("Server belum memberikan jawaban. Periksa koneksi dan deployment Web App."));},45000)};document.body.appendChild(frame);const form=document.createElement("form");form.method="POST";form.action=API_URL;form.target=frame.name;form.style.display="none";const input=document.createElement("textarea");input.name="bmnApi";input.value=JSON.stringify({id,method,args});form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();}
+function runner(success,failure){return new Proxy({}, {get(_t,prop){if(prop==="withSuccessHandler")return cb=>runner(cb,failure);if(prop==="withFailureHandler")return cb=>runner(success,cb);if(prop==="withUserObject")return ()=>runner(success,failure);if(typeof prop!=="string"||prop==="then")return undefined;return(...args)=>send(prop,args,success,failure);}});}
+window.google=window.google||{};window.google.script=window.google.script||{};window.google.script.run=runner(null,null);
+const $=id=>document.getElementById(id);
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+$("tanggal").value=today();$("tanggalPemeliharaan").value=today();
+function message(t,type){const m=$("message");m.textContent=t;m.className="msg "+type;m.scrollIntoView({behavior:"smooth",block:"center"});}
+function busy(form,on,label){const b=form.querySelector("button[type=submit]");b.disabled=on;b.textContent=on?"Mengirim data...":label;}
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","stock"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("message").className="msg";}));
+let refs=null;
+function fill(select,items,placeholder,labelFn){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);(items||[]).forEach(item=>{const o=document.createElement("option");o.value=labelFn?labelFn(item).value:item;o.textContent=labelFn?labelFn(item).label:item;select.appendChild(o);});}
+function updateBarang(){const jenis=$("jenisForm").value;const atk=$("jenisATK").value;const isAtk=jenis==="ATK";$("atkWrap").classList.toggle("hidden",!isAtk);$("jenisATK").required=isAtk;const list=(refs?.daftarBarang||[]).filter(x=>x.jenisForm===jenis&&(!isAtk||x.jenisATK===atk));fill($("namaBarang"),list,isAtk&&!atk?"Pilih jenis ATK terlebih dahulu":"Pilih nama barang",x=>({value:x.namaBarang,label:x.satuan?x.namaBarang+" ("+x.satuan+")":x.namaBarang}));}
+function loadReferences(){google.script.run.withSuccessHandler(function(data){refs=data||{};fill($("jenisForm"),refs.jenisForm||[],"Pilih jenis formulir");fill($("jenisATK"),refs.jenisATK||[],"Pilih jenis ATK");fill($("aset"),refs.daftarAset||[],"Pilih aset",x=>({value:x.id,label:x.nama}));updateBarang();if(!(refs.daftarBarang||[]).length)message("Daftar referensi barang masih kosong. Admin perlu mengisi sheet Referensi_Barang sebelum formulir penggunaan dapat dikirim.","err");if(!(refs.daftarAset||[]).length)$("aset").innerHTML='<option value="">Belum ada aset aktif yang dapat dipilih</option>';}).withFailureHandler(e=>message("Gagal memuat referensi: "+(e.message||e),"err")).getReferensiFormPublik();}
+$("jenisForm").addEventListener("change",updateBarang);$("jenisATK").addEventListener("change",updateBarang);
+$("usageForm").addEventListener("submit",function(e){e.preventDefault();const data={jenisForm:$("jenisForm").value,jenisATK:$("jenisATK").value,namaBarang:$("namaBarang").value,namaPemakai:$("namaPemakai").value.trim(),tanggal:$("tanggal").value,jumlah:$("jumlah").value};busy(this,true,"");google.script.run.withSuccessHandler(r=>{busy($("usageForm"),false,"Kirim Formulir Penggunaan");$("usageForm").reset();$("tanggal").value=today();updateBarang();message((r.pesan||"Berhasil disimpan.")+" Nomor: "+r.id,"ok");}).withFailureHandler(err=>{busy($("usageForm"),false,"Kirim Formulir Penggunaan");message(err.message||String(err),"err");}).kirimPenggunaanBarang(data);});
+$("proposalForm").addEventListener("submit",function(e){e.preventDefault();const data={namaPengusul:$("namaPengusul").value.trim(),namaBarang:$("barangUsulan").value.trim(),jumlah:$("jumlahUsulan").value,spesifikasi:$("spesifikasi").value.trim(),perkiraanHargaSatuan:$("harga").value,alasanKebutuhan:$("alasan").value.trim()};busy(this,true,"");google.script.run.withSuccessHandler(r=>{busy($("proposalForm"),false,"Kirim Usulan Pengadaan");$("proposalForm").reset();message((r.pesan||"Usulan berhasil disimpan.")+" Nomor: "+r.id,"ok");}).withFailureHandler(err=>{busy($("proposalForm"),false,"Kirim Usulan Pengadaan");message(err.message||String(err),"err");}).kirimUsulanATKOperasional(data);});
+function fileToBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]);reader.onerror=()=>reject(new Error("Foto tidak dapat dibaca."));reader.readAsDataURL(file);});}
+$("maintenanceForm").addEventListener("submit",async function(e){e.preventDefault();const file=$("foto").files[0];if(!file){message("Silakan pilih foto dokumentasi.","err");return;}if(file.size>5*1024*1024){message("Ukuran foto melebihi 5 MB. Silakan pilih foto yang lebih kecil.","err");return;}busy(this,true,"");try{const base64=await fileToBase64(file);const data={idAset:$("aset").value,tanggalPemeliharaan:$("tanggalPemeliharaan").value,jenisPemeliharaan:$("jenisPemeliharaan").value,temuan:$("temuan").value.trim(),hasilPemeliharaan:$("hasilPemeliharaan").value.trim(),petugas:$("petugas").value,foto:{mimeType:file.type,base64:base64}};google.script.run.withSuccessHandler(r=>{busy($("maintenanceForm"),false,"Kirim Laporan Pemeliharaan");$("maintenanceForm").reset();$("tanggalPemeliharaan").value=today();loadReferences();message((r.pesan||"Laporan berhasil disimpan.")+" Nomor: "+r.id,"ok");}).withFailureHandler(err=>{busy($("maintenanceForm"),false,"Kirim Laporan Pemeliharaan");message(err.message||String(err),"err");}).kirimPemeliharaanAset(data);}catch(err){busy($("maintenanceForm"),false,"Kirim Laporan Pemeliharaan");message(err.message||String(err),"err");}});
+loadReferences();
+})();
+</script>
+</body></html>
