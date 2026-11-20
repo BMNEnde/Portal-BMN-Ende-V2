@@ -261,7 +261,8 @@
     form.appendChild(input);
     document.body.appendChild(form);
     form.submit();
-    form.remove();
+    // Pertahankan form sebentar agar browser sempat memulai POST ke iframe.
+    window.setTimeout(function(){ if(form.parentNode) form.parentNode.removeChild(form); }, 1500);
   }
 
   function makeRunner(success, failure) {
