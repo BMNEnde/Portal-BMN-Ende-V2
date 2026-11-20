@@ -118,6 +118,16 @@ function setupDatabase() {
     }
   });
 
+  // Migrasi aman: perbarui nama kolom ID pada data pemeliharaan lama
+  // tanpa menghapus atau mengubah isi data yang sudah tersimpan.
+  const dataPemeliharaanLama = ss.getSheetByName("Data_Pemeliharaan_Aset");
+  if (dataPemeliharaanLama && dataPemeliharaanLama.getLastColumn() >= 3) {
+    const headerId = String(dataPemeliharaanLama.getRange(1, 3).getDisplayValue() || "").trim();
+    if (headerId === "ID_Aset") {
+      dataPemeliharaanLama.getRange(1, 3).setValue("ID_Aset_Pemeliharaan");
+    }
+  }
+
   const ref = ss.getSheetByName("Referensi");
 
   if (ref.getLastRow() === 1) {
