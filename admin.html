@@ -1003,6 +1003,20 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       .loan-table .action-buttons{flex-wrap:wrap}
     }
 
+
+    /* Pratinjau foto dokumentasi pada dashboard admin */
+    .bmn-photo-thumb{display:inline-flex;align-items:center;justify-content:center;padding:3px;border:1px solid #d8e4ec;border-radius:10px;background:#fff;cursor:zoom-in;transition:transform .18s,box-shadow .18s}
+    .bmn-photo-thumb:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(16,48,72,.18)}
+    .bmn-photo-thumb img{display:block;width:76px;height:60px;object-fit:cover;border-radius:7px}
+    .bmn-photo-cell{min-width:92px;text-align:center}
+    .bmn-photo-empty{color:#9aa9b5}
+    .bmn-photo-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(5,18,30,.82);backdrop-filter:blur(5px)}
+    .bmn-photo-modal[hidden]{display:none}
+    .bmn-photo-dialog{position:relative;max-width:min(100%,1000px);max-height:92vh;padding:12px;background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+    .bmn-photo-dialog img{display:block;max-width: min( min(88vw, 960px), 100%);max-height:78vh;object-fit:contain;border-radius:9px}
+    .bmn-photo-caption{padding:10px 42px 2px 4px;color:#40566a;font-size:13px;font-weight:650}
+    .bmn-photo-close{position:absolute;right:10px;top:10px;width:34px;height:34px;border:0;border-radius:50%;background:#edf2f6;color:#183b56;font-size:22px;line-height:1;cursor:pointer}
+    @media(max-width:650px){.bmn-photo-modal{padding:10px}.bmn-photo-dialog{padding:8px}.bmn-photo-dialog img{max-width:88vw;max-height:76vh}}
 </style>
 </head>
 
@@ -2408,7 +2422,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
           const ident=r.kategori==='Pegawai Eksternal'?'NIK: '+(r.nik||'-')+' / NIP: '+(r.nip||'-'):'NIP: '+(r.nip||'-');
           let aksi='-';
           if(r.status==='MENUNGGU PERSETUJUAN') aksi='<div class="action-buttons"><button class="btn btn-success" onclick="setujuiPengajuan(\''+teksAman(r.id)+'\')">Setujui</button><button class="btn btn-danger" onclick="tolakPengajuan(\''+teksAman(r.id)+'\')">Tolak</button></div>';
-          return '<tr><td>'+(i+1)+'</td><td>'+teksAman(formatTanggal(r.tanggalPengajuan))+'</td><td><b>'+teksAman(r.nama)+'</b><br><small>'+teksAman(r.instansi)+'</small></td><td>'+teksAman(r.kategori)+'<br><small>'+teksAman(ident)+'</small></td><td>'+teksAman(r.namaAset)+'<br><small>'+teksAman(r.kode)+'</small>'+(r.fotoPeminjaman?'<br><a href="'+teksAman(r.fotoPeminjaman)+'" target="_blank" rel="noopener">Lihat Foto Barang</a>':'')+'</td><td>'+teksAman(formatTanggal(r.tanggalPinjam))+'</td><td>'+teksAman(formatTanggal(r.rencanaKembali))+'</td><td>'+statusBadge(r.status)+'</td><td>'+aksi+'</td></tr>';
+          return '<tr><td>'+(i+1)+'</td><td>'+teksAman(formatTanggal(r.tanggalPengajuan))+'</td><td><b>'+teksAman(r.nama)+'</b><br><small>'+teksAman(r.instansi)+'</small></td><td>'+teksAman(r.kategori)+'<br><small>'+teksAman(ident)+'</small></td><td>'+teksAman(r.namaAset)+'<br><small>'+teksAman(r.kode)+'</small>'+'<br><div class="bmn-photo-cell">'+buatThumbnailFotoAdmin(r.fotoPeminjaman,'Foto barang peminjaman')+'</div>'+'</td><td>'+teksAman(formatTanggal(r.tanggalPinjam))+'</td><td>'+teksAman(formatTanggal(r.rencanaKembali))+'</td><td>'+statusBadge(r.status)+'</td><td>'+aksi+'</td></tr>';
         }).join('');
       }).withFailureHandler(function(e){body.innerHTML='<tr><td colspan="9">'+teksAman(e.message)+'</td></tr>';tampilToast(e.message,true);}).getDaftarPeminjamanAdmin(tokenAdmin);
     }
@@ -2428,7 +2442,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const body=el('returnTableBody');body.innerHTML='<tr><td colspan="7">Memuat data...</td></tr>';
       google.script.run.withSuccessHandler(function(rows){
         if(!rows||!rows.length){body.innerHTML='<tr><td colspan="7" class="empty-state">Tidak ada barang yang sedang dipinjam.</td></tr>';return;}
-        body.innerHTML=rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td><b>'+teksAman(r.nama)+'</b><br><small>'+teksAman(r.instansi)+'</small></td><td>'+teksAman(r.namaAset)+'<br><small>'+teksAman(r.kode)+'</small>'+(r.fotoPeminjaman?'<br><a href="'+teksAman(r.fotoPeminjaman)+'" target="_blank" rel="noopener">Lihat Foto Barang</a>':'')+'</td><td>'+teksAman(formatTanggal(r.tanggalPinjam))+'</td><td>'+teksAman(formatTanggal(r.rencanaKembali))+'</td><td>'+teksAman(r.keperluan)+'</td><td><button class="btn btn-success" onclick="catatPengembalian(\''+teksAman(r.id)+'\')">Catat Pengembalian</button></td></tr>';}).join('');
+        body.innerHTML=rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td><b>'+teksAman(r.nama)+'</b><br><small>'+teksAman(r.instansi)+'</small></td><td>'+teksAman(r.namaAset)+'<br><small>'+teksAman(r.kode)+'</small>'+'<br><div class="bmn-photo-cell">'+buatThumbnailFotoAdmin(r.fotoPeminjaman,'Foto barang peminjaman')+'</div>'+'</td><td>'+teksAman(formatTanggal(r.tanggalPinjam))+'</td><td>'+teksAman(formatTanggal(r.rencanaKembali))+'</td><td>'+teksAman(r.keperluan)+'</td><td><button class="btn btn-success" onclick="catatPengembalian(\''+teksAman(r.id)+'\')">Catat Pengembalian</button></td></tr>';}).join('');
       }).withFailureHandler(function(e){body.innerHTML='<tr><td colspan="7">'+teksAman(e.message)+'</td></tr>';tampilToast(e.message,true);}).getDaftarPengembalianAdmin(tokenAdmin);
     }
     async function catatPengembalian(id) {
@@ -2455,13 +2469,44 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       document.querySelectorAll("[data-form-kind]").forEach(b=>{b.classList.toggle("btn-primary",b.dataset.formKind===jenis);b.classList.toggle("btn-light",b.dataset.formKind!==jenis);});
       tampilkanFormAdmin();
     }
+    function sumberFotoAdmin(url){
+      const raw=String(url||"").trim();
+      if(!raw)return "";
+      if(!/^https:\/\//i.test(raw))return "";
+      const drive=raw.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([A-Za-z0-9_-]+)/i)||raw.match(/[?&]id=([A-Za-z0-9_-]+)/i);
+      return drive?"https://drive.google.com/thumbnail?id="+drive[1]+"&sz=w900":raw;
+    }
+    function buatThumbnailFotoAdmin(url,label){
+      const src=sumberFotoAdmin(url);
+      if(!src)return '<span class="bmn-photo-empty">-</span>';
+      return '<button type="button" class="bmn-photo-thumb" data-foto-url="'+escapeHTML(src)+'" data-foto-label="'+escapeHTML(label||"Dokumentasi foto")+'" title="Klik untuk melihat foto lebih besar"><img src="'+escapeHTML(src)+'" alt="'+escapeHTML(label||"Foto dokumentasi")+'" loading="lazy" onerror="this.closest(\'.bmn-photo-thumb\').outerHTML=\'<span class=\\\'bmn-photo-empty\\\'>Foto tidak tersedia</span>\'"></button>';
+    }
+    function bukaFotoAdmin(url,label){
+      const src=sumberFotoAdmin(url);if(!src)return;
+      let modal=document.getElementById("bmnPhotoModal");
+      if(!modal){
+        modal=document.createElement("div");modal.id="bmnPhotoModal";modal.className="bmn-photo-modal";modal.hidden=true;
+        modal.innerHTML='<div class="bmn-photo-dialog" role="dialog" aria-modal="true" aria-label="Pratinjau foto"><button type="button" class="bmn-photo-close" aria-label="Tutup">&times;</button><img alt="Foto dokumentasi"><div class="bmn-photo-caption"></div></div>';
+        modal.addEventListener("click",e=>{if(e.target===modal||e.target.classList.contains("bmn-photo-close"))modal.hidden=true;});
+        document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!modal.hidden)modal.hidden=true;});
+        document.body.appendChild(modal);
+      }
+      modal.querySelector("img").src=src;
+      modal.querySelector("img").alt=label||"Foto dokumentasi";
+      modal.querySelector(".bmn-photo-caption").textContent=label||"Dokumentasi foto";
+      modal.hidden=false;
+    }
+    document.addEventListener("click",function(e){
+      const thumb=e.target.closest(".bmn-photo-thumb");
+      if(thumb)bukaFotoAdmin(thumb.dataset.fotoUrl,thumb.dataset.fotoLabel);
+    });
     function tampilkanFormAdmin(){
       const cols=kolomFormAdmin[jenisFormAdminAktif], rows=dataFormAdmin[jenisFormAdminAktif]||[];
-      el("formAdminHead").innerHTML="<tr>"+cols.map(c=>"<th>"+escapeHTML(c.replace(/_/g," "))+"</th>").join("")+"</tr>";
+      el("formAdminHead").innerHTML="<tr>"+cols.map(c=>"<th>"+escapeHTML(({Dokumentasi_URL:"Foto Dokumentasi",Foto_URL:"Foto Barang",Foto_Peminjaman_URL:"Foto Peminjaman"})[c]||c.replace(/_/g," "))+"</th>").join("")+"</tr>";
       if(!rows.length){el("formAdminBody").innerHTML='<tr><td colspan="'+cols.length+'" class="empty-state">Belum ada data formulir yang masuk.</td></tr>';el("formAdminCount").textContent="0 data";return;}
       el("formAdminBody").innerHTML=rows.map(row=>"<tr>"+cols.map(c=>{
         const v=row[c];
-        if(["Dokumentasi_URL","Foto_URL","Foto_Peminjaman_URL"].includes(c)&&v)return '<td><a href="'+escapeHTML(v)+'" target="_blank" rel="noopener"><img src="'+escapeHTML(v)+'" alt="Foto dokumentasi" style="width:76px;height:58px;object-fit:cover;border-radius:7px;display:block;margin-bottom:5px">Lihat Foto</a></td>';
+        if(["Dokumentasi_URL","Foto_URL","Foto_Peminjaman_URL","Foto_Barang_URL","Foto_URL_Pemeliharaan"].includes(c))return '<td class="bmn-photo-cell">'+buatThumbnailFotoAdmin(v,"Foto dokumentasi "+jenisFormAdminAktif)+'</td>';
         return "<td>"+escapeHTML(v==null||v===""?"-":v)+"</td>";
       }).join("")+"</tr>").join("");
       el("formAdminCount").textContent="Menampilkan "+rows.length+" data";
