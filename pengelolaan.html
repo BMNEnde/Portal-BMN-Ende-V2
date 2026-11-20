@@ -43,6 +43,9 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="tab active" data-tab="usage" type="button">Penggunaan Barang</button>
       <button class="tab" data-tab="proposal" type="button">Usulan ATK & Operasional</button>
       <button class="tab" data-tab="maintenance" type="button">Pemeliharaan Aset</button>
+      <button class="tab" data-tab="transfer" type="button">Pemindahan Barang</button>
+      <button class="tab" data-tab="damage" type="button">Pelaporan Barang Rusak</button>
+      <button class="tab" data-tab="glass" type="button">Alat Gelas Pecah</button>
       <button class="tab" data-tab="stock" type="button">Kartu Stok / SPB / SBBK</button>
       <button class="tab" data-tab="borrowing" type="button">Formulir Peminjaman</button>
     </div>
@@ -84,6 +87,44 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       </div><label class="statement"><input id="pernyataanPemeliharaan" type="checkbox" required><span>Saya bersedia menjaga dan memelihara aset yang menjadi tanggung jawab saya dengan melakukan pemeliharaan sesuai ketentuan serta melaporkan apabila terjadi kerusakan.</span></label>
       <button class="submit" type="submit">Kirim Laporan Pemeliharaan</button></form>
     </section>
+    <section id="transfer" class="hidden">
+      <h2>Formulir Pemindahan Barang</h2><p class="desc">Ajukan pemindahan barang antar ruang. Data barang dan ruang mengikuti Master BMN.</p>
+      <form id="transferForm"><div class="grid">
+        <div class="field"><label>Nama Penanggung Jawab Ruang *</label><input id="namaPJ" required maxlength="150"></div>
+        <div class="field"><label>NIP *</label><input id="nipPJ" required maxlength="40"></div>
+        <div class="field full"><label>Nama Barang / Merk *</label><select id="asetPindah" required><option value="">Memuat barang...</option></select></div>
+        <div class="field"><label>Jumlah *</label><input id="jumlahPindah" type="number" min="1" step="1" required></div>
+        <div class="field"><label>Kondisi *</label><select id="kondisiPindah" required><option value="">Pilih kondisi</option><option>Baik</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div>
+        <div class="field"><label>Nama Ruang Asal *</label><select id="ruangAsal" required><option value="">Pilih barang terlebih dahulu</option></select></div>
+        <div class="field"><label>Nama Ruang Tujuan *</label><select id="ruangTujuan" required><option value="">Pilih ruang tujuan</option></select></div>
+        <div class="field"><label>Alasan Pemindahan *</label><select id="alasanPindah" required><option value="">Pilih alasan</option><option>Penataan Ruangan</option><option>Kebutuhan Operasional</option><option>Lainnya</option></select></div>
+        <div class="field hidden" id="alasanLainnyaWrap"><label>Jelaskan Alasan Lainnya *</label><input id="alasanLainnya" maxlength="300"></div>
+      </div><label class="statement"><input type="checkbox" required><span>Dengan ini menyatakan bahwa barang tersebut benar dipindahkan sesuai data di atas dan akan digunakan serta dipelihara dengan penuh tanggung jawab.</span></label>
+      <button class="submit" type="submit">Kirim Formulir Pemindahan</button></form>
+    </section>
+    <section id="damage" class="hidden">
+      <h2>Formulir Pelaporan Barang Rusak</h2><p class="desc">Laporkan kerusakan barang BMN dan sertakan foto kondisi barang.</p>
+      <form id="damageForm"><div class="grid">
+        <div class="field"><label>Tanggal *</label><input id="tanggalRusak" type="date" required></div>
+        <div class="field"><label>Nama Pelapor *</label><input id="pelaporRusak" required maxlength="150"></div>
+        <div class="field full"><label>Nama Barang / Merk *</label><select id="asetRusak" required><option value="">Memuat barang...</option></select></div>
+        <div class="field"><label>Tingkat Kerusakan *</label><select id="tingkatRusak" required><option value="">Pilih tingkat</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div>
+        <div class="field"><label>Lokasi Barang *</label><select id="lokasiRusak" required><option value="">Pilih barang terlebih dahulu</option></select></div>
+        <div class="field full"><label>Detail Kerusakan *</label><textarea id="detailRusak" required placeholder="Jelaskan kerusakan yang terjadi"></textarea></div>
+        <div class="field full"><label>Foto Barang *</label><input id="fotoRusak" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required><div class="hint">JPG, PNG, atau WEBP. Maksimal 5 MB.</div></div>
+      </div><label class="statement"><input type="checkbox" required><span>Saya menyatakan bahwa pengaduan ini disampaikan dengan sebenar-benarnya dan dapat dipertanggungjawabkan.</span></label>
+      <button class="submit" type="submit">Kirim Laporan Barang Rusak</button></form>
+    </section>
+    <section id="glass" class="hidden">
+      <h2>Formulir Pelaporan Alat Gelas Pecah</h2><p class="desc">Catat kejadian alat gelas yang pecah selama penggunaan.</p>
+      <form id="glassForm"><div class="grid">
+        <div class="field"><label>Nama Pelapor *</label><input id="pelaporGelas" required maxlength="150"></div>
+        <div class="field"><label>Tanggal *</label><input id="tanggalGelas" type="date" required></div>
+        <div class="field full"><label>Nama Barang *</label><select id="namaAlatGelas" required><option value="">Memuat daftar alat gelas...</option></select></div>
+        <div class="field"><label>Jumlah Pecah *</label><input id="jumlahPecah" type="number" min="1" step="1" required></div>
+      </div><label class="statement"><input type="checkbox" required><span>Saya bersedia melaporkan setiap kejadian alat gelas yang pecah secara jujur dan bertanggung jawab atas kerusakan yang terjadi akibat penggunaan yang tidak sesuai dengan prosedur.</span></label>
+      <button class="submit" type="submit">Kirim Laporan Alat Gelas Pecah</button></form>
+    </section>
     <section id="stock" class="hidden">
       <h2>Kartu Stok, SPB, SBBK & Pemakaian Barang Persediaan</h2><p class="desc">Layanan ini disiapkan untuk terhubung dengan administrasi persediaan BMN.</p>
       <div class="note">Menu ini belum diaktifkan. Sesuai tahapan pengembangan, tautan ke Spreadsheet administrasi persediaan akan ditambahkan setelah alur dan hak akses admin ditetapkan.</div>
@@ -111,8 +152,8 @@ const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth
 $("tanggal").value=today();$("tanggalPemeliharaan").value=today();
 function message(t,type){const m=$("message");m.textContent=t;m.className="msg "+type;m.scrollIntoView({behavior:"smooth",block:"center"});}
 function busy(form,on,label){const b=form.querySelector("button[type=submit]");b.disabled=on;b.textContent=on?"Mengirim data...":label;}
-const heroContent={usage:["Formulir Penggunaan Barang","Catat penggunaan ATK, reagen dan media, baku pembanding, baku mikroba, suku cadang, serta alat gelas."],proposal:["Formulir Usulan ATK dan Operasional","Sampaikan usulan kebutuhan barang dan operasional untuk ditinjau petugas."],maintenance:["Formulir Pemeliharaan Aset","Catat pemeliharaan aset, termasuk barang yang tidak tersedia untuk dipinjam."],stock:["Kartu Stok, SPB, SBBK dan Pemakaian Barang Persediaan","Layanan administrasi persediaan Barang Milik Negara."],borrowing:["Formulir Peminjaman BMN","Lengkapi identitas peminjam dan informasi barang yang akan dipinjam. Pengajuan akan diperiksa oleh petugas."]};
-document.querySelectorAll("button.tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("button.tab").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","stock","borrowing"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("heroTitle").textContent=heroContent[btn.dataset.tab][0];$("heroDescription").textContent=heroContent[btn.dataset.tab][1];$("message").className="msg";}));
+const heroContent={usage:["Formulir Penggunaan Barang","Catat penggunaan ATK, reagen dan media, baku pembanding, baku mikroba, suku cadang, serta alat gelas."],proposal:["Formulir Usulan ATK dan Operasional","Sampaikan usulan kebutuhan barang dan operasional untuk ditinjau petugas."],maintenance:["Formulir Pemeliharaan Aset","Catat pemeliharaan aset, termasuk barang yang tidak tersedia untuk dipinjam."],transfer:["Formulir Pemindahan Barang","Ajukan pemindahan barang antar ruang dengan data lokasi dari Master BMN."],damage:["Formulir Pelaporan Barang Rusak","Laporkan kerusakan barang BMN beserta dokumentasi foto."],glass:["Formulir Pelaporan Alat Gelas Pecah","Catat alat gelas yang pecah selama penggunaan."],stock:["Kartu Stok, SPB, SBBK dan Pemakaian Barang Persediaan","Layanan administrasi persediaan Barang Milik Negara."],borrowing:["Formulir Peminjaman BMN","Lengkapi identitas peminjam dan informasi barang yang akan dipinjam. Pengajuan akan diperiksa oleh petugas."]};
+document.querySelectorAll("button.tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("button.tab").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","transfer","damage","glass","stock","borrowing"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("heroTitle").textContent=heroContent[btn.dataset.tab][0];$("heroDescription").textContent=heroContent[btn.dataset.tab][1];$("message").className="msg";}));
 let refs=null;
 function fill(select,items,placeholder,labelFn){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);(items||[]).forEach(item=>{const o=document.createElement("option");o.value=labelFn?labelFn(item).value:item;o.textContent=labelFn?labelFn(item).label:item;select.appendChild(o);});}
 function updateBarang(){const jenis=$("jenisForm").value;const atk=$("jenisATK").value;const isAtk=jenis==="ATK";$("atkWrap").classList.toggle("hidden",!isAtk);$("jenisATK").required=isAtk;const list=(refs?.daftarBarang||[]).filter(x=>x.jenisForm===jenis&&(!isAtk||x.jenisATK===atk));fill($("namaBarang"),list,isAtk&&!atk?"Pilih jenis ATK terlebih dahulu":"Pilih nama barang",x=>({value:x.namaBarang,label:x.satuan?x.namaBarang+" ("+x.satuan+")":x.namaBarang}));}
