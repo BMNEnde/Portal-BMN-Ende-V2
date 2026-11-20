@@ -491,7 +491,7 @@ function doGet(e) {
 function bmnApiResponse_(payload) {
   const json = JSON.stringify(payload).replace(/</g, "\\u003c");
   const html = '<!doctype html><html><head><meta charset="utf-8"></head><body>' +
-    '<script>window.top.postMessage(' + json + ', "*");<\/script>' +
+    '<script>window.parent.postMessage(' + json + ', "*");<\/script>' +
     '</body></html>';
   return HtmlService.createHtmlOutput(html)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
