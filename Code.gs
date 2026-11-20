@@ -1150,8 +1150,8 @@ function ajukanPeminjamanPublik(data) {
   const tanggalPinjam = String(data.tanggalPinjam || "").trim();
   const rencanaKembali = String(data.rencanaKembali || "").trim();
   if (!["Pegawai Internal", "Pegawai Eksternal"].includes(kategori)) throw new Error("Kategori peminjam tidak valid.");
-  if (!nama || !nip || !jabatan || !instansi || !noHp || !idAset || !keperluan || !tanggalPinjam || !rencanaKembali)
-    throw new Error("Mohon lengkapi seluruh data wajib.");
+  if (!nama || !nip || !jabatan || !instansi || !noHp || !idAset || !keperluan || !tanggalPinjam || !rencanaKembali || !data.foto)
+    throw new Error("Mohon lengkapi seluruh data wajib dan unggah foto barang.");
   if (kategori === "Pegawai Eksternal" && !/^\d{16}$/.test(nik)) throw new Error("NIK pegawai eksternal harus terdiri dari 16 digit.");
   if (kategori === "Pegawai Internal" && !/^[0-9A-Za-z./-]+$/.test(nip)) throw new Error("Format NIP tidak valid.");
   const tPinjam = new Date(tanggalPinjam + "T00:00:00");
@@ -1232,7 +1232,7 @@ function formatPeminjamanAdmin_(o) {
     tanggalDikembalikan: nilaiTanggalBMN_(o.Tanggal_Dikembalikan),
     kondisiDiserahkan: String(o.Kondisi_Saat_Diserahkan || ''),
     kondisiDikembalikan: String(o.Kondisi_Saat_Dikembalikan || ''),
-    petugasPenerima: String(o.Petugas_Penerima || ''), catatan: String(o.Catatan || '')
+    petugasPenerima: String(o.Petugas_Penerima || ''), catatan: String(o.Catatan || ''), fotoPeminjaman: String(o.Foto_Peminjaman_URL || '')
   };
 }
 
