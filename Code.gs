@@ -1638,12 +1638,27 @@ function kirimPemeliharaanAset(data) {
 }
 
 
+function normalisasiTanggalPemeliharaan_(nilai) {
+  const s = String(nilai || "").trim();
+  let m = s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);
+  if (!m) {
+    const lokal = s.match(/^(\\d{1,2})[\\/.-](\\d{1,2})[\\/.-](\\d{4})$/);
+    if (lokal) m = [lokal[0], lokal[3], lokal[2], lokal[1]];
+  }
+  if (!m) return "";
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  const cek = new Date(Date.UTC(y, mo - 1, d));
+  if (cek.getUTCFullYear() !== y || cek.getUTCMonth() !== mo - 1 || cek.getUTCDate() !== d) return "";
+  return String(y).padStart(4,"0")+"-"+String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+}
+
 function kirimPemeliharaanTerpadu(data) {
   if (!data || typeof data !== "object") throw new Error("Data pemeliharaan tidak valid.");
   const tipe = String(data.tipe || "").trim().toUpperCase();
-  const tanggal = String(data.tanggal || "").trim();
+  const tanggal = normalisasiTanggalPemeliharaan_(data.tanggal);
   const petugas = String(data.petugas || "").trim();
-  if (!tanggalISOValidBMN_(tanggal) || !petugas || petugas.length > 150) throw new Error("Tanggal dan nama petugas wajib diisi dengan benar.");
+  if (!tanggal) throw new Error("Tanggal pemeriksaan tidak valid. Silakan pilih tanggal kembali.");
+  if (!petugas || petugas.length > 150) throw new Error("Nama petugas wajib diisi (maksimal 150 karakter).");
   const refs = getReferensiFormPublik();
   const sh = sheetBMN_("Data_Pemeliharaan_Aset", ["ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang","Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan","Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Pernyataan","Status"]);
   const extra = ["Tipe_Form","Kategori_Aset","Checklist_JSON","Keterangan_Pemeriksaan"];
