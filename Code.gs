@@ -1608,6 +1608,9 @@ function simpanDokumentasiPemeliharaan_(foto) {
   }
   const nama = "PEMELIHARAAN_" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMdd_HHmmss") + "." + (mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg");
   const file = folder.createFile(Utilities.newBlob(bytes, mime, nama));
+  // Agar thumbnail dapat dimuat pada dashboard admin yang berjalan di GitHub Pages.
+  // File foto dapat diakses oleh siapa pun yang memiliki tautannya.
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return file.getUrl();
 }
 
