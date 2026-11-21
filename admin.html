@@ -2541,9 +2541,11 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
     let laporanMatriksMonitoring=false;
     function buatMatriksMonitoringBMN(rows,kategori,tahun){
       const kegiatan=CHECKLIST_MONITORING_BMN[kategori]||[];
-      const status={};
+      const status={},alasan={};
+      const bulanNama=BULAN_MONITORING_BMN;
       rows.forEach(r=>{
-        const dt=String(r.Tanggal_Pemeliharaan||"").match(/^(\d{4})-(\d{1,2})/);
+        const tanggal=String(r.Tanggal_Pemeliharaan||"");
+        const dt=tanggal.match(/^(\\d{4})-(\\d{1,2})/);
         if(!dt||dt[1]!==String(tahun))return;
         const bulan=Number(dt[2])-1;if(bulan<0||bulan>11)return;
         let checks=[];try{checks=JSON.parse(r.Checklist_JSON||"[]");}catch(e){}
@@ -2553,10 +2555,23 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
           if(ix<0)return;
           const st=String(c.status||"").toUpperCase();
           status[ix+"_"+bulan]=status[ix+"_"+bulan]==="SUDAH"?"SUDAH":st;
+          if(st==="BELUM"){
+            const tgl=tanggal?new Date(tanggal).toLocaleDateString("id-ID"):"Tanggal tidak tercatat";
+            const aset=String(r.Nama_Barang||"Aset tidak tercatat");
+            const petugas=String(r.Petugas_Pemeliharaan||"Petugas tidak tercatat");
+            const alasanTeks=String(c.keterangan||"").trim()||"Alasan belum diisi pada data lama";
+            const detail=bulanNama[bulan]+" ("+tgl+") · "+aset+" · Petugas: "+petugas+" · Alasan: "+alasanTeks;
+            if(!alasan[ix])alasan[ix]=[];
+            if(!alasan[ix].includes(detail))alasan[ix].push(detail);
+          }
         });
       });
-      const cols=[["Kegiatan","Kegiatan"],...BULAN_MONITORING_BMN.map((b,i)=>[String(i),b])];
-      const matrix=kegiatan.map((k,i)=>{const row={Kegiatan:k};BULAN_MONITORING_BMN.forEach((b,m)=>{row[String(m)]=status[i+"_"+m]==="SUDAH"?"☑":status[i+"_"+m]==="BELUM"?"☐":"";});return row;});
+      const cols=[["Kegiatan","Kegiatan"],...BULAN_MONITORING_BMN.map((b,i)=>[String(i),b]),["Keterangan_Belum","Keterangan Pemeriksaan Belum"]];
+      const matrix=kegiatan.map((k,i)=>{
+        const row={Kegiatan:k,Keterangan_Belum:(alasan[i]||[]).join("\\n")};
+        BULAN_MONITORING_BMN.forEach((b,m)=>{row[String(m)]=status[i+"_"+m]==="SUDAH"?"☑":status[i+"_"+m]==="BELUM"?"☐":"";});
+        return row;
+      });
       return {cols,rows:matrix};
     }
     function periodeTanggalBMN(v){if(!v)return"";const x=String(v).match(/^(\\d{4})-(\\d{1,2})/);if(x)return x[1]+"-"+String(x[2]).padStart(2,"0");const d=new Date(v);return isNaN(d)? "":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");}
@@ -2584,9 +2599,9 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const period=laporanMatriksMonitoring?el("reportYear").value:el("reportMonth").selectedOptions[0].text+" "+el("reportYear").value;
       if(laporanMatriksMonitoring){
         const aoa=[["MONITORING PEMELIHARAAN APAR & KOTAK P3K"],[],laporanAktifCols.map(c=>c[1]),...laporanAktifRows.map(r=>laporanAktifCols.map(c=>r[c[0]]||""))];
-        const ws=XLSX.utils.aoa_to_sheet(aoa);ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:laporanAktifCols.length-1}}];ws["!cols"]=[{wch:48},...Array(12).fill({wch:15})];ws["!rows"]=[{hpt:30},{hpt:12},{hpt:26},...laporanAktifRows.map(()=>({hpt:24}))];
+        const ws=XLSX.utils.aoa_to_sheet(aoa);ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:laporanAktifCols.length-1}}];ws["!cols"]=[{wch:42},...Array(12).fill({wch:12}),{wch:65}];ws["!rows"]=[{hpt:30},{hpt:12},{hpt:30},...laporanAktifRows.map(r=>({hpt:Math.max(30,Math.min(120,String(r.Keterangan_Belum||"").split("\\n").length*42))}))];
         const border={top:{style:"thin",color:{rgb:"000000"}},bottom:{style:"thin",color:{rgb:"000000"}},left:{style:"thin",color:{rgb:"000000"}},right:{style:"thin",color:{rgb:"000000"}}};
-        for(let rr=0;rr<aoa.length;rr++)for(let cc=0;cc<laporanAktifCols.length;cc++){const cell=ws[XLSX.utils.encode_cell({r:rr,c:cc})];if(!cell)continue;cell.s={font:{name:"Arial",sz:rr===0?15:11,bold:rr===0||rr===2,color:{rgb:"000000"}},alignment:{vertical:"center",horizontal:rr===0||rr===2||cc>0?"center":"left",wrapText:true},border,fill:rr===2?{fgColor:{rgb:"FFFF00"}}:{fgColor:{rgb:"FFFFFF"}}};}
+        for(let rr=0;rr<aoa.length;rr++)for(let cc=0;cc<laporanAktifCols.length;cc++){const cell=ws[XLSX.utils.encode_cell({r:rr,c:cc})];if(!cell)continue;cell.s={font:{name:"Arial",sz:rr===0?15:11,bold:rr===0||rr===2,color:{rgb:"000000"}},alignment:{vertical:"center",horizontal:rr===0||rr===2||cc>0&&cc<13?"center":"left",wrapText:true},border,fill:rr===2?{fgColor:{rgb:"FFFF00"}}:{fgColor:{rgb:"FFFFFF"}}};}
         ws["!pageSetup"]={orientation:"landscape",fitToWidth:1,fitToHeight:1};ws["!sheetPr"]={pageSetUpPr:{fitToPage:true}};ws["!margins"]={left:.25,right:.25,top:.4,bottom:.4,header:.2,footer:.2};
         const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Monitoring "+(el("reportMaintenanceType").value));XLSX.writeFile(wb,"Monitoring_APAR_P3K_"+period+".xlsx",{bookType:"xlsx",compression:true});return;
       }
@@ -2698,7 +2713,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const heads=laporanAktifCols.map(c=>"<th>"+escapeHTML(c[1])+"</th>").join("");
       const body=(laporanAktifRows||[]).map(r=>"<tr>"+laporanAktifCols.map(c=>"<td>"+escapeHTML(c[0]==="Perkiraan_Harga_Satuan"?formatRupiahAdmin(r[c[0]]):(r[c[0]]==null?"":r[c[0]]))+"</td>").join("")+"</tr>").join("");
       if(laporanMatriksMonitoring){
-        w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#000}h1{text-align:center;font-size:17px}p{text-align:center;font-size:11px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #000;padding:6px;text-align:center}th{background:#ffff00}td:first-child{text-align:left;width:32%}@page{size:landscape;margin:10mm}</style></head><body><h1>MONITORING PEMELIHARAAN APAR &amp; KOTAK P3K</h1><p>Tahun '+escapeHTML(period)+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
+        w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#000}h1{text-align:center;font-size:17px}p{text-align:center;font-size:11px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #000;padding:6px;text-align:center}th{background:#ffff00}td:first-child{text-align:left;width:22%}th:last-child,td:last-child{text-align:left;min-width:260px;white-space:pre-line}td{white-space:pre-line}@page{size:landscape;margin:10mm}</style></head><body><h1>MONITORING PEMELIHARAAN APAR &amp; KOTAK P3K</h1><p>Tahun '+escapeHTML(period)+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
         w.document.close();return;
       }
       w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:22px;color:#172b3a}h1{font-size:20px}p{font-size:12px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #9aa8b5;padding:6px;text-align:left;vertical-align:top}th{background:#eaf0f5}tr{page-break-inside:avoid}@page{size:landscape;margin:12mm}</style></head><body><h1>'+escapeHTML(title)+'</h1><p>Periode: '+escapeHTML(period)+' · Jumlah data: '+(laporanAktifRows||[]).length+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
