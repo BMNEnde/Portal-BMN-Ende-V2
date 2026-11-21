@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#173b5e">
+<title>Dokumen BMN | Balai POM di Ende</title>
+<style>
+:root{--navy:#173b5e;--deep:#102d49;--blue:#2563a6;--green:#16845b;--ink:#1e293b;--muted:#64748b;--line:#dce6ef;--bg:#f3f7fb}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,#eaf1f7 0,#f5f8fb 280px);font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+.top{height:7px;background:linear-gradient(90deg,#102d49,#2563a6 55%,#16845b)}
+.wrap{width:min(1120px,calc(100% - 36px));margin:0 auto}
+header{display:flex;align-items:center;gap:14px;padding:22px 0}
+.logo{width:52px;height:52px;border-radius:15px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;color:var(--navy);font-size:24px;box-shadow:0 5px 18px #173b5e12}
+.brand strong{display:block;color:var(--navy);font-size:14px;letter-spacing:.08em}
+.brand span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.back{margin-left:auto;text-decoration:none;border:1px solid var(--line);background:#fff;color:var(--navy);font-size:12px;font-weight:750;padding:10px 14px;border-radius:10px}
+.hero{padding:35px clamp(22px,5vw,48px);border-radius:25px;color:#fff;background:linear-gradient(120deg,#173b5e,#285d7c 65%,#347d78);box-shadow:0 18px 45px #173b5e20;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:300px;height:300px;border:1px solid #ffffff28;border-radius:50%;right:-80px;top:-160px;box-shadow:0 0 0 30px #ffffff08,0 0 0 65px #ffffff08}
+.kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#bfe8d0;font-weight:850}
+h1{font-size:clamp(28px,4vw,40px);letter-spacing:-.04em;margin:10px 0}
+.hero p{margin:0;max-width:650px;color:#d8e5ee;font-size:13px;line-height:1.8}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:32px 2px 16px}
+.section-head h2{margin:0;color:var(--navy);font-size:21px}
+.section-head p{margin:0;color:var(--muted);font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;padding-bottom:35px}
+.doc{width:100%;min-height:158px;text-align:left;padding:19px;border:1px solid #e1eaf1;border-radius:17px;background:#fff;box-shadow:0 8px 22px #173b5e09;display:flex;flex-direction:column;align-items:flex-start;gap:12px;transition:.2s}
+.doc:hover{transform:translateY(-3px);border-color:#a9c9df;box-shadow:0 14px 28px #173b5e15}
+.doc:disabled{cursor:default;opacity:1}
+.doc:disabled:hover{transform:none}
+.num{width:34px;height:34px;border-radius:11px;background:#eaf3f8;color:var(--blue);display:grid;place-items:center;font-size:13px;font-weight:850}
+.doc strong{font-size:14px;line-height:1.45;color:var(--navy)}
+.doc small{margin-top:auto;color:#8a98a7;font-size:10px;font-weight:700;letter-spacing:.04em}
+.note{margin:0 0 35px;padding:14px 16px;border:1px solid #dcebe3;background:#f7fcf8;border-radius:13px;color:#587366;font-size:11px;line-height:1.7}
+footer{border-top:1px solid var(--line);padding:17px 0 24px;color:#7b8b9b;font-size:10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer strong{color:var(--navy)}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.wrap{width:calc(100% - 28px)}header{padding:15px 0}.logo{width:45px;height:45px}.brand strong{font-size:11px}.brand span{font-size:10px}.back{padding:9px 10px;font-size:10px}.hero{border-radius:19px;padding:28px 21px}.section-head{align-items:flex-start;flex-direction:column}.grid{gap:10px}.doc{min-height:150px;padding:14px}.doc strong{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<div class="wrap">
+<header>
+  <div class="logo" aria-hidden="true">▤</div>
+  <div class="brand"><strong>BALAI POM DI ENDE</strong><span>Sistem Manajemen Barang Milik Negara</span></div>
+  <a class="back" href="index.html">← Kembali ke Portal</a>
+</header>
+<section class="hero">
+  <div class="kicker">Pusat Dokumen</div>
+  <h1>Dokumen BMN</h1>
+  <p>Akses dokumen administrasi, perencanaan, pencatatan, dan pelaporan Barang Milik Negara Balai POM di Ende.</p>
+</section>
+<div class="section-head">
+  <h2>Daftar Dokumen</h2>
+  <p>Delapan kelompok dokumen BMN</p>
+</div>
+<main class="grid" aria-label="Daftar dokumen BMN">
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">01</span><strong>Stock Opname</strong><small>TAUTAN MENYUSUL</small></button>
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">02</span><strong>Sensus / Pra-Sensus</strong><small>TAUTAN MENYUSUL</small></button>
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">03</span><strong>Sarana dan Prasarana</strong><small>TAUTAN MENYUSUL</small></button>
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">04</span><strong>RKBMN (Rencana Kebutuhan Barang Milik Negara)</strong><small>TAUTAN MENYUSUL</small></button>
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">05</span><strong>Laporan BMN dan Wasdal</strong><small>TAUTAN MENYUSUL</small></button>
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">06</span><strong>Laporan Keuangan</strong><small>TAUTAN MENYUSUL</small></button>
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">07</span><strong>Penghapusan BMN</strong><small>TAUTAN MENYUSUL</small></button>
+  <button class="doc" type="button" disabled title="Tautan Google Drive akan ditambahkan"><span class="num">08</span><strong>Dokumen Lainnya</strong><small>TAUTAN MENYUSUL</small></button>
+</main>
+<div class="note"><strong>Informasi:</strong> Tautan Google Drive untuk masing-masing dokumen akan dipasang pada tahap berikutnya. Pengaturan akses file akan mengikuti ketentuan: administrator/pemilik file dapat mengedit, sedangkan pengguna lainnya hanya dapat melihat.</div>
+<footer><span><strong>Balai POM di Ende</strong> · Sistem Manajemen Barang Milik Negara</span><span>Dokumen BMN</span></footer>
+</div>
+</body>
+</html>
