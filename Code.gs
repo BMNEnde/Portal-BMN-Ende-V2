@@ -1670,7 +1670,7 @@ function kirimPemeliharaanTerpadu(data) {
     const wajib=kategori==="APAR"?10:kategori==="P3K"?7:0;
     if(!aset||checks.length!==wajib||checks.some(x=>!["SUDAH","BELUM"].includes(String(x.status||"").toUpperCase()))) throw new Error("Pilih aset dan lengkapi seluruh checklist "+kategori+".");
     const catatan=String(data.keterangan||"").trim();
-    const ringkasan=checks.filter(x=>String(x.status).toUpperCase()==="BELUM").map(x=>x.kegiatan+": "+String(x.keterangan||"Belum dilakukan")).join("; ");
+    const ringkasan=checks.map(x=>x.kegiatan+": "+String(x.status).toUpperCase()+(String(x.keterangan||"").trim()?" ("+String(x.keterangan).trim()+")":"")).join("; ");
     simpan(aset,kategori,"MONITORING "+kategori,ringkasan||"Seluruh checklist sudah dilakukan", "Pemeriksaan "+kategori+" selesai",JSON.stringify(checks),catatan);
     return {berhasil:true,pesan:"Monitoring "+kategori+" berhasil disimpan.",jumlahChecklist:checks.length};
   }
