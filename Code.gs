@@ -1447,8 +1447,8 @@ function getReferensiFormPublik() {
 
   const asetSh = ss.getSheetByName("Master_Pemeliharaan");
   const daftarPemeliharaan = [], daftarPemeliharaanTIK = [], daftarPemeliharaanNonTIK = [];
+  const daftarAPAR = [], daftarP3K = [];
   try {
-    const daftarAPAR = [], daftarP3K = [];
     if (asetSh && asetSh.getLastRow() >= 2) {
       const v = asetSh.getDataRange().getDisplayValues();
       const h = v[0].map(x => String(x).trim());
