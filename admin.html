@@ -2565,6 +2565,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const bulan=String(el("reportMonth").value||"").trim(),tahun=String(el("reportYear").value||"").trim(),kind=el("reportKind").value,usage=el("reportUsageType").value,maintenanceType=el("reportMaintenanceType").value;
       if(!/^([1-9]|1[0-2])$/.test(bulan)||!/^20[0-9]{2}$/.test(tahun)||Number(tahun)>2100){el("reportTableBody").innerHTML='<tr><td class="empty-state">Pilih bulan dan isi tahun laporan yang valid.</td></tr>';tampilToast("Periode laporan tidak valid. Periksa bulan dan tahun.",true);return;}
       el("reportTableBody").innerHTML='<tr><td class="empty-state">Menyiapkan laporan...</td></tr>';el("reportSummary").innerHTML="";
+      laporanMatriksMonitoring=false;
       const key=tahun+"-"+String(bulan).padStart(2,"0");
       if(kind==="peminjaman"){
         const cols=[["id","ID Pengajuan"],["tanggalPengajuan","Tgl Pengajuan"],["nama","Peminjam"],["instansi","Instansi"],["nip","NIP"],["noHp","No. HP"],["namaAset","Nama Barang"],["kode","Kode BMN"],["tanggalPinjam","Tgl Pinjam"],["rencanaKembali","Rencana Kembali"],["tanggalDikembalikan","Tgl Dikembalikan"],["kondisiDikembalikan","Kondisi Kembali"],["keperluan","Keperluan"],["status","Status"]];
