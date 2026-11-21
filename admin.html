@@ -1018,6 +1018,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
     .bmn-photo-close{position:absolute;right:10px;top:10px;width:34px;height:34px;border:0;border-radius:50%;background:#edf2f6;color:#183b56;font-size:22px;line-height:1;cursor:pointer}
     @media(max-width:650px){.bmn-photo-modal{padding:10px}.bmn-photo-dialog{padding:8px}.bmn-photo-dialog img{max-width:88vw;max-height:76vh}}
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 </head>
 
 <body>
@@ -2547,23 +2548,109 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
     }
     function eksporLaporanExcel(){
       if(!laporanAktifCols.length){tampilToast("Tampilkan laporan terlebih dahulu.",true);return;}
-      const xmlEscape=value=>String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
-      const colCount=laporanAktifCols.length;
+      if(typeof XLSX==="undefined"||!XLSX.utils||!XLSX.writeFile){
+        tampilToast("Komponen Excel belum termuat. Periksa koneksi internet lalu muat ulang halaman.",true);
+        return;
+      }
       const period=el("reportMonth").selectedOptions[0].text+" "+el("reportYear").value;
       const rows=laporanAktifRows||[];
-      const widths=laporanAktifCols.map(c=>Math.max(14,Math.min(34,String(c[1]).length+5)));
-      const columnXml=widths.map(w=>'<Column ss:AutoFitWidth="0" ss:Width="'+(w*6)+'"/>').join("");
-      const titleRow='<Row ss:Height="30"><Cell ss:MergeAcross="'+Math.max(0,colCount-1)+'" ss:StyleID="Title"><Data ss:Type="String">'+xmlEscape(laporanAktifTitle||"Laporan BMN")+'</Data></Cell></Row>';
-      const infoRow='<Row ss:Height="22"><Cell ss:MergeAcross="'+Math.max(0,colCount-1)+'" ss:StyleID="Info"><Data ss:Type="String">Periode: '+xmlEscape(period)+' | Jumlah data: '+rows.length+'</Data></Cell></Row>';
-      const blankRow="<Row/>";
-      const headerRow='<Row ss:Height="32">'+laporanAktifCols.map(c=>'<Cell ss:StyleID="Header"><Data ss:Type="String">'+xmlEscape(c[1])+'</Data></Cell>').join("")+'</Row>';
-      const dataRows=rows.map((r,index)=>'<Row ss:Height="22">'+laporanAktifCols.map(c=>'<Cell ss:StyleID="'+(index%2?"BodyAlt":"Body")+'"><Data ss:Type="String">'+xmlEscape(r[c[0]]==null?"":r[c[0]])+'</Data></Cell>').join("")+'</Row>').join("");
-      const totalRow='<Row ss:Height="25"><Cell ss:MergeAcross="'+Math.max(0,colCount-2)+'" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL DATA</Data></Cell><Cell ss:StyleID="TotalValue"><Data ss:Type="Number">'+rows.length+'</Data></Cell></Row>';
-      const workbook='<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40"><DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Title>'+xmlEscape(laporanAktifTitle)+'</Title><Subject>Laporan BMN '+xmlEscape(period)+'</Subject><Author>Portal BMN V2</Author></DocumentProperties><Styles><Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="10" ss:Color="#243447"/><Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/></Style><Style ss:ID="Title"><Alignment ss:Vertical="Center" ss:Horizontal="Left"/><Font ss:FontName="Calibri" ss:Size="16" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#174A6E" ss:Pattern="Solid"/></Style><Style ss:ID="Info"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="10" ss:Italic="1" ss:Color="#40566B"/><Interior ss:Color="#EAF1F6" ss:Pattern="Solid"/></Style><Style ss:ID="Header"><Alignment ss:Vertical="Center" ss:Horizontal="Center" ss:WrapText="1"/><Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#26749A" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#174A6E"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D4DEE7"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D4DEE7"/></Borders></Style><Style ss:ID="Body"><Alignment ss:Vertical="Center" ss:WrapText="1"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCE4EB"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E6EBF0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E6EBF0"/></Borders></Style><Style ss:ID="BodyAlt"><Alignment ss:Vertical="Center" ss:WrapText="1"/><Interior ss:Color="#F1F6FA" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCE4EB"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E6EBF0"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E6EBF0"/></Borders></Style><Style ss:ID="TotalLabel"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#174A6E" ss:Pattern="Solid"/><Alignment ss:Horizontal="Right" ss:Vertical="Center"/></Style><Style ss:ID="TotalValue"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#174A6E" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style></Styles><Worksheet ss:Name="Laporan BMN"><Table ss:ExpandedColumnCount="'+colCount+'" ss:ExpandedRowCount="'+(rows.length+5)+'" x:FullColumns="1" x:FullRows="1">'+columnXml+titleRow+infoRow+blankRow+headerRow+dataRows+totalRow+'</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><PageSetup><Layout x:Orientation="Landscape"/></PageSetup><Print><ValidPrinterInfo/><PaperSizeIndex>9</PaperSizeIndex><HorizontalResolution>600</HorizontalResolution><VerticalResolution>600</VerticalResolution></Print><Selected/><DoNotDisplayGridlines/><FreezePanes/><FrozenNoSplit/><SplitHorizontal>4</SplitHorizontal><TopRowBottomPane>4</TopRowBottomPane><ActivePane>2</ActivePane></WorksheetOptions></Worksheet></Workbook>';
-      const blob=new Blob([workbook],{type:"application/vnd.ms-excel;charset=utf-8;"});
-      const url=URL.createObjectURL(blob),a=document.createElement("a");
-      a.href=url;a.download=(laporanAktifTitle||"Laporan_BMN").replace(/[^a-z0-9_-]/gi,"_")+"_"+period.replace(/[^a-z0-9_-]/gi,"_")+".xls";
-      document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+      const colCount=laporanAktifCols.length;
+      const title=laporanAktifTitle||"Laporan BMN";
+      const header=laporanAktifCols.map(c=>String(c[1]||""));
+      const data=rows.map(r=>laporanAktifCols.map(c=>{
+        const value=r[c[0]];
+        return value===null||value===undefined?"":String(value);
+      }));
+      const aoa=[
+        [title],
+        ["Periode: "+period+" | Jumlah data: "+rows.length],
+        [],
+        header,
+        ...data,
+        ["TOTAL DATA",...Array(Math.max(0,colCount-2)).fill(""),rows.length]
+      ];
+      const ws=XLSX.utils.aoa_to_sheet(aoa);
+      ws["!merges"]=[
+        {s:{r:0,c:0},e:{r:0,c:colCount-1}},
+        {s:{r:1,c:0},e:{r:1,c:colCount-1}}
+      ];
+      ws["!cols"]=laporanAktifCols.map(c=>({
+        wch:Math.max(14,Math.min(34,String(c[1]||"").length+7))
+      }));
+      ws["!rows"]=[
+        {hpt:30},
+        {hpt:22},
+        {hpt:8},
+        {hpt:32},
+        ...data.map(()=>({hpt:24})),
+        {hpt:25}
+      ];
+      const setStyle=(address,style)=>{
+        if(ws[address])ws[address].s=style;
+      };
+      const titleStyle={
+        font:{name:"Calibri",sz:16,bold:true,color:{rgb:"FFFFFF"}},
+        fill:{fgColor:{rgb:"174A6E"}},
+        alignment:{vertical:"center",horizontal:"left"}
+      };
+      const infoStyle={
+        font:{name:"Calibri",sz:10,italic:true,color:{rgb:"40566B"}},
+        fill:{fgColor:{rgb:"EAF1F6"}},
+        alignment:{vertical:"center"}
+      };
+      const headerStyle={
+        font:{name:"Calibri",sz:10,bold:true,color:{rgb:"FFFFFF"}},
+        fill:{fgColor:{rgb:"26749A"}},
+        alignment:{vertical:"center",horizontal:"center",wrapText:true},
+        border:{
+          bottom:{style:"thin",color:{rgb:"174A6E"}},
+          left:{style:"thin",color:{rgb:"D4DEE7"}},
+          right:{style:"thin",color:{rgb:"D4DEE7"}}
+        }
+      };
+      const totalStyle={
+        font:{name:"Calibri",sz:10,bold:true,color:{rgb:"FFFFFF"}},
+        fill:{fgColor:{rgb:"174A6E"}},
+        alignment:{vertical:"center",horizontal:"center"},
+        border:{top:{style:"thin",color:{rgb:"174A6E"}}}
+      };
+      setStyle("A1",titleStyle);
+      setStyle("A2",infoStyle);
+      for(let c=0;c<colCount;c++){
+        const cell=XLSX.utils.encode_cell({r:3,c});
+        setStyle(cell,headerStyle);
+      }
+      for(let r=0;r<data.length;r++){
+        for(let c=0;c<colCount;c++){
+          const address=XLSX.utils.encode_cell({r:r+4,c});
+          setStyle(address,{
+            font:{name:"Calibri",sz:10,color:{rgb:"243447"}},
+            fill:{fgColor:{rgb:r%2?"F1F6FA":"FFFFFF"}},
+            alignment:{vertical:"center",wrapText:true},
+            border:{
+              bottom:{style:"thin",color:{rgb:"DCE4EB"}},
+              left:{style:"thin",color:{rgb:"E6EBF0"}},
+              right:{style:"thin",color:{rgb:"E6EBF0"}}
+            }
+          });
+        }
+      }
+      const totalRowIndex=4+data.length;
+      for(let c=0;c<colCount;c++){
+        setStyle(XLSX.utils.encode_cell({r:totalRowIndex,c}),totalStyle);
+      }
+      if(colCount>1)ws["!merges"].push({
+        s:{r:totalRowIndex,c:0},e:{r:totalRowIndex,c:colCount-2}
+      });
+      ws["!autofilter"]={ref:XLSX.utils.encode_range({
+        s:{r:3,c:0},e:{r:3+data.length,c:colCount-1}
+      })};
+      ws["!pageSetup"]={orientation:"landscape",fitToWidth:1,fitToHeight:0};
+      ws["!sheetPr"]={pageSetUpPr:{fitToPage:true}};
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,"Laporan BMN");
+      const safeName=(title+"_"+period).replace(/[^a-z0-9_-]/gi,"_");
+      XLSX.writeFile(wb,safeName+".xlsx",{bookType:"xlsx",compression:true});
     }
     function eksporLaporanPDF(){if(!laporanAktifCols.length){tampilToast("Tampilkan laporan terlebih dahulu.",true);return;}const w=window.open("","_blank");if(!w){tampilToast("Izinkan pop-up browser untuk membuat PDF.",true);return;}const title=laporanAktifTitle,period=el("reportMonth").selectedOptions[0].text+" "+el("reportYear").value,heads=laporanAktifCols.map(c=>"<th>"+escapeHTML(c[1])+"</th>").join(""),body=(laporanAktifRows||[]).map(r=>"<tr>"+laporanAktifCols.map(c=>"<td>"+escapeHTML(r[c[0]]==null?"-":r[c[0]])+"</td>").join("")+"</tr>").join("");w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:22px;color:#172b3a}h1{font-size:20px}p{font-size:12px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #9aa8b5;padding:6px;text-align:left;vertical-align:top}th{background:#eaf0f5}tr{page-break-inside:avoid}@page{size:landscape;margin:12mm}</style></head><body><h1>'+escapeHTML(title)+'</h1><p>Periode: '+escapeHTML(period)+' · Jumlah data: '+(laporanAktifRows||[]).length+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');w.document.close();}
     el("reportKind").addEventListener("change",function(){el("reportUsageTypeWrap").style.display=this.value==="penggunaan"?"block":"none";});
