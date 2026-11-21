@@ -492,7 +492,7 @@ function doGet(e) {
 
 // Mengirim hasil API kembali ke halaman GitHub melalui iframe tersembunyi.
 function bmnApiResponse_(payload) {
-  const json = JSON.stringify(payload).replace(/</g, "\\u003c");
+  const json = JSON.stringify(payload).replace(/</g, "\u003c");
   const html = '<!doctype html><html><head><meta charset="utf-8"></head><body>' +
     '<script>window.top.postMessage(' + json + ', "*");<\/script>' +
     '</body></html>';
@@ -1574,8 +1574,8 @@ function kirimUsulanATKOperasional(data) {
   const barang = String(data.namaBarang || "").trim();
   const jumlah = Number(data.jumlah);
   const spesifikasi = String(data.spesifikasi || "").trim();
-  const hargaTeks = String(data.perkiraanHargaSatuan == null ? "" : data.perkiraanHargaSatuan).trim().replace(/^Rp\\.?\\s*/i,"").replace(/\\s/g,"");
-  const hargaNormal = hargaTeks.includes(",") ? hargaTeks.replace(/\\./g,"").replace(",",".") : hargaTeks.replace(/\\./g,"");
+  const hargaTeks = String(data.perkiraanHargaSatuan == null ? "" : data.perkiraanHargaSatuan).trim().replace(/^Rp\.?\s*/i,"").replace(/\s/g,"");
+  const hargaNormal = hargaTeks.includes(",") ? hargaTeks.replace(/\./g,"").replace(",",".") : hargaTeks.replace(/\./g,"");
   const harga = Number(hargaNormal);
   const alasan = String(data.alasanKebutuhan || "").trim();
   if (!nama || !barang || !(jumlah > 0) || !spesifikasi || !(harga >= 0) || !alasan) {
