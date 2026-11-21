@@ -5,6 +5,18 @@
 <base target="_top"><title>Formulir Pengelolaan BMN | Balai POM di Ende</title>
 <link rel="icon" type="image/png" href="logo-bmn.png.png">
 <style>
+    /* Tombol interaktif pada daftar barang */
+    .btn-tambah-barang,.btn-hapus-barang{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:10px 15px;font:700 12px Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.15px;cursor:pointer;user-select:none;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease,background .2s ease;position:relative;overflow:hidden}
+    .btn-tambah-barang{color:#fff;background:linear-gradient(115deg,#123d5d 0%,#176b91 62%,#16845b 100%);box-shadow:0 5px 13px rgba(18,61,93,.18)}
+    .btn-tambah-barang:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.22) 48%,transparent 72%);transform:translateX(-120%);transition:transform .55s ease}
+    .btn-tambah-barang:hover{transform:translateY(-2px);box-shadow:0 9px 19px rgba(18,61,93,.25);filter:saturate(1.12)}
+    .btn-tambah-barang:hover:before{transform:translateX(120%)}
+    .btn-tambah-barang:active,.btn-hapus-barang:active{transform:translateY(1px) scale(.97);box-shadow:0 2px 6px rgba(15,40,60,.16)}
+    .btn-hapus-barang{color:#a43b42;background:linear-gradient(135deg,#fff3f2,#ffe5e2);border:1px solid #f2c7c4;padding:9px 12px;box-shadow:0 3px 8px rgba(164,59,66,.07)}
+    .btn-hapus-barang:hover{color:#fff;background:linear-gradient(120deg,#c84b50,#a92f3c);border-color:#b83d47;transform:translateY(-2px);box-shadow:0 7px 15px rgba(169,47,60,.2)}
+    .btn-tambah-barang:focus-visible,.btn-hapus-barang:focus-visible{outline:3px solid rgba(36,118,199,.28);outline-offset:3px}
+    @media(max-width:480px){.btn-tambah-barang,.btn-hapus-barang{padding:10px 12px;font-size:11px}}
+
 :root{--navy:#173b5e;--navy2:#102d49;--blue:#2563eb;--bg:#f3f6fa;--text:#1e293b;--muted:#64748b;--line:#dbe3ed;--green:#15803d}
 *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}body{margin:0;background:linear-gradient(180deg,#eaf1f8 0,#f5f7fb 320px);color:var(--text);padding:26px 15px}.wrap{max-width:920px;margin:auto}
 .top{margin:0 0 16px}.top a{color:var(--navy);text-decoration:none;font-weight:700;font-size:13px}
@@ -168,7 +180,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <form id="usageForm"><div class="grid">
         <div class="field full"><label for="jenisForm">Jenis Formulir *</label><select id="jenisForm" required><option value="">Memuat jenis formulir...</option></select></div>
         <div class="field hidden" id="atkWrap"><label for="jenisATK">Jenis ATK *</label><select id="jenisATK"><option value="">Pilih jenis ATK</option></select></div>
-        <div class="field full"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><label style="margin:0">Daftar Barang yang Digunakan *</label><button type="button" class="secondary" id="tambahItemPenggunaan">+ Tambah Barang</button></div><div id="daftarItemPenggunaan" style="display:grid;gap:12px;margin-top:12px"></div><small style="color:var(--muted)">Pilih satu atau beberapa barang dari jenis formulir yang sama. Jumlah dan satuan diisi untuk setiap barang.</small></div>
+        <div class="field full"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><label style="margin:0">Daftar Barang yang Digunakan *</label><button type="button" class="btn-tambah-barang" id="tambahItemPenggunaan">+ Tambah Barang</button></div><div id="daftarItemPenggunaan" style="display:grid;gap:12px;margin-top:12px"></div><small style="color:var(--muted)">Pilih satu atau beberapa barang dari jenis formulir yang sama. Jumlah dan satuan diisi untuk setiap barang.</small></div>
         <div class="field"><label for="namaPemakai">Nama Pemakai *</label><input id="namaPemakai" required maxlength="150" placeholder="Masukkan nama lengkap"></div>
         <div class="field"><label for="tanggal">Tanggal *</label><input id="tanggal" type="date" required></div>
       </div><label class="statement"><input id="pernyataanPenggunaan" type="checkbox" required><span>Saya bersedia menggunakan barang tersebut sesuai dengan kebutuhan dan ketentuan, mencatat setiap pemakaian dengan benar, serta bertanggung jawab atas penggunaan yang tidak sesuai prosedur.</span></label>
@@ -278,7 +290,7 @@ function buatItemPenggunaan(){
  const satuanText=document.createElement("input");satuanText.readOnly=true;satuanText.classList.add("hidden");
  const jumlah=document.createElement("input");jumlah.type="number";jumlah.min="0.01";jumlah.step="any";jumlah.required=true;jumlah.placeholder="Jumlah";
  const satuanWrap=document.createElement("div");satuanWrap.append(satuan,satuanText);
- const hapus=document.createElement("button");hapus.type="button";hapus.textContent="Hapus";hapus.className="secondary";hapus.addEventListener("click",()=>{if(document.querySelectorAll(".item-penggunaan").length>1)card.remove();});
+ const hapus=document.createElement("button");hapus.type="button";hapus.textContent="✕ Hapus";hapus.className="btn-hapus-barang";hapus.addEventListener("click",()=>{if(document.querySelectorAll(".item-penggunaan").length>1)card.remove();});
  const lainnyaWrap=makeField("Nama barang lainnya",lainnya);
  grid.append(makeField("Nama Barang *",barang),lainnyaWrap,makeField("Satuan",satuanWrap),makeField("Jumlah *",jumlah),hapus);
  card.className="item-penggunaan";card.appendChild(grid);card._controls={barang,lainnya,satuan,satuanText,jumlah};$("daftarItemPenggunaan").appendChild(card);isiPilihanBarangItem(card);return card;
