@@ -1447,32 +1447,36 @@ function getReferensiFormPublik() {
 
   const asetSh = ss.getSheetByName("Master_Pemeliharaan");
   const daftarPemeliharaan = [], daftarPemeliharaanTIK = [], daftarPemeliharaanNonTIK = [];
-  const daftarAPAR = [], daftarP3K = [];
-  if (asetSh && asetSh.getLastRow() >= 2) {
-    const v = asetSh.getDataRange().getDisplayValues();
-    const h = v[0].map(x => String(x).trim());
-    const ix = {};
-    h.forEach((x,i) => ix[x] = i);
-    const ambil = (r, namaKolom, alternatif) => {
-      for (const k of [namaKolom].concat(alternatif || [])) {
-        if (ix[k] !== undefined && String(r[ix[k]] || "").trim()) return String(r[ix[k]]).trim();
-      }
-      return "";
-    };
-    v.slice(1).forEach((r, n) => {
-      const nama = ambil(r, "Nama_Barang", ["Nama Aset","Nama Barang"]);
-      if (!nama) return;
-      const id = ambil(r, "ID_Aset_Pemeliharaan", ["ID_Aset","ID Aset","ID"]) || ("MASTER-PEMEL-" + String(n + 2).padStart(4,"0"));
-      const kategori = ambil(r, "Kategori", ["Jenis_Aset","Jenis Aset"]).toUpperCase().replace(/[_-]/g," ").trim();
-      const status = ambil(r, "Status_Aktif", ["Status Aktif"]).toUpperCase();
-      if (status && !["AKTIF","ACTIVE","YA","TRUE","1"].includes(status)) return;
-      const item = {id:id,nama:nama,kategori:kategori,merk:ambil(r,"Merk",["Merek"]),tipeModel:ambil(r,"Tipe_Model",["Tipe Model"]),lokasi:ambil(r,"Lokasi",["Ruang"])};
-      daftarPemeliharaan.push(item);
-      if (kategori === "TIK") daftarPemeliharaanTIK.push(item);
-      else if (kategori === "NON TIK" || kategori === "NON-TIK") daftarPemeliharaanNonTIK.push(item);
-      else if (kategori === "APAR") daftarAPAR.push(item);
-      else if (kategori === "P3K") daftarP3K.push(item);
-    });
+  try {
+    const daftarAPAR = [], daftarP3K = [];
+    if (asetSh && asetSh.getLastRow() >= 2) {
+      const v = asetSh.getDataRange().getDisplayValues();
+      const h = v[0].map(x => String(x).trim());
+      const ix = {};
+      h.forEach((x,i) => ix[x] = i);
+      const ambil = (r, namaKolom, alternatif) => {
+        for (const k of [namaKolom].concat(alternatif || [])) {
+          if (ix[k] !== undefined && String(r[ix[k]] || "").trim()) return String(r[ix[k]]).trim();
+        }
+        return "";
+      };
+      v.slice(1).forEach((r, n) => {
+        const nama = ambil(r, "Nama_Barang", ["Nama Aset","Nama Barang"]);
+        if (!nama) return;
+        const id = ambil(r, "ID_Aset_Pemeliharaan", ["ID_Aset","ID Aset","ID"]) || ("MASTER-PEMEL-" + String(n + 2).padStart(4,"0"));
+        const kategori = ambil(r, "Kategori", ["Jenis_Aset","Jenis Aset"]).toUpperCase().replace(/[_-]/g," ").trim();
+        const status = ambil(r, "Status_Aktif", ["Status Aktif"]).toUpperCase();
+        if (status && !["AKTIF","ACTIVE","YA","TRUE","1"].includes(status)) return;
+        const item = {id:id,nama:nama,kategori:kategori,merk:ambil(r,"Merk",["Merek"]),tipeModel:ambil(r,"Tipe_Model",["Tipe Model"]),lokasi:ambil(r,"Lokasi",["Ruang"])};
+        daftarPemeliharaan.push(item);
+        if (kategori === "TIK") daftarPemeliharaanTIK.push(item);
+        else if (kategori === "NON TIK" || kategori === "NON-TIK") daftarPemeliharaanNonTIK.push(item);
+        else if (kategori === "APAR") daftarAPAR.push(item);
+        else if (kategori === "P3K") daftarP3K.push(item);
+      });
+    }
+  } catch (err) {
+    console.error("Gagal membaca Master_Pemeliharaan; referensi formulir umum tetap dilanjutkan: " + err.message);
   }
   const master = ss.getSheetByName("Master_BMN");
   const daftarAset = [], daftarLokasi = [];
