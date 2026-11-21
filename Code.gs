@@ -1656,7 +1656,9 @@ function kirimPemeliharaanTerpadu(data) {
     items.forEach(x=>{
       const aset=refs.daftarPemeliharaanTIK.find(a=>a.id===String(x.id||""));
       if(!aset) throw new Error("Aset TIK tidak ditemukan pada Master Pemeliharaan.");
-      const ya=String(x.pemeliharaan||"").toUpperCase()==="YA";
+      const statusPemeliharaan=String(x.pemeliharaan||"").toUpperCase();
+      if(!["YA","TIDAK"].includes(statusPemeliharaan)) throw new Error("Pilih Ya atau Tidak untuk setiap aset TIK.");
+      const ya=statusPemeliharaan==="YA";
       const ket=String(x.keterangan||"").trim();
       if(ya&&!ket) throw new Error("Keterangan wajib diisi untuk aset yang dipelihara: "+aset.nama);
       simpan(aset,"TIK",ya?"PEMELIHARAAN DILAKUKAN":"TIDAK DILAKUKAN",ya?ket:"Tidak dilakukan",ya?ket:"Tidak dilakukan","",ket);
