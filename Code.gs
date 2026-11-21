@@ -1508,16 +1508,44 @@ function kirimPenggunaanBarang(data) {
   }
   if (isLainnya && barangLainnya.length > 200) throw new Error("Nama barang lainnya maksimal 200 karakter.");
   const ref = getReferensiFormPublik().daftarBarang;
-  const cocok = ref.some(x => x.jenisForm === jenis && x.namaBarang === pilihanBarang &&
+  const itemRef = ref.find(x => x.jenisForm === jenis && x.namaBarang === pilihanBarang &&
     (jenis !== "ATK" || x.jenisATK === jenisATK));
-  if (!cocok) throw new Error("Nama barang tidak sesuai dengan referensi database. Muat ulang formulir.");
+  if (!itemRef) throw new Error("Nama barang tidak sesuai dengan referensi database. Muat ulang formulir.");
   if (isLainnya && !barangLainnya) throw new Error("Silakan tuliskan nama barang yang dimaksud pada pilihan Lainnya.");
+  const daftarSatuan = [...new Set(String(itemRef.satuan || "").split(";").map(x => x.trim()).filter(Boolean))];
+  const satuan = String(data.satuan || "").trim();
+  if (jenis === "ATK" && daftarSatuan.length === 1 && satuan !== daftarSatuan[0]) {
+    throw new Error("Satuan barang tidak sesuai dengan referensi.");
+  }
+  if (jenis === "ATK" && daftarSatuan.length > 1 && !daftarSatuan.includes(satuan)) {
+    throw new Error("Silakan pilih satuan barang yang tersedia.");
+  }
+  if (jenis === "ATK" && daftarSatuan.length === 0 && satuan) {
+    throw new Error("Satuan barang tidak tersedia pada referensi.");
+  }
   const sh = sheetBMN_("Data_Penggunaan_Barang", [
     "ID_Penggunaan","Waktu_Input","Jenis_Form","Jenis_ATK","Nama_Barang",
     "Nama_Pemakai","Tanggal","Jumlah","Pernyataan","Status"
   ]);
-  const id = "PGN" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900);
-  sh.appendRow([id,new Date(),jenis,jenis === "ATK" ? jenisATK : "",barang,pemakai,new Date(tanggal+"T12:00:00"),jumlah,PERNYATAAN_PENGGUNAAN_,"BARU"]);
+  const header = sh.getRange(1,1,1,sh.getLastColumn()).getDisplayValues()[0].map(x => String(x).trim());
+  let idxSatuan = header.indexOf("Satuan");
+  if (idxSatuan < 0) {
+    idxSatuan = header.length;
+    sh.getRange(1,idxSatuan+1).setValue("Satuan");
+  }
+  const kolom = Math.max(sh.getLastColumn(),idxSatuan+1);
+  const baris = Array(kolom).fill("");
+  const nilai = {
+    ID_Penggunaan:"PGN" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900),
+    Waktu_Input:new Date(),Jenis_Form:jenis,Jenis_ATK:jenis === "ATK" ? jenisATK : "",
+    Nama_Barang:barang,Nama_Pemakai:pemakai,Tanggal:new Date(tanggal+"T12:00:00"),
+    Jumlah:jumlah,Satuan:jenis === "ATK" ? satuan : "",
+    Pernyataan:PERNYATAAN_PENGGUNAAN_,Status:"BARU"
+  };
+  const headerLengkap = sh.getRange(1,1,1,kolom).getDisplayValues()[0].map(x => String(x).trim());
+  headerLengkap.forEach((namaKolom,i) => { if (Object.prototype.hasOwnProperty.call(nilai,namaKolom)) baris[i]=nilai[namaKolom]; });
+  sh.appendRow(baris);
+  const id = nilai.ID_Penggunaan;
   return {berhasil:true,pesan:"Formulir penggunaan barang berhasil dikirim.",id:id};
 }
 
