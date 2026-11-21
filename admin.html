@@ -2545,7 +2545,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const bulanNama=BULAN_MONITORING_BMN;
       rows.forEach(r=>{
         const tanggal=String(r.Tanggal_Pemeliharaan||"");
-        const dt=tanggal.match(/^(\\d{4})-(\\d{1,2})/);
+        const dt=tanggal.match(/^(\d{4})-(\d{1,2})/);
         if(!dt||dt[1]!==String(tahun))return;
         const bulan=Number(dt[2])-1;if(bulan<0||bulan>11)return;
         let checks=[];try{checks=JSON.parse(r.Checklist_JSON||"[]");}catch(e){}
@@ -2568,7 +2568,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       });
       const cols=[["Kegiatan","Kegiatan"],...BULAN_MONITORING_BMN.map((b,i)=>[String(i),b]),["Keterangan_Belum","Keterangan Pemeriksaan Belum"]];
       const matrix=kegiatan.map((k,i)=>{
-        const row={Kegiatan:k,Keterangan_Belum:(alasan[i]||[]).join("\\n")};
+        const row={Kegiatan:k,Keterangan_Belum:(alasan[i]||[]).join("\n")};
         BULAN_MONITORING_BMN.forEach((b,m)=>{row[String(m)]=status[i+"_"+m]==="SUDAH"?"☑":status[i+"_"+m]==="BELUM"?"☐":"";});
         return row;
       });
