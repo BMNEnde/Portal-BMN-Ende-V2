@@ -529,6 +529,7 @@ function doPost(e) {
       kirimPenggunaanBarang: kirimPenggunaanBarang,
       kirimUsulanATKOperasional: kirimUsulanATKOperasional,
       kirimPemeliharaanAset: kirimPemeliharaanAset,
+      kirimPemeliharaanTerpadu: kirimPemeliharaanTerpadu,
       getDataPenggunaanBarangAdmin: getDataPenggunaanBarangAdmin,
       getDataUsulanATKAdmin: getDataUsulanATKAdmin,
       getDataPemeliharaanAdmin: getDataPemeliharaanAdmin,
@@ -1445,22 +1446,32 @@ function getReferensiFormPublik() {
   }
 
   const asetSh = ss.getSheetByName("Master_Pemeliharaan");
-  const daftarPemeliharaan = [];
+  const daftarPemeliharaan = [], daftarPemeliharaanTIK = [], daftarPemeliharaanNonTIK = [];
+  const daftarAPAR = [], daftarP3K = [];
   if (asetSh && asetSh.getLastRow() >= 2) {
     const v = asetSh.getDataRange().getDisplayValues();
     const h = v[0].map(x => String(x).trim());
     const ix = {};
     h.forEach((x,i) => ix[x] = i);
-    const idxId = ix.ID_Aset_Pemeliharaan;
-    const idxNama = ix.Nama_Barang;
-    const idxAktif = ix.Status_Aktif;
-    v.slice(1).forEach(r => {
-      const id = idxId === undefined ? "" : String(r[idxId] || "").trim();
-      const nama = idxNama === undefined ? "" : String(r[idxNama] || "").trim();
-      const status = idxAktif === undefined ? "AKTIF" : String(r[idxAktif] || "").trim().toUpperCase();
-      if (id && nama && (!status || ["AKTIF","YA","TRUE","1"].includes(status))) {
-        daftarPemeliharaan.push({ id: id, nama: nama });
+    const ambil = (r, namaKolom, alternatif) => {
+      for (const k of [namaKolom].concat(alternatif || [])) {
+        if (ix[k] !== undefined && String(r[ix[k]] || "").trim()) return String(r[ix[k]]).trim();
       }
+      return "";
+    };
+    v.slice(1).forEach((r, n) => {
+      const nama = ambil(r, "Nama_Barang", ["Nama Aset","Nama Barang"]);
+      if (!nama) return;
+      const id = ambil(r, "ID_Aset_Pemeliharaan", ["ID_Aset","ID Aset","ID"]) || ("MASTER-PEMEL-" + String(n + 2).padStart(4,"0"));
+      const kategori = ambil(r, "Kategori", ["Jenis_Aset","Jenis Aset"]).toUpperCase().replace(/[_-]/g," ").trim();
+      const status = ambil(r, "Status_Aktif", ["Status Aktif"]).toUpperCase();
+      if (status && !["AKTIF","ACTIVE","YA","TRUE","1"].includes(status)) return;
+      const item = {id:id,nama:nama,kategori:kategori,merk:ambil(r,"Merk",["Merek"]),tipeModel:ambil(r,"Tipe_Model",["Tipe Model"]),lokasi:ambil(r,"Lokasi",["Ruang"])};
+      daftarPemeliharaan.push(item);
+      if (kategori === "TIK") daftarPemeliharaanTIK.push(item);
+      else if (kategori === "NON TIK" || kategori === "NON-TIK") daftarPemeliharaanNonTIK.push(item);
+      else if (kategori === "APAR") daftarAPAR.push(item);
+      else if (kategori === "P3K") daftarP3K.push(item);
     });
   }
   const master = ss.getSheetByName("Master_BMN");
@@ -1484,7 +1495,7 @@ function getReferensiFormPublik() {
   const daftarAlatGelas = [...new Set(daftarBarang.filter(x => x.jenisForm === "ALAT GELAS").map(x => x.namaBarang))].sort();
   return {
     jenisForm: JENIS_FORM_PENGGUNAAN_, jenisATK: jenisATK.sort(), daftarBarang: daftarBarang,
-    daftarPemeliharaan: daftarPemeliharaan, daftarAset: daftarAset, daftarLokasi: daftarLokasi.sort(),
+    daftarPemeliharaan: daftarPemeliharaan, daftarPemeliharaanTIK: daftarPemeliharaanTIK, daftarPemeliharaanNonTIK: daftarPemeliharaanNonTIK, daftarAPAR: daftarAPAR, daftarP3K: daftarP3K, daftarAset: daftarAset, daftarLokasi: daftarLokasi.sort(),
     daftarAlatGelas: daftarAlatGelas,
     jenisPemeliharaan: ["RUTIN", "PERBAIKAN RINGAN", "DARURAT"], petugasPemeliharaan: PETUGAS_PEMELIHARAAN_
   };
@@ -1620,6 +1631,50 @@ function kirimPemeliharaanAset(data) {
   const id = "PMH" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900);
   sh.appendRow([id,new Date(),idAset,aset.nama,new Date(tanggal+"T12:00:00"),jenis,temuan,hasil,petugas,urlFoto,PERNYATAAN_PEMELIHARAAN_,"BARU"]);
   return {berhasil:true,pesan:"Laporan pemeliharaan berhasil dikirim.",id:id,dokumentasi:urlFoto};
+}
+
+
+function kirimPemeliharaanTerpadu(data) {
+  if (!data || typeof data !== "object") throw new Error("Data pemeliharaan tidak valid.");
+  const tipe = String(data.tipe || "").trim().toUpperCase();
+  const tanggal = String(data.tanggal || "").trim();
+  const petugas = String(data.petugas || "").trim();
+  if (!tanggalISOValidBMN_(tanggal) || !PETUGAS_PEMELIHARAAN_.includes(petugas)) throw new Error("Tanggal dan petugas wajib diisi dengan benar.");
+  const refs = getReferensiFormPublik();
+  const sh = sheetBMN_("Data_Pemeliharaan_Aset", ["ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang","Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan","Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Pernyataan","Status"]);
+  const extra = ["Tipe_Form","Kategori_Aset","Checklist_JSON","Keterangan_Pemeriksaan"];
+  let headers = sh.getRange(1,1,1,sh.getLastColumn()).getDisplayValues()[0].map(x=>String(x).trim());
+  extra.forEach(h=>{if(!headers.includes(h)){sh.getRange(1,sh.getLastColumn()+1).setValue(h);headers.push(h);}});
+  const idBaru = () => "PMH"+Utilities.formatDate(new Date(),Session.getScriptTimeZone(),"yyyyMMddHHmmss")+Math.floor(100+Math.random()*900);
+  const simpan = (aset, kategori, jenis, temuan, hasil, checklist, keterangan) => {
+    const row = {ID_Pemeliharaan:idBaru(),Waktu_Input:new Date(),ID_Aset_Pemeliharaan:aset.id,Nama_Barang:aset.nama,Tanggal_Pemeliharaan:new Date(tanggal+"T12:00:00"),Jenis_Pemeliharaan:jenis,Temuan:temuan,Hasil_Pemeliharaan:hasil,Petugas_Pemeliharaan:petugas,Dokumentasi_URL:"",Pernyataan:PERNYATAAN_PEMELIHARAAN_,Status:"BARU",Tipe_Form:tipe,Kategori_Aset:kategori,Checklist_JSON:checklist||"",Keterangan_Pemeriksaan:keterangan||""};
+    sh.appendRow(headers.map(h=>Object.prototype.hasOwnProperty.call(row,h)?row[h]:""));
+  };
+  if (tipe === "TIK") {
+    const items = Array.isArray(data.items)?data.items:[];
+    if (!items.length) throw new Error("Pilih minimal satu aset TIK.");
+    items.forEach(x=>{
+      const aset=refs.daftarPemeliharaanTIK.find(a=>a.id===String(x.id||""));
+      if(!aset) throw new Error("Aset TIK tidak ditemukan pada Master Pemeliharaan.");
+      const ya=String(x.pemeliharaan||"").toUpperCase()==="YA";
+      const ket=String(x.keterangan||"").trim();
+      if(ya&&!ket) throw new Error("Keterangan wajib diisi untuk aset yang dipelihara: "+aset.nama);
+      simpan(aset,"TIK",ya?"PEMELIHARAAN DILAKUKAN":"TIDAK DILAKUKAN",ya?ket:"Tidak dilakukan",ya?ket:"Tidak dilakukan","",ket);
+    });
+    return {berhasil:true,pesan:"Data pemeliharaan TIK berhasil dikirim.",jumlah:items.length};
+  }
+  if (tipe === "MONITORING_APAR_P3K") {
+    const kategori=String(data.kategori||"").trim().toUpperCase();
+    const aset=(kategori==="APAR"?refs.daftarAPAR:kategori==="P3K"?refs.daftarP3K:[]).find(a=>a.id===String(data.idAset||""));
+    const checks=Array.isArray(data.checklist)?data.checklist:[];
+    const wajib=kategori==="APAR"?10:kategori==="P3K"?7:0;
+    if(!aset||checks.length!==wajib||checks.some(x=>!["SUDAH","BELUM"].includes(String(x.status||"").toUpperCase()))) throw new Error("Pilih aset dan lengkapi seluruh checklist "+kategori+".");
+    const catatan=String(data.keterangan||"").trim();
+    const ringkasan=checks.filter(x=>String(x.status).toUpperCase()==="BELUM").map(x=>x.kegiatan+": "+String(x.keterangan||"Belum dilakukan")).join("; ");
+    simpan(aset,kategori,"MONITORING "+kategori,ringkasan||"Seluruh checklist sudah dilakukan", "Pemeriksaan "+kategori+" selesai",JSON.stringify(checks),catatan);
+    return {berhasil:true,pesan:"Monitoring "+kategori+" berhasil disimpan.",jumlahChecklist:checks.length};
+  }
+  throw new Error("Jenis formulir pemeliharaan tidak dikenal.");
 }
 
 
