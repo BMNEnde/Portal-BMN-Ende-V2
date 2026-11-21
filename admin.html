@@ -2504,7 +2504,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const thumb=e.target.closest(".bmn-photo-thumb");
       if(thumb)bukaFotoAdmin(thumb.dataset.fotoUrl,thumb.dataset.fotoLabel);
     });
-    function formatRupiahAdmin(nilai){if(nilai===null||nilai===undefined||nilai==="")return "-";const raw=String(nilai).trim();const n=Number(raw.replace(/\\./g,"").replace(",", "."));if(!Number.isFinite(n))return raw;return "Rp. "+new Intl.NumberFormat("id-ID",{maximumFractionDigits:0}).format(n);}
+    function formatRupiahAdmin(nilai){if(nilai===null||nilai===undefined||nilai==="")return "-";const raw=String(nilai).trim();const n=Number(raw.replace(/\./g,"").replace(",", "."));if(!Number.isFinite(n))return raw;return "Rp. "+new Intl.NumberFormat("id-ID",{maximumFractionDigits:0}).format(n);}
     function tampilkanFormAdmin(){
       const cols=kolomFormAdmin[jenisFormAdminAktif], rows=dataFormAdmin[jenisFormAdminAktif]||[];
       el("formAdminHead").innerHTML="<tr>"+cols.map(c=>"<th>"+escapeHTML(({Dokumentasi_URL:"Foto Dokumentasi",Foto_URL:"Foto Barang",Foto_Peminjaman_URL:"Foto Peminjaman"})[c]||c.replace(/_/g," "))+"</th>").join("")+"</tr>";
