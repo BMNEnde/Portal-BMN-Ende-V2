@@ -2504,6 +2504,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const thumb=e.target.closest(".bmn-photo-thumb");
       if(thumb)bukaFotoAdmin(thumb.dataset.fotoUrl,thumb.dataset.fotoLabel);
     });
+    function formatRupiahAdmin(nilai){if(nilai===null||nilai===undefined||nilai==="")return "-";const raw=String(nilai).trim();const n=Number(raw.replace(/\\./g,"").replace(",", "."));if(!Number.isFinite(n))return raw;return "Rp. "+new Intl.NumberFormat("id-ID",{maximumFractionDigits:0}).format(n);}
     function tampilkanFormAdmin(){
       const cols=kolomFormAdmin[jenisFormAdminAktif], rows=dataFormAdmin[jenisFormAdminAktif]||[];
       el("formAdminHead").innerHTML="<tr>"+cols.map(c=>"<th>"+escapeHTML(({Dokumentasi_URL:"Foto Dokumentasi",Foto_URL:"Foto Barang",Foto_Peminjaman_URL:"Foto Peminjaman"})[c]||c.replace(/_/g," "))+"</th>").join("")+"</tr>";
@@ -2511,7 +2512,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       el("formAdminBody").innerHTML=rows.map(row=>"<tr>"+cols.map(c=>{
         const v=row[c];
         if(["Dokumentasi_URL","Foto_URL","Foto_Peminjaman_URL","Foto_Barang_URL","Foto_URL_Pemeliharaan"].includes(c))return '<td class="bmn-photo-cell">'+buatThumbnailFotoAdmin(v,"Foto dokumentasi "+jenisFormAdminAktif)+'</td>';
-        return "<td>"+escapeHTML(v==null||v===""?"-":v)+"</td>";
+        if(c==="Perkiraan_Harga_Satuan")return "<td>"+escapeHTML(formatRupiahAdmin(v))+"</td>";if(c[0]==="Perkiraan_Harga_Satuan")return "<td>"+escapeHTML(formatRupiahAdmin(v))+"</td>";return "<td>"+escapeHTML(v==null||v===""?"-":v)+"</td>";
       }).join("")+"</tr>").join("");
       el("formAdminCount").textContent="Menampilkan "+rows.length+" data";
     }
@@ -2596,7 +2597,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const header=laporanAktifCols.map(c=>String(c[1]||""));
       const data=rows.map(r=>laporanAktifCols.map(c=>{
         const value=r[c[0]];
-        return value===null||value===undefined?"":String(value);
+        return value===null||value===undefined?"":(c[0]==="Perkiraan_Harga_Satuan"?formatRupiahAdmin(value):String(value));
       }));
       const aoa=[
         [title],
@@ -2695,7 +2696,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const title=laporanAktifTitle;
       const period=laporanMatriksMonitoring?el("reportYear").value:el("reportMonth").selectedOptions[0].text+" "+el("reportYear").value;
       const heads=laporanAktifCols.map(c=>"<th>"+escapeHTML(c[1])+"</th>").join("");
-      const body=(laporanAktifRows||[]).map(r=>"<tr>"+laporanAktifCols.map(c=>"<td>"+escapeHTML(r[c[0]]==null?"":r[c[0]])+"</td>").join("")+"</tr>").join("");
+      const body=(laporanAktifRows||[]).map(r=>"<tr>"+laporanAktifCols.map(c=>"<td>"+escapeHTML(c[0]==="Perkiraan_Harga_Satuan"?formatRupiahAdmin(r[c[0]]):(r[c[0]]==null?"":r[c[0]]))+"</td>").join("")+"</tr>").join("");
       if(laporanMatriksMonitoring){
         w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#000}h1{text-align:center;font-size:17px}p{text-align:center;font-size:11px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #000;padding:6px;text-align:center}th{background:#ffff00}td:first-child{text-align:left;width:32%}@page{size:landscape;margin:10mm}</style></head><body><h1>MONITORING PEMELIHARAAN APAR &amp; KOTAK P3K</h1><p>Tahun '+escapeHTML(period)+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
         w.document.close();return;
