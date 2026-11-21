@@ -1494,19 +1494,24 @@ function kirimPenggunaanBarang(data) {
   if (!data || typeof data !== "object") throw new Error("Data formulir tidak valid.");
   const jenis = String(data.jenisForm || "").trim().toUpperCase();
   const jenisATK = String(data.jenisATK || "").trim();
-  const barang = String(data.namaBarang || "").trim();
+  const pilihanBarang = String(data.namaBarang || "").trim();
+  const barangLainnya = String(data.namaBarangLainnya || "").trim();
+  const isLainnya = pilihanBarang.toUpperCase() === "LAINNYA";
+  const barang = isLainnya ? barangLainnya : pilihanBarang;
   const pemakai = String(data.namaPemakai || "").trim();
   const tanggal = String(data.tanggal || "").trim();
   const jumlah = Number(data.jumlah);
   if (!JENIS_FORM_PENGGUNAAN_.includes(jenis)) throw new Error("Jenis formulir tidak valid.");
   if (jenis === "ATK" && !jenisATK) throw new Error("Jenis ATK wajib dipilih.");
-  if (!barang || !pemakai || !tanggalISOValidBMN_(tanggal) || !(jumlah > 0)) {
+  if (!pilihanBarang || !barang || !pemakai || !tanggalISOValidBMN_(tanggal) || !(jumlah > 0)) {
     throw new Error("Mohon lengkapi nama barang, nama pemakai, tanggal, dan jumlah dengan benar.");
   }
+  if (isLainnya && barangLainnya.length > 200) throw new Error("Nama barang lainnya maksimal 200 karakter.");
   const ref = getReferensiFormPublik().daftarBarang;
-  const cocok = ref.some(x => x.jenisForm === jenis && x.namaBarang === barang &&
+  const cocok = ref.some(x => x.jenisForm === jenis && x.namaBarang === pilihanBarang &&
     (jenis !== "ATK" || x.jenisATK === jenisATK));
   if (!cocok) throw new Error("Nama barang tidak sesuai dengan referensi database. Muat ulang formulir.");
+  if (isLainnya && !barangLainnya) throw new Error("Silakan tuliskan nama barang yang dimaksud pada pilihan Lainnya.");
   const sh = sheetBMN_("Data_Penggunaan_Barang", [
     "ID_Penggunaan","Waktu_Input","Jenis_Form","Jenis_ATK","Nama_Barang",
     "Nama_Pemakai","Tanggal","Jumlah","Pernyataan","Status"
