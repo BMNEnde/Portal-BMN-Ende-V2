@@ -1574,7 +1574,9 @@ function kirimUsulanATKOperasional(data) {
   const barang = String(data.namaBarang || "").trim();
   const jumlah = Number(data.jumlah);
   const spesifikasi = String(data.spesifikasi || "").trim();
-  const harga = Number(data.perkiraanHargaSatuan);
+  const hargaTeks = String(data.perkiraanHargaSatuan == null ? "" : data.perkiraanHargaSatuan).trim().replace(/^Rp\\.?\\s*/i,"").replace(/\\s/g,"");
+  const hargaNormal = hargaTeks.includes(",") ? hargaTeks.replace(/\\./g,"").replace(",",".") : hargaTeks.replace(/\\./g,"");
+  const harga = Number(hargaNormal);
   const alasan = String(data.alasanKebutuhan || "").trim();
   if (!nama || !barang || !(jumlah > 0) || !spesifikasi || !(harga >= 0) || !alasan) {
     throw new Error("Mohon lengkapi seluruh data usulan dengan benar.");
@@ -1693,7 +1695,7 @@ function kirimPemeliharaanTerpadu(data) {
     const aset=(kategori==="APAR"?refs.daftarAPAR:kategori==="P3K"?refs.daftarP3K:[]).find(a=>a.id===String(data.idAset||""));
     const checks=Array.isArray(data.checklist)?data.checklist:[];
     const wajib=kategori==="APAR"?10:kategori==="P3K"?7:0;
-    if(!aset||checks.length!==wajib||checks.some(x=>!["SUDAH","BELUM"].includes(String(x.status||"").toUpperCase()))) throw new Error("Pilih aset dan lengkapi seluruh checklist "+kategori+".");
+    if(!aset||checks.length!==wajib||checks.some(x=>!["SUDAH","BELUM"].includes(String(x.status||"").toUpperCase()))) throw new Error("Pilih aset dan lengkapi seluruh checklist "+kategori+".");\n    if(checks.some(x=>String(x.status||"").toUpperCase()==="BELUM"&&!String(x.keterangan||"").trim())) throw new Error("Setiap checklist yang dijawab Belum wajib disertai alasan pada kolom keterangan.");
     const catatan=String(data.keterangan||"").trim();
     const ringkasan=checks.map(x=>x.kegiatan+": "+String(x.status).toUpperCase()+(String(x.keterangan||"").trim()?" ("+String(x.keterangan).trim()+")":"")).join("; ");
     simpan(aset,kategori,"MONITORING "+kategori,ringkasan||"Seluruh checklist sudah dilakukan", "Pemeriksaan "+kategori+" selesai",JSON.stringify(checks),catatan);
