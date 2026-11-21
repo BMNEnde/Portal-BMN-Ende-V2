@@ -1467,7 +1467,7 @@ function getReferensiFormPublik() {
         const kategori = ambil(r, "Kategori", ["Jenis_Aset","Jenis Aset"]).toUpperCase().replace(/[_-]/g," ").trim();
         const status = ambil(r, "Status_Aktif", ["Status Aktif"]).toUpperCase();
         if (status && !["AKTIF","ACTIVE","YA","TRUE","1"].includes(status)) return;
-        const item = {id:id,nama:nama,kategori:kategori,merk:ambil(r,"Merk",["Merek"]),tipeModel:ambil(r,"Tipe_Model",["Tipe Model"]),lokasi:ambil(r,"Lokasi",["Ruang"])};
+        const item = {id:id,nama:nama,kategori:kategori,merk:ambil(r,"Merk",["Merek"]),tipeModel:ambil(r,"Tipe_Model",["Tipe Model"]),nomorSeri:ambil(r,"Nomor_Seri",["Nomor Seri","No. Seri"]),lokasi:ambil(r,"Lokasi",["Ruang"])};
         daftarPemeliharaan.push(item);
         if (kategori === "TIK") daftarPemeliharaanTIK.push(item);
         else if (kategori === "NON TIK" || kategori === "NON-TIK") daftarPemeliharaanNonTIK.push(item);
@@ -1621,7 +1621,7 @@ function kirimPemeliharaanAset(data) {
   const petugas = String(data.petugasPemeliharaan || "").trim();
   if (!idAset || !tanggalISOValidBMN_(tanggal) ||
       !["RUTIN","PERBAIKAN RINGAN","DARURAT"].includes(jenis) ||
-      !temuan || !hasil || !PETUGAS_PEMELIHARAAN_.includes(petugas)) {
+      !temuan || !hasil || !petugas || petugas.length > 150) {
     throw new Error("Mohon lengkapi seluruh data pemeliharaan dengan benar.");
   }
   const aset = getReferensiFormPublik().daftarPemeliharaan.find(x => x.id === idAset);
@@ -1643,7 +1643,7 @@ function kirimPemeliharaanTerpadu(data) {
   const tipe = String(data.tipe || "").trim().toUpperCase();
   const tanggal = String(data.tanggal || "").trim();
   const petugas = String(data.petugas || "").trim();
-  if (!tanggalISOValidBMN_(tanggal) || !PETUGAS_PEMELIHARAAN_.includes(petugas)) throw new Error("Tanggal dan petugas wajib diisi dengan benar.");
+  if (!tanggalISOValidBMN_(tanggal) || !petugas || petugas.length > 150) throw new Error("Tanggal dan nama petugas wajib diisi dengan benar.");
   const refs = getReferensiFormPublik();
   const sh = sheetBMN_("Data_Pemeliharaan_Aset", ["ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang","Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan","Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Pernyataan","Status"]);
   const extra = ["Tipe_Form","Kategori_Aset","Checklist_JSON","Keterangan_Pemeriksaan"];
