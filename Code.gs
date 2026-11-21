@@ -1494,61 +1494,65 @@ function kirimPenggunaanBarang(data) {
   if (!data || typeof data !== "object") throw new Error("Data formulir tidak valid.");
   const jenis = String(data.jenisForm || "").trim().toUpperCase();
   const jenisATK = String(data.jenisATK || "").trim();
-  const pilihanBarang = String(data.namaBarang || "").trim();
-  const barangLainnya = String(data.namaBarangLainnya || "").trim();
-  const isLainnya = pilihanBarang.toUpperCase() === "LAINNYA";
-  const barang = isLainnya ? barangLainnya : pilihanBarang;
   const pemakai = String(data.namaPemakai || "").trim();
   const tanggal = String(data.tanggal || "").trim();
-  const jumlah = Number(data.jumlah);
   if (!JENIS_FORM_PENGGUNAAN_.includes(jenis)) throw new Error("Jenis formulir tidak valid.");
   if (jenis === "ATK" && !jenisATK) throw new Error("Jenis ATK wajib dipilih.");
-  if (!pilihanBarang || !barang || !pemakai || !tanggalISOValidBMN_(tanggal) || !(jumlah > 0)) {
-    throw new Error("Mohon lengkapi nama barang, nama pemakai, tanggal, dan jumlah dengan benar.");
-  }
-  if (isLainnya && barangLainnya.length > 200) throw new Error("Nama barang lainnya maksimal 200 karakter.");
-  const ref = getReferensiFormPublik().daftarBarang;
-  const itemRef = ref.find(x => x.jenisForm === jenis && x.namaBarang === pilihanBarang &&
-    (jenis !== "ATK" || x.jenisATK === jenisATK));
-  if (!itemRef) throw new Error("Nama barang tidak sesuai dengan referensi database. Muat ulang formulir.");
-  if (isLainnya && !barangLainnya) throw new Error("Silakan tuliskan nama barang yang dimaksud pada pilihan Lainnya.");
-  const daftarSatuan = [...new Set(String(itemRef.satuan || "").split(";").map(x => x.trim()).filter(Boolean))];
-  const satuan = String(data.satuan || "").trim();
-  if (daftarSatuan.length === 1 && satuan !== daftarSatuan[0]) {
-    throw new Error("Satuan barang tidak sesuai dengan referensi.");
-  }
-  if (daftarSatuan.length > 1 && !daftarSatuan.includes(satuan)) {
-    throw new Error("Silakan pilih satuan barang yang tersedia.");
-  }
-  if (daftarSatuan.length === 0 && satuan) {
-    throw new Error("Satuan barang tidak tersedia pada referensi.");
-  }
+  if (!pemakai || !tanggalISOValidBMN_(tanggal)) throw new Error("Nama pemakai dan tanggal wajib diisi dengan benar.");
+
+  const items = Array.isArray(data.items) ? data.items : [{
+    namaBarang:data.namaBarang,namaBarangLainnya:data.namaBarangLainnya,
+    satuan:data.satuan,jumlah:data.jumlah
+  }];
+  if (!items.length || items.length > 50) throw new Error("Jumlah barang harus antara 1 sampai 50 item.");
+  const referensi = getReferensiFormPublik().daftarBarang;
+  const waktu = new Date();
+  const prefix = "PGN" + Utilities.formatDate(waktu, Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900);
+  const hasil = [];
+
+  items.forEach((item, index) => {
+    const pilihanBarang = String(item.namaBarang || "").trim();
+    const barangLainnya = String(item.namaBarangLainnya || "").trim();
+    const isLainnya = pilihanBarang.toUpperCase() === "LAINNYA";
+    const barang = isLainnya ? barangLainnya : pilihanBarang;
+    const jumlah = Number(item.jumlah);
+    if (!pilihanBarang || !barang || !(jumlah > 0)) throw new Error("Nama barang dan jumlah item ke-" + (index+1) + " wajib diisi dengan benar.");
+    if (isLainnya && barangLainnya.length > 200) throw new Error("Nama barang lainnya maksimal 200 karakter.");
+    if (isLainnya && !barangLainnya) throw new Error("Tuliskan nama barang untuk pilihan Lainnya pada item ke-" + (index+1) + ".");
+    const itemRef = referensi.find(x => x.jenisForm === jenis && x.namaBarang === pilihanBarang &&
+      (jenis !== "ATK" || x.jenisATK === jenisATK));
+    if (!itemRef) throw new Error("Barang pada item ke-" + (index+1) + " tidak sesuai referensi database. Muat ulang formulir.");
+    const daftarSatuan = [...new Set(String(itemRef.satuan || "").split(";").map(x => x.trim()).filter(Boolean))];
+    const satuan = String(item.satuan || "").trim();
+    if (daftarSatuan.length === 1 && satuan !== daftarSatuan[0]) throw new Error("Satuan item ke-" + (index+1) + " tidak sesuai referensi.");
+    if (daftarSatuan.length > 1 && !daftarSatuan.includes(satuan)) throw new Error("Pilih satuan yang tersedia untuk item ke-" + (index+1) + ".");
+    if (daftarSatuan.length === 0 && satuan) throw new Error("Satuan item ke-" + (index+1) + " tidak tersedia pada referensi.");
+    hasil.push({barang:barang,jumlah:jumlah,satuan:satuan});
+  });
+
   const sh = sheetBMN_("Data_Penggunaan_Barang", [
     "ID_Penggunaan","Waktu_Input","Jenis_Form","Jenis_ATK","Nama_Barang",
     "Nama_Pemakai","Tanggal","Jumlah","Pernyataan","Status"
   ]);
   const header = sh.getRange(1,1,1,sh.getLastColumn()).getDisplayValues()[0].map(x => String(x).trim());
   let idxSatuan = header.indexOf("Satuan");
-  if (idxSatuan < 0) {
-    idxSatuan = header.length;
-    sh.getRange(1,idxSatuan+1).setValue("Satuan");
-  }
+  if (idxSatuan < 0) { idxSatuan = header.length; sh.getRange(1,idxSatuan+1).setValue("Satuan"); }
   const kolom = Math.max(sh.getLastColumn(),idxSatuan+1);
-  const baris = Array(kolom).fill("");
-  const nilai = {
-    ID_Penggunaan:"PGN" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900),
-    Waktu_Input:new Date(),Jenis_Form:jenis,Jenis_ATK:jenis === "ATK" ? jenisATK : "",
-    Nama_Barang:barang,Nama_Pemakai:pemakai,Tanggal:new Date(tanggal+"T12:00:00"),
-    Jumlah:jumlah,Satuan:satuan,
-    Pernyataan:PERNYATAAN_PENGGUNAAN_,Status:"BARU"
-  };
-  const headerLengkap = sh.getRange(1,1,1,kolom).getDisplayValues()[0].map(x => String(x).trim());
-  headerLengkap.forEach((namaKolom,i) => { if (Object.prototype.hasOwnProperty.call(nilai,namaKolom)) baris[i]=nilai[namaKolom]; });
-  sh.appendRow(baris);
-  const id = nilai.ID_Penggunaan;
-  return {berhasil:true,pesan:"Formulir penggunaan barang berhasil dikirim.",id:id};
+  const headers = sh.getRange(1,1,1,kolom).getDisplayValues()[0].map(x => String(x).trim());
+  const rows = hasil.map((item,index) => {
+    const id = prefix + (hasil.length > 1 ? "-" + String(index+1).padStart(2,"0") : "");
+    const nilai = {
+      ID_Penggunaan:id,Waktu_Input:waktu,Jenis_Form:jenis,Jenis_ATK:jenis === "ATK" ? jenisATK : "",
+      Nama_Barang:item.barang,Nama_Pemakai:pemakai,Tanggal:new Date(tanggal+"T12:00:00"),
+      Jumlah:item.jumlah,Satuan:item.satuan,Pernyataan:PERNYATAAN_PENGGUNAAN_,Status:"BARU"
+    };
+    const row = Array(kolom).fill("");
+    headers.forEach((nama,i) => { if (Object.prototype.hasOwnProperty.call(nilai,nama)) row[i]=nilai[nama]; });
+    return row;
+  });
+  sh.getRange(sh.getLastRow()+1,1,rows.length,kolom).setValues(rows);
+  return {berhasil:true,pesan:hasil.length + " barang berhasil dikirim.",id:prefix,jumlahItem:hasil.length};
 }
-
 function kirimUsulanATKOperasional(data) {
   if (!data || typeof data !== "object") throw new Error("Data formulir tidak valid.");
   const nama = String(data.namaPengusul || "").trim();
