@@ -1640,9 +1640,9 @@ function kirimPemeliharaanAset(data) {
 
 function normalisasiTanggalPemeliharaan_(nilai) {
   const s = String(nilai || "").trim();
-  let m = s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
   if (!m) {
-    const lokal = s.match(/^(\\d{1,2})[\\/.-](\\d{1,2})[\\/.-](\\d{4})$/);
+    const lokal = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
     if (lokal) m = [lokal[0], lokal[3], lokal[2], lokal[1]];
   }
   if (!m) return "";
