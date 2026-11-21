@@ -1514,13 +1514,13 @@ function kirimPenggunaanBarang(data) {
   if (isLainnya && !barangLainnya) throw new Error("Silakan tuliskan nama barang yang dimaksud pada pilihan Lainnya.");
   const daftarSatuan = [...new Set(String(itemRef.satuan || "").split(";").map(x => x.trim()).filter(Boolean))];
   const satuan = String(data.satuan || "").trim();
-  if (jenis === "ATK" && daftarSatuan.length === 1 && satuan !== daftarSatuan[0]) {
+  if (daftarSatuan.length === 1 && satuan !== daftarSatuan[0]) {
     throw new Error("Satuan barang tidak sesuai dengan referensi.");
   }
-  if (jenis === "ATK" && daftarSatuan.length > 1 && !daftarSatuan.includes(satuan)) {
+  if (daftarSatuan.length > 1 && !daftarSatuan.includes(satuan)) {
     throw new Error("Silakan pilih satuan barang yang tersedia.");
   }
-  if (jenis === "ATK" && daftarSatuan.length === 0 && satuan) {
+  if (daftarSatuan.length === 0 && satuan) {
     throw new Error("Satuan barang tidak tersedia pada referensi.");
   }
   const sh = sheetBMN_("Data_Penggunaan_Barang", [
@@ -1539,7 +1539,7 @@ function kirimPenggunaanBarang(data) {
     ID_Penggunaan:"PGN" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900),
     Waktu_Input:new Date(),Jenis_Form:jenis,Jenis_ATK:jenis === "ATK" ? jenisATK : "",
     Nama_Barang:barang,Nama_Pemakai:pemakai,Tanggal:new Date(tanggal+"T12:00:00"),
-    Jumlah:jumlah,Satuan:jenis === "ATK" ? satuan : "",
+    Jumlah:jumlah,Satuan:satuan,
     Pernyataan:PERNYATAAN_PENGGUNAAN_,Status:"BARU"
   };
   const headerLengkap = sh.getRange(1,1,1,kolom).getDisplayValues()[0].map(x => String(x).trim());
