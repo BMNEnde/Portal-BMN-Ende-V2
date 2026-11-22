@@ -1,0 +1,148 @@
+/* Portal BMN — penyempurnaan tampilan responsif dan mobile
+   Lapisan visual saja: tidak mengubah alur formulir, data, atau autentikasi. */
+:root {
+  color-scheme: light;
+  --bmn-ink: #17354b;
+  --bmn-muted: #718397;
+  --bmn-line: #e1eaf0;
+  --bmn-paper: #ffffff;
+  --bmn-bg: #f3f7fa;
+  --bmn-navy: #10334f;
+  --bmn-blue: #176b91;
+  --bmn-green: #16845b;
+}
+html { -webkit-text-size-adjust: 100%; }
+body { color: var(--bmn-ink); }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, .tab, .doc, .menu-item { touch-action: manipulation; }
+
+/* ADMIN: dashboard lebih bersih, kontras, dan mudah dipakai */
+#appPage { background: #f3f7fa; }
+.sidebar {
+  background: linear-gradient(180deg, #10334f 0%, #0b263d 100%);
+  box-shadow: 8px 0 30px rgba(13, 45, 70, .08);
+}
+.sidebar .brand { padding-bottom: 22px; }
+.sidebar .menu-item {
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.sidebar .menu-item:hover { transform: translateX(2px); background: rgba(255,255,255,.10); }
+.sidebar .menu-item.active {
+  background: linear-gradient(100deg, rgba(45,130,170,.42), rgba(22,132,91,.22));
+  border-color: rgba(190,225,235,.18);
+  box-shadow: inset 3px 0 #54c18a;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  box-shadow: 0 4px 18px rgba(16,45,73,.045);
+}
+.content { max-width: 1600px; margin: 0 auto; }
+.page-heading h1 { letter-spacing: -.45px; }
+.stat-card, .panel, .table-wrap {
+  border-color: #e3ebf1;
+  border-radius: 15px;
+  box-shadow: 0 7px 22px rgba(16,45,73,.045);
+}
+.stat-card { transition: transform .18s ease, box-shadow .18s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(16,45,73,.08); }
+.stat-card .stat-value { letter-spacing: -.7px; }
+.panel { padding: 22px; }
+.filter-bar input, .filter-bar select, .field input, .field select, .field textarea {
+  min-height: 43px;
+  border-radius: 10px;
+}
+.btn { min-height: 38px; }
+.table-wrap { overflow: hidden; }
+.table-scroll { max-width: 100%; -webkit-overflow-scrolling: touch; }
+th { letter-spacing: .15px; }
+tbody tr { transition: background .15s ease; }
+tbody tr:hover { background: #f1f7fa; }
+.modal-card { border: 1px solid #e2eaf0; }
+
+/* FORM PENGELOLAAN DAN FORM PENGGUNA */
+body:has(.agency-brand) { background: radial-gradient(ellipse at 8% 4%, rgba(28,105,151,.10), transparent 30%), #f3f7fa; }
+.wrap { width: min(100% - 32px, 900px); }
+.top { padding: 4px 2px 15px; }
+.top a, .back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  text-decoration: none;
+  transition: color .18s ease, transform .18s ease;
+}
+.top a:hover, .back:hover { color: #16845b; transform: translateX(-2px); }
+.hero, .header {
+  box-shadow: 0 17px 40px rgba(12,43,66,.14);
+}
+.card {
+  box-shadow: 0 20px 48px rgba(21,55,78,.075);
+}
+.tab, .submit, button {
+  -webkit-appearance: none;
+}
+.tab:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 3px solid rgba(36,118,199,.35);
+  outline-offset: 3px;
+}
+input, select, textarea { max-width: 100%; }
+input[type="file"] { min-height: 44px; }
+.submit, button[type="submit"] {
+  min-height: 48px;
+  border-radius: 12px;
+}
+.hint { overflow-wrap: anywhere; }
+
+/* DOKUMEN BMN */
+body:has(.doc) { background: radial-gradient(ellipse at 8% 4%, rgba(28,105,151,.10), transparent 30%), #f3f7fa; }
+.doc {
+  min-width: 0;
+  border-color: #e2eaf0;
+  box-shadow: 0 9px 24px rgba(23,59,94,.06);
+}
+.doc strong { overflow-wrap: anywhere; }
+.doc:focus-visible { outline-color: #2476c7; }
+.note { box-shadow: 0 5px 16px rgba(23,59,94,.035); }
+
+@media (max-width: 700px) {
+  .sidebar { z-index: 1000; }
+  .topbar { min-height: 64px; }
+  .topbar h2 { line-height: 1.25; }
+  .admin-info { max-width: 46vw; min-width: 0; }
+  .admin-info > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .content { padding: 18px 12px 30px; }
+  .page-heading { align-items: flex-start; }
+  .stats-grid { gap: 10px; }
+  .stat-card { min-width: 0; }
+  .stat-card .stat-title { overflow-wrap: anywhere; }
+  .panel { padding: 16px 13px; }
+  .filter-bar { grid-template-columns: minmax(0,1fr); }
+  .table-wrap { border-radius: 12px; }
+  .table-scroll { overflow-x: auto; }
+  .modal { align-items: flex-end; }
+  .modal-card { width: 100%; max-height: 92dvh; overflow-y: auto; }
+  .modal-footer { position: sticky; bottom: 0; background: #fff; }
+  .wrap { width: calc(100% - 24px); }
+  .tabs { position: relative; }
+  .tab { min-height: 48px; border-radius: 11px; }
+  .doc { min-height: 150px; }
+}
+@media (max-width: 420px) {
+  .admin-info { font-size: 10px; }
+  .admin-info .avatar { flex: 0 0 30px; }
+  .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .stat-card { padding: 13px 11px; }
+  .stat-card .stat-value { font-size: 23px; }
+  .page-heading h1 { font-size: 20px; }
+  .wrap { width: calc(100% - 20px); }
+  .doc { min-height: 138px; padding: 12px 9px; }
+  .folder-icon, .folder-icon svg { width: 78px; height: 66px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
