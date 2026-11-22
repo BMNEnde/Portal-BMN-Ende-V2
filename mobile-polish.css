@@ -67,6 +67,7 @@ tbody tr:hover { background: #f1f7fa; }
 /* FORM PENGELOLAAN DAN FORM PENGGUNA */
 body:has(.agency-brand) { background: radial-gradient(ellipse at 8% 4%, rgba(28,105,151,.10), transparent 30%), #f3f7fa; }
 .wrap { width: min(100% - 32px, 900px); }
+body:has(.doc) .wrap { width: min(100% - 32px, 1120px); }
 .top { padding: 4px 2px 15px; }
 .top a, .back {
   display: inline-flex;
@@ -127,7 +128,8 @@ body:has(.doc) { background: radial-gradient(ellipse at 8% 4%, rgba(28,105,151,.
   .modal { align-items: flex-end; }
   .modal-card { width: 100%; max-height: 92dvh; overflow-y: auto; }
   .modal-footer { position: sticky; bottom: 0; background: #fff; }
-  .wrap { width: calc(100% - 24px); }
+  body:has(.agency-brand) .wrap { width: calc(100% - 24px); }
+  body:has(.doc) .wrap { width: calc(100% - 24px); }
   .tabs { position: relative; }
   .tab { min-height: 48px; border-radius: 11px; }
   .doc { min-height: 150px; }
@@ -139,7 +141,8 @@ body:has(.doc) { background: radial-gradient(ellipse at 8% 4%, rgba(28,105,151,.
   .stat-card { padding: 13px 11px; }
   .stat-card .stat-value { font-size: 23px; }
   .page-heading h1 { font-size: 20px; }
-  .wrap { width: calc(100% - 20px); }
+  body:has(.agency-brand) .wrap { width: calc(100% - 20px); }
+  body:has(.doc) .wrap { width: calc(100% - 20px); }
   .doc { min-height: 138px; padding: 12px 9px; }
   .folder-icon, .folder-icon svg { width: 78px; height: 66px; }
 }
