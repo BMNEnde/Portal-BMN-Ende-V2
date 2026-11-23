@@ -22,18 +22,33 @@ function getDatabase() {
   return SpreadsheetApp.openById(DATABASE_ID);
 }
 
-// Tambahkan NUP di kolom paling kanan jika belum ada.
-// Tidak memindahkan, menghapus, atau menimpa kolom dan data yang sudah ada.
+// Pastikan NUP berada tepat setelah Kode_BMN dan sebelum Nama_Aset.
+// Jika NUP sudah pernah dibuat di kolom lain, pindahkan seluruh kolomnya
+// agar data pada kolom tersebut tetap ikut berpindah dan tidak tertimpa.
 function pastikanKolomNUPMasterBMN_() {
   const sheet = getDatabase().getSheetByName("Master_BMN");
   if (!sheet || sheet.getLastColumn() < 1) return sheet;
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn())
+
+  let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn())
     .getDisplayValues()[0].map(h => String(h).trim());
-  if (!headers.includes("NUP")) {
-    const col = sheet.getLastColumn() + 1;
-    sheet.getRange(1, col).setValue("NUP")
+  const kodeCol = headers.indexOf("Kode_BMN") + 1;
+  if (!kodeCol) throw new Error("Kolom Kode_BMN tidak ditemukan pada Master_BMN.");
+
+  let nupCol = headers.indexOf("NUP") + 1;
+  const posisiNUP = kodeCol + 1;
+
+  if (!nupCol) {
+    sheet.insertColumnAfter(kodeCol);
+    sheet.getRange(1, posisiNUP).setValue("NUP")
       .setBackground("#173B5E").setFontColor("#FFFFFF").setFontWeight("bold");
+  } else if (nupCol !== posisiNUP) {
+    // Pindahkan seluruh kolom NUP, bukan hanya judulnya, agar isi datanya aman.
+    sheet.moveColumns(sheet.getRange(1, nupCol, sheet.getMaxRows(), 1), posisiNUP);
   }
+
+  // Pastikan judul dan format header NUP benar setelah penambahan/perpindahan.
+  sheet.getRange(1, posisiNUP).setValue("NUP")
+    .setBackground("#173B5E").setFontColor("#FFFFFF").setFontWeight("bold");
   return sheet;
 }
 
@@ -136,7 +151,7 @@ function setupDatabase() {
     }
   });
 
-  // Pastikan kolom NUP tersedia tanpa mengubah susunan kolom lama.
+  // Pastikan NUP berada di antara Kode_BMN dan Nama_Aset.
   pastikanKolomNUPMasterBMN_();
 
   // Migrasi aman: perbarui nama kolom ID pada data pemeliharaan lama
