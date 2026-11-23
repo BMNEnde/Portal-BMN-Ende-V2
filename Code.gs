@@ -1168,7 +1168,7 @@ function ambilAsetTersediaPublik() {
       (!statusPenggunaan || statusPenggunaan === "TERSEDIA");
   }).map(row => ({
     id: String(row[idx.ID_Aset] || ""), kode: String(row[idx.Kode_BMN] || ""),
-    nama: String(row[idx.Nama_Aset] || ""), nup: idx.NUP === undefined ? "" : String(row[idx.NUP] || ""), jenis: String(row[idx.Jenis_BMN] || "")
+    nama: String(row[idx.Nama_Aset] || ""), nup: idx.NUP === undefined ? "" : String(row[idx.NUP] || ""), merk: idx.Merk === undefined ? "" : String(row[idx.Merk] || ""), tipeModel: idx.Tipe_Model === undefined ? "" : String(row[idx.Tipe_Model] || ""), jenis: String(row[idx.Jenis_BMN] || "")
   })).filter(a => a.id && a.nama);
 }
 
@@ -1531,7 +1531,7 @@ function getReferensiFormPublik() {
       const merk = ix.Merk === undefined ? "" : String(r[ix.Merk] || "").trim();
       const tipeModel = ix.Tipe_Model === undefined ? "" : String(r[ix.Tipe_Model] || "").trim();
       const nomorSeri = ix.Nomor_Seri === undefined ? "" : String(r[ix.Nomor_Seri] || "").trim();
-      const item = {id:id,nama:nama,jenisBMN:jenisBMN,nup:nup,merk:merk,tipeModel:tipeModel,nomorSeri:nomorSeri,lokasi:lokasi,label:[nama,nup ? "NUP " + nup : "",merk].filter(Boolean).join(" / ")};
+      const item = {id:id,nama:nama,jenisBMN:jenisBMN,nup:nup,merk:merk,tipeModel:tipeModel,nomorSeri:nomorSeri,lokasi:lokasi,label:[nup,nama,merk,tipeModel].filter(Boolean).join(" / ")};
       daftarAset.push(item);
       if (status === "AKTIF") {
         if (jenisBMN === "MESIN PERALATAN KHUSUS TIK") { daftarPemeliharaanTIK.push(item); daftarPemeliharaan.push(item); }
