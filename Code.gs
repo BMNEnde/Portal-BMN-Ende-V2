@@ -109,7 +109,7 @@ function setupDatabase() {
     Data_Usulan_ATK_Operasional: [
       "ID_Usulan", "Waktu_Input", "Nama_Pengusul", "Nama_Barang",
       "Jumlah", "Spesifikasi", "Perkiraan_Harga_Satuan",
-      "Alasan_Kebutuhan", "Pernyataan", "Status"
+      "Alasan_Kebutuhan", "Foto_Produk_URL", "Pernyataan", "Status"
     ],
 
     Master_Pemeliharaan: [
@@ -1622,18 +1622,57 @@ function kirimUsulanATKOperasional(data) {
   const hargaNormal = hargaTeks.includes(",") ? hargaTeks.replace(/\./g,"").replace(",",".") : hargaTeks.replace(/\./g,"");
   const harga = Number(hargaNormal);
   const alasan = String(data.alasanKebutuhan || "").trim();
-  if (!nama || !barang || !(jumlah > 0) || !spesifikasi || !(harga >= 0) || !alasan) {
-    throw new Error("Mohon lengkapi seluruh data usulan dengan benar.");
+  if (!nama || !barang || !(jumlah > 0) || !spesifikasi || !(harga >= 0) || !alasan || !data.fotoProduk) {
+    throw new Error("Mohon lengkapi seluruh data usulan dan unggah foto produk.");
   }
+
+  const fotoProdukUrl = simpanFotoProdukUsulan_(data.fotoProduk);
   const sh = sheetBMN_("Data_Usulan_ATK_Operasional", [
     "ID_Usulan","Waktu_Input","Nama_Pengusul","Nama_Barang","Jumlah",
-    "Spesifikasi","Perkiraan_Harga_Satuan","Alasan_Kebutuhan","Pernyataan","Status"
+    "Spesifikasi","Perkiraan_Harga_Satuan","Alasan_Kebutuhan","Foto_Produk_URL","Pernyataan","Status"
   ]);
+  // Tambahkan kolom pada sheet lama tanpa menimpa data yang sudah ada.
+  const headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getDisplayValues()[0].map(h => String(h).trim());
+  if (!headers.includes("Foto_Produk_URL")) {
+    sh.getRange(1, sh.getLastColumn() + 1).setValue("Foto_Produk_URL");
+    headers.push("Foto_Produk_URL");
+  }
   const id = "USL" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900);
-  sh.appendRow([id,new Date(),nama,barang,jumlah,spesifikasi,harga,alasan,PERNYATAAN_USULAN_,"BARU"]);
-  return {berhasil:true,pesan:"Usulan ATK dan operasional berhasil dikirim.",id:id};
+  const record = {
+    ID_Usulan:id, Waktu_Input:new Date(), Nama_Pengusul:nama, Nama_Barang:barang,
+    Jumlah:jumlah, Spesifikasi:spesifikasi, Perkiraan_Harga_Satuan:harga,
+    Alasan_Kebutuhan:alasan, Foto_Produk_URL:fotoProdukUrl,
+    Pernyataan:PERNYATAAN_USULAN_, Status:"BARU"
+  };
+  sh.appendRow(headers.map(h => Object.prototype.hasOwnProperty.call(record, h) ? record[h] : ""));
+  return {berhasil:true,pesan:"Usulan ATK dan operasional beserta foto produk berhasil dikirim.",id:id,fotoProduk:fotoProdukUrl};
 }
 
+function simpanFotoProdukUsulan_(foto) {
+  if (!foto || typeof foto !== "object") throw new Error("Foto produk wajib diunggah.");
+  const mime = String(foto.mimeType || "").toLowerCase();
+  if (!["image/jpeg","image/png","image/webp"].includes(mime)) throw new Error("Foto produk harus berformat JPG, PNG, atau WEBP.");
+  const base64 = String(foto.base64 || "").replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, "");
+  if (!base64 || base64.length > 7 * 1024 * 1024) throw new Error("Ukuran foto produk terlalu besar. Maksimal 5 MB.");
+  const bytes = Utilities.base64Decode(base64);
+  if (bytes.length > 5 * 1024 * 1024) throw new Error("Ukuran foto produk maksimal 5 MB.");
+  const props = PropertiesService.getScriptProperties();
+  let folderId = props.getProperty("FOLDER_FOTO_PRODUK_USULAN_BMN");
+  let folder;
+  if (folderId) {
+    try { folder = DriveApp.getFolderById(folderId); } catch (e) { folder = null; }
+  }
+  if (!folder) {
+    folder = DriveApp.createFolder("Foto Produk Usulan BMN V2");
+    props.setProperty("FOLDER_FOTO_PRODUK_USULAN_BMN", folder.getId());
+  }
+  const ekstensi = mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg";
+  const namaFile = "FOTO_USULAN_" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMdd_HHmmss") + "_" + Math.floor(1000 + Math.random()*9000) + "." + ekstensi;
+  const file = folder.createFile(Utilities.newBlob(bytes, mime, namaFile));
+  folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return file.getUrl();
+}
 function simpanDokumentasiPemeliharaan_(foto) {
   if (!foto || typeof foto !== "object") throw new Error("Dokumentasi foto wajib diunggah.");
   const mime = String(foto.mimeType || "").toLowerCase();
