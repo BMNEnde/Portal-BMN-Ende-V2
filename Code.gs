@@ -709,6 +709,7 @@ function catatAktivitasBMN_(admin, aktivitas, idAset, keterangan) {
 
 function getMasterBMN(token, filter) {
   wajibAdminBMN_(token);
+  pastikanKolomNUPMasterBMN_();
 
   const data = ambilHeaderBMN_();
   const sheet = data.sheet;
