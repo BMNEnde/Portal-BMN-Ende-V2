@@ -1150,7 +1150,8 @@ function getReferensiBMN(token) {
 function ambilAsetTersediaPublik() {
   const sheet = getDatabase().getSheetByName("Master_BMN");
   if (!sheet || sheet.getLastRow() < 2) return [];
-  const values = sheet.getDataRange().getValues();
+  // Gunakan nilai tampilan agar NUP dengan angka nol di depan tetap terjaga.
+  const values = sheet.getDataRange().getDisplayValues();
   const header = values[0].map(String);
   const idx = {};
   header.forEach((h, i) => idx[h] = i);
@@ -1166,10 +1167,19 @@ function ambilAsetTersediaPublik() {
     return !["true", "ya", "1"].includes(deleted) &&
       statusAset === "AKTIF" &&
       (!statusPenggunaan || statusPenggunaan === "TERSEDIA");
-  }).map(row => ({
-    id: String(row[idx.ID_Aset] || ""), kode: String(row[idx.Kode_BMN] || ""),
-    nama: String(row[idx.Nama_Aset] || ""), nup: idx.NUP === undefined ? "" : String(row[idx.NUP] || ""), merk: idx.Merk === undefined ? "" : String(row[idx.Merk] || ""), tipeModel: idx.Tipe_Model === undefined ? "" : String(row[idx.Tipe_Model] || ""), jenis: String(row[idx.Jenis_BMN] || "")
-  })).filter(a => a.id && a.nama);
+  }).map(row => {
+    const aset = {
+      id: String(row[idx.ID_Aset] || "").trim(),
+      kode: String(row[idx.Kode_BMN] || "").trim(),
+      nama: String(row[idx.Nama_Aset] || "").trim(),
+      nup: idx.NUP === undefined ? "" : String(row[idx.NUP] || "").trim(),
+      merk: idx.Merk === undefined ? "" : String(row[idx.Merk] || "").trim(),
+      tipeModel: idx.Tipe_Model === undefined ? "" : String(row[idx.Tipe_Model] || "").trim(),
+      jenis: String(row[idx.Jenis_BMN] || "").trim()
+    };
+    aset.label = [aset.nup, aset.nama, aset.merk, aset.tipeModel].filter(Boolean).join(" / ");
+    return aset;
+  }).filter(a => a.id && a.nama);
 }
 
 function ajukanPeminjamanPublik(data) {
