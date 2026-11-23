@@ -301,7 +301,7 @@
   function loadAssets(){
     google.script.run.withSuccessHandler(function(items){
       const select=$('aset');select.innerHTML='<option value="">Pilih barang</option>';
-      (items||[]).forEach(function(a){const op=document.createElement('option');op.value=a.id;op.textContent=[a.nama,a.kode,a.nup?'NUP '+a.nup:'',a.jenis].filter(Boolean).join(' — ');select.appendChild(op);});
+      (items||[]).forEach(function(a){const op=document.createElement('option');op.value=a.id;op.textContent=[a.nup,a.nama,a.merk,a.tipeModel].filter(Boolean).join(' / ');select.appendChild(op);});
       if(!items||!items.length){select.innerHTML='<option value="">Belum ada aset tersedia</option>';}
     }).withFailureHandler(function(err){$('aset').innerHTML='<option value="">Gagal memuat aset</option>';showMessage(err.message||String(err),'error');}).ambilAsetTersediaPublik();
   }
