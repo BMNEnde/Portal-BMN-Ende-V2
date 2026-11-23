@@ -22,6 +22,21 @@ function getDatabase() {
   return SpreadsheetApp.openById(DATABASE_ID);
 }
 
+// Tambahkan NUP di kolom paling kanan jika belum ada.
+// Tidak memindahkan, menghapus, atau menimpa kolom dan data yang sudah ada.
+function pastikanKolomNUPMasterBMN_() {
+  const sheet = getDatabase().getSheetByName("Master_BMN");
+  if (!sheet || sheet.getLastColumn() < 1) return sheet;
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn())
+    .getDisplayValues()[0].map(h => String(h).trim());
+  if (!headers.includes("NUP")) {
+    const col = sheet.getLastColumn() + 1;
+    sheet.getRange(1, col).setValue("NUP")
+      .setBackground("#173B5E").setFontColor("#FFFFFF").setFontWeight("bold");
+  }
+  return sheet;
+}
+
 
 
 function setupDatabase() {
@@ -121,17 +136,8 @@ function setupDatabase() {
     }
   });
 
-  // Migrasi aman: tambahkan kolom NUP tanpa menggeser atau menimpa kolom/data lama.
-  const masterBMN = ss.getSheetByName("Master_BMN");
-  if (masterBMN && masterBMN.getLastColumn() > 0) {
-    const headerMaster = masterBMN.getRange(1, 1, 1, masterBMN.getLastColumn())
-      .getDisplayValues()[0].map(h => String(h).trim());
-    if (!headerMaster.includes("NUP")) {
-      const kolomNUP = masterBMN.getLastColumn() + 1;
-      masterBMN.getRange(1, kolomNUP).setValue("NUP")
-        .setBackground("#173B5E").setFontColor("#FFFFFF").setFontWeight("bold");
-    }
-  }
+  // Pastikan kolom NUP tersedia tanpa mengubah susunan kolom lama.
+  pastikanKolomNUPMasterBMN_();
 
   // Migrasi aman: perbarui nama kolom ID pada data pemeliharaan lama
   // tanpa menghapus atau mengubah isi data yang sudah tersimpan.
@@ -822,7 +828,7 @@ function simpanAset(token, dataAset) {
   if (!dataAset || typeof dataAset !== "object") throw new Error("Data aset tidak valid.");
 
   const ss = getDatabase();
-  const sheet = ss.getSheetByName("Master_BMN");
+  const sheet = pastikanKolomNUPMasterBMN_();
   if (!sheet) throw new Error("Sheet Master_BMN tidak ditemukan pada spreadsheet: " + ss.getName());
 
   const jumlahKolom = sheet.getLastColumn();
@@ -1125,7 +1131,7 @@ function getReferensiBMN(token) {
    ========================================================= */
 
 function ambilAsetTersediaPublik() {
-  const sheet = getDatabase().getSheetByName("Master_BMN");
+  const sheet = pastikanKolomNUPMasterBMN_();
   if (!sheet || sheet.getLastRow() < 2) return [];
   const values = sheet.getDataRange().getValues();
   const header = values[0].map(String);
@@ -1490,7 +1496,7 @@ function getReferensiFormPublik() {
   }
 
   // Aset TIK dan Non-TIK diambil dari Master_BMN, memakai ID_Aset sebagai ID referensi.
-  const master = ss.getSheetByName("Master_BMN");
+  const master = pastikanKolomNUPMasterBMN_();
   const daftarAset = [], daftarLokasi = [];
   if (master && master.getLastRow() >= 2) {
     const values = master.getDataRange().getDisplayValues();
