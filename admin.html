@@ -1275,6 +1275,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
                     <th>No.</th>
                     <th>Jenis BMN</th>
                     <th>Kode BMN</th>
+                    <th>NUP</th>
                     <th>Nama Aset</th>
                     <th>Kategori</th>
                     <th>Merk / Tipe</th>
@@ -1288,7 +1289,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 
                 <tbody id="assetTableBody">
                   <tr>
-                    <td colspan="11" class="empty-state">
+                    <td colspan="12" class="empty-state">
                       Data belum dimuat.
                     </td>
                   </tr>
@@ -1388,6 +1389,11 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
                 placeholder="Masukkan kode BMN"
                 required
               >
+            </div>
+
+            <div class="field">
+              <label>NUP</label>
+              <input type="text" id="formNUP" placeholder="Masukkan NUP aset">
             </div>
 
             <div class="field">
@@ -2063,7 +2069,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 
     function muatMasterBMN() {
       el("assetTableBody").innerHTML =
-        '<tr><td colspan="11" class="loading">Memuat data aset...</td></tr>';
+        '<tr><td colspan="12" class="loading">Memuat data aset...</td></tr>';
 
       const filter = {
         kataKunci: el("searchAsset").value || "",
@@ -2105,7 +2111,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         })
         .withFailureHandler(function(error) {
           el("assetTableBody").innerHTML =
-            '<tr><td colspan="11" class="empty-state">' +
+            '<tr><td colspan="12" class="empty-state">' +
             escapeHTML(error.message) +
             '</td></tr>';
 
@@ -2124,7 +2130,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 
       if (!data || data.length === 0) {
         tbody.innerHTML =
-          '<tr><td colspan="11" class="empty-state">' +
+          '<tr><td colspan="12" class="empty-state">' +
           'Belum ada data aset yang sesuai dengan pencarian.' +
           '</td></tr>';
 
@@ -2154,6 +2160,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
             <td>${index + 1}</td>
             <td>${escapeHTML(aset.Jenis_BMN || "-")}</td>
             <td>${escapeHTML(aset.Kode_BMN || "-")}</td>
+            <td>${escapeHTML(aset.NUP || "-")}</td>
             <td><strong>${escapeHTML(aset.Nama_Aset || "-")}</strong></td>
             <td>${escapeHTML(aset.Kategori || "-")}</td>
             <td>${escapeHTML(merkTipe || "-")}</td>
@@ -2234,6 +2241,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         el("formID").value = aset.ID_Aset || "";
         el("formJenis").value = aset.Jenis_BMN || "";
         el("formKode").value = aset.Kode_BMN || "";
+        el("formNUP").value = aset.NUP || "";
         el("formNama").value = aset.Nama_Aset || "";
         el("formKategori").value = aset.Kategori || "";
         el("formMerk").value = aset.Merk || "";
@@ -2276,6 +2284,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         ID_Aset: el("formID").value.trim(),
         Jenis_BMN: el("formJenis").value.trim(),
         Kode_BMN: el("formKode").value.trim(),
+        NUP: el("formNUP").value.trim(),
         Nama_Aset: el("formNama").value.trim(),
         Kategori: el("formKategori").value,
         Merk: el("formMerk").value.trim(),

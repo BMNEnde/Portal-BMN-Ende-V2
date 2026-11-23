@@ -22,6 +22,36 @@ function getDatabase() {
   return SpreadsheetApp.openById(DATABASE_ID);
 }
 
+// Pastikan NUP berada tepat setelah Kode_BMN dan sebelum Nama_Aset.
+// Jika NUP sudah pernah dibuat di kolom lain, pindahkan seluruh kolomnya
+// agar data pada kolom tersebut tetap ikut berpindah dan tidak tertimpa.
+function pastikanKolomNUPMasterBMN_() {
+  const sheet = getDatabase().getSheetByName("Master_BMN");
+  if (!sheet || sheet.getLastColumn() < 1) return sheet;
+
+  let headers = sheet.getRange(1, 1, 1, sheet.getLastColumn())
+    .getDisplayValues()[0].map(h => String(h).trim());
+  const kodeCol = headers.indexOf("Kode_BMN") + 1;
+  if (!kodeCol) throw new Error("Kolom Kode_BMN tidak ditemukan pada Master_BMN.");
+
+  let nupCol = headers.indexOf("NUP") + 1;
+  const posisiNUP = kodeCol + 1;
+
+  if (!nupCol) {
+    sheet.insertColumnAfter(kodeCol);
+    sheet.getRange(1, posisiNUP).setValue("NUP")
+      .setBackground("#173B5E").setFontColor("#FFFFFF").setFontWeight("bold");
+  } else if (nupCol !== posisiNUP) {
+    // Pindahkan seluruh kolom NUP, bukan hanya judulnya, agar isi datanya aman.
+    sheet.moveColumns(sheet.getRange(1, nupCol, sheet.getMaxRows(), 1), posisiNUP);
+  }
+
+  // Pastikan judul dan format header NUP benar setelah penambahan/perpindahan.
+  sheet.getRange(1, posisiNUP).setValue("NUP")
+    .setBackground("#173B5E").setFontColor("#FFFFFF").setFontWeight("bold");
+  return sheet;
+}
+
 
 
 function setupDatabase() {
@@ -29,7 +59,7 @@ function setupDatabase() {
 
   const struktur = {
     Master_BMN: [
-      "ID_Aset", "Jenis_BMN", "Kode_BMN", "Nama_Aset",
+      "ID_Aset", "Jenis_BMN", "Kode_BMN", "NUP", "Nama_Aset",
       "Kategori", "Merk", "Tipe_Model", "Nomor_Seri",
       "Tahun_Perolehan", "Kondisi", "Lokasi",
       "Status_Aset", "Status_Penggunaan", "Keterangan",
@@ -120,6 +150,9 @@ function setupDatabase() {
       sheet.setFrozenRows(1);
     }
   });
+
+  // Pastikan NUP berada di antara Kode_BMN dan Nama_Aset.
+  pastikanKolomNUPMasterBMN_();
 
   // Migrasi aman: perbarui nama kolom ID pada data pemeliharaan lama
   // tanpa menghapus atau mengubah isi data yang sudah tersimpan.
@@ -571,6 +604,7 @@ function doPost(e) {
 
 function getDashboardData(token) {
   wajibAdminBMN_(token);
+  pastikanKolomNUPMasterBMN_();
 
   const ss = getDatabase();
   const sheet = ss.getSheetByName("Master_BMN");
@@ -691,6 +725,7 @@ function catatAktivitasBMN_(admin, aktivitas, idAset, keterangan) {
 
 function getMasterBMN(token, filter) {
   wajibAdminBMN_(token);
+  pastikanKolomNUPMasterBMN_();
 
   const data = ambilHeaderBMN_();
   const sheet = data.sheet;
@@ -765,7 +800,7 @@ function getMasterBMN(token, filter) {
       if (statusFilter && String(aset.Status_Aset || "").toUpperCase() !== statusFilter) return;
 
       if (kataKunci) {
-        const teks = [aset.Jenis_BMN, aset.Kode_BMN, aset.Nama_Aset, aset.Kategori,
+        const teks = [aset.Jenis_BMN, aset.Kode_BMN, aset.NUP, aset.Nama_Aset, aset.Kategori,
           aset.Merk, aset.Tipe_Model, aset.Nomor_Seri, aset.Lokasi].join(" ").toLowerCase();
         if (!teks.includes(kataKunci)) return;
       }
@@ -810,7 +845,7 @@ function simpanAset(token, dataAset) {
   if (!dataAset || typeof dataAset !== "object") throw new Error("Data aset tidak valid.");
 
   const ss = getDatabase();
-  const sheet = ss.getSheetByName("Master_BMN");
+  const sheet = pastikanKolomNUPMasterBMN_();
   if (!sheet) throw new Error("Sheet Master_BMN tidak ditemukan pada spreadsheet: " + ss.getName());
 
   const jumlahKolom = sheet.getLastColumn();
@@ -1133,7 +1168,7 @@ function ambilAsetTersediaPublik() {
       (!statusPenggunaan || statusPenggunaan === "TERSEDIA");
   }).map(row => ({
     id: String(row[idx.ID_Aset] || ""), kode: String(row[idx.Kode_BMN] || ""),
-    nama: String(row[idx.Nama_Aset] || ""), jenis: String(row[idx.Jenis_BMN] || "")
+    nama: String(row[idx.Nama_Aset] || ""), nup: idx.NUP === undefined ? "" : String(row[idx.NUP] || ""), jenis: String(row[idx.Jenis_BMN] || "")
   })).filter(a => a.id && a.nama);
 }
 
@@ -1445,6 +1480,7 @@ function getReferensiFormPublik() {
     });
   }
 
+  // APAR dan P3K tetap menggunakan Master_Pemeliharaan.
   const asetSh = ss.getSheetByName("Master_Pemeliharaan");
   const daftarPemeliharaan = [], daftarPemeliharaanTIK = [], daftarPemeliharaanNonTIK = [];
   const daftarAPAR = [], daftarP3K = [];
@@ -1467,17 +1503,16 @@ function getReferensiFormPublik() {
         const kategori = ambil(r, "Kategori", ["Jenis_Aset","Jenis Aset"]).toUpperCase().replace(/[_-]/g," ").trim();
         const status = ambil(r, "Status_Aktif", ["Status Aktif"]).toUpperCase();
         if (status && !["AKTIF","ACTIVE","YA","TRUE","1"].includes(status)) return;
-        const item = {id:id,nama:nama,kategori:kategori,merk:ambil(r,"Merk",["Merek"]),tipeModel:ambil(r,"Tipe_Model",["Tipe Model"]),nomorSeri:ambil(r,"Nomor_Seri",["Nomor Seri","No. Seri"]),lokasi:ambil(r,"Lokasi",["Ruang"])};
-        daftarPemeliharaan.push(item);
-        if (kategori === "TIK") daftarPemeliharaanTIK.push(item);
-        else if (kategori === "NON TIK" || kategori === "NON-TIK") daftarPemeliharaanNonTIK.push(item);
-        else if (kategori === "APAR") daftarAPAR.push(item);
-        else if (kategori === "P3K") daftarP3K.push(item);
+        const item = {id:id,nama:nama,kategori:kategori,merk:ambil(r,"Merk",["Merek"]),tipeModel:ambil(r,"Tipe_Model",["Tipe Model"]),nomorSeri:ambil(r,"Nomor_Seri",["Nomor Seri","No. Seri"]),lokasi:ambil(r,"Lokasi",["Ruang"]),nup:""};
+        if (kategori === "APAR") { daftarAPAR.push(item); daftarPemeliharaan.push(item); }
+        else if (kategori === "P3K") { daftarP3K.push(item); daftarPemeliharaan.push(item); }
       });
     }
   } catch (err) {
-    console.error("Gagal membaca Master_Pemeliharaan; referensi formulir umum tetap dilanjutkan: " + err.message);
+    console.error("Gagal membaca Master_Pemeliharaan untuk APAR/P3K: " + err.message);
   }
+
+  // Aset TIK dan Non-TIK diambil dari Master_BMN, memakai ID_Aset sebagai ID referensi.
   const master = ss.getSheetByName("Master_BMN");
   const daftarAset = [], daftarLokasi = [];
   if (master && master.getLastRow() >= 2) {
@@ -1488,12 +1523,21 @@ function getReferensiFormPublik() {
       const id = String(r[ix.ID_Aset] || "").trim();
       const nama = String(r[ix.Nama_Aset] || "").trim();
       const lokasi = String(r[ix.Lokasi] || "").trim();
+      const jenisBMN = String(r[ix.Jenis_BMN] || "").trim().toUpperCase();
       const status = String(r[ix.Status_Aset] || "").trim().toUpperCase();
       const dihapus = String(r[ix.Dihapus] || "").trim().toUpperCase();
+      const nup = ix.NUP === undefined ? "" : String(r[ix.NUP] || "").trim();
       if (!id || !nama || ["YA","TRUE","1","DIHAPUS"].includes(dihapus)) return;
       const merk = ix.Merk === undefined ? "" : String(r[ix.Merk] || "").trim();
-      daftarAset.push({id:id,nama:nama,merk:merk,lokasi:lokasi,label:[nama,merk].filter(Boolean).join(" / ")});
-      if (lokasi && !["NONAKTIF","TIDAK AKTIF"].includes(status) && !daftarLokasi.includes(lokasi)) daftarLokasi.push(lokasi);
+      const tipeModel = ix.Tipe_Model === undefined ? "" : String(r[ix.Tipe_Model] || "").trim();
+      const nomorSeri = ix.Nomor_Seri === undefined ? "" : String(r[ix.Nomor_Seri] || "").trim();
+      const item = {id:id,nama:nama,jenisBMN:jenisBMN,nup:nup,merk:merk,tipeModel:tipeModel,nomorSeri:nomorSeri,lokasi:lokasi,label:[nama,nup ? "NUP " + nup : "",merk].filter(Boolean).join(" / ")};
+      daftarAset.push(item);
+      if (status === "AKTIF") {
+        if (jenisBMN === "MESIN PERALATAN KHUSUS TIK") { daftarPemeliharaanTIK.push(item); daftarPemeliharaan.push(item); }
+        else if (jenisBMN === "MESIN PERALATAN NON TIK") { daftarPemeliharaanNonTIK.push(item); daftarPemeliharaan.push(item); }
+        if (lokasi && !daftarLokasi.includes(lokasi)) daftarLokasi.push(lokasi);
+      }
     });
   }
   const daftarAlatGelas = [...new Set(daftarBarang.filter(x => x.jenisForm === "ALAT GELAS").map(x => x.namaBarang))].sort();
@@ -1630,16 +1674,20 @@ function kirimPemeliharaanAset(data) {
       !temuan || !hasil || !petugas || petugas.length > 150) {
     throw new Error("Mohon lengkapi seluruh data pemeliharaan dengan benar.");
   }
-  const aset = getReferensiFormPublik().daftarPemeliharaan.find(x => x.id === idAset);
-  if (!aset) throw new Error("Aset tidak ditemukan atau tidak aktif.");
+  const aset = getReferensiFormPublik().daftarPemeliharaanNonTIK.find(x => x.id === idAset);
+  if (!aset) throw new Error("Aset Non-TIK tidak ditemukan atau tidak aktif pada Master_BMN.");
   const urlFoto = simpanDokumentasiPemeliharaan_(data.dokumentasi);
   const sh = sheetBMN_("Data_Pemeliharaan_Aset", [
     "ID_Pemeliharaan","Waktu_Input","ID_Aset_Pemeliharaan","Nama_Barang",
     "Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan",
     "Hasil_Pemeliharaan","Petugas_Pemeliharaan","Dokumentasi_URL","Pernyataan","Status"
   ]);
+  const extra = ["Tipe_Form","Kategori_Aset","Checklist_JSON","Keterangan_Pemeriksaan"];
+  let headers = sh.getRange(1,1,1,sh.getLastColumn()).getDisplayValues()[0].map(x=>String(x).trim());
+  extra.forEach(h=>{if(!headers.includes(h)){sh.getRange(1,sh.getLastColumn()+1).setValue(h);headers.push(h);}});
   const id = "PMH" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900);
-  sh.appendRow([id,new Date(),idAset,aset.nama,new Date(tanggal+"T12:00:00"),jenis,temuan,hasil,petugas,urlFoto,PERNYATAAN_PEMELIHARAAN_,"BARU"]);
+  const row = {ID_Pemeliharaan:id,Waktu_Input:new Date(),ID_Aset_Pemeliharaan:idAset,Nama_Barang:aset.nama,Tanggal_Pemeliharaan:new Date(tanggal+"T12:00:00"),Jenis_Pemeliharaan:jenis,Temuan:temuan,Hasil_Pemeliharaan:hasil,Petugas_Pemeliharaan:petugas,Dokumentasi_URL:urlFoto,Pernyataan:PERNYATAAN_PEMELIHARAAN_,Status:"BARU",Tipe_Form:"NON_TIK",Kategori_Aset:"MESIN PERALATAN NON TIK",Checklist_JSON:"",Keterangan_Pemeriksaan:""};
+  sh.appendRow(headers.map(h=>Object.prototype.hasOwnProperty.call(row,h)?row[h]:""));
   return {berhasil:true,pesan:"Laporan pemeliharaan berhasil dikirim.",id:id,dokumentasi:urlFoto};
 }
 
@@ -1680,13 +1728,13 @@ function kirimPemeliharaanTerpadu(data) {
     if (!items.length) throw new Error("Pilih minimal satu aset TIK.");
     items.forEach(x=>{
       const aset=refs.daftarPemeliharaanTIK.find(a=>a.id===String(x.id||""));
-      if(!aset) throw new Error("Aset TIK tidak ditemukan pada Master Pemeliharaan.");
+      if(!aset) throw new Error("Aset TIK tidak ditemukan atau tidak aktif pada Master_BMN.");
       const statusPemeliharaan=String(x.pemeliharaan||"").toUpperCase();
       if(!["YA","TIDAK"].includes(statusPemeliharaan)) throw new Error("Pilih Ya atau Tidak untuk setiap aset TIK.");
       const ya=statusPemeliharaan==="YA";
       const ket=String(x.keterangan||"").trim();
       if(ya&&!ket) throw new Error("Keterangan wajib diisi untuk aset yang dipelihara: "+aset.nama);
-      simpan(aset,"TIK",ya?"PEMELIHARAAN DILAKUKAN":"TIDAK DILAKUKAN",ya?ket:"Tidak dilakukan",ya?ket:"Tidak dilakukan","",ket);
+      simpan(aset,"MESIN PERALATAN KHUSUS TIK",ya?"PEMELIHARAAN DILAKUKAN":"TIDAK DILAKUKAN",ya?ket:"Tidak dilakukan",ya?ket:"Tidak dilakukan","",ket);
     });
     return {berhasil:true,pesan:"Data pemeliharaan TIK berhasil dikirim.",jumlah:items.length};
   }
@@ -1695,7 +1743,8 @@ function kirimPemeliharaanTerpadu(data) {
     const aset=(kategori==="APAR"?refs.daftarAPAR:kategori==="P3K"?refs.daftarP3K:[]).find(a=>a.id===String(data.idAset||""));
     const checks=Array.isArray(data.checklist)?data.checklist:[];
     const wajib=kategori==="APAR"?10:kategori==="P3K"?7:0;
-    if(!aset||checks.length!==wajib||checks.some(x=>!["SUDAH","BELUM"].includes(String(x.status||"").toUpperCase()))) throw new Error("Pilih aset dan lengkapi seluruh checklist "+kategori+".");\n    if(checks.some(x=>String(x.status||"").toUpperCase()==="BELUM"&&!String(x.keterangan||"").trim())) throw new Error("Setiap checklist yang dijawab Belum wajib disertai alasan pada kolom keterangan.");
+    if(!aset||checks.length!==wajib||checks.some(x=>!["SUDAH","BELUM"].includes(String(x.status||"").toUpperCase()))) throw new Error("Pilih aset dan lengkapi seluruh checklist "+kategori+".");
+    if(checks.some(x=>String(x.status||"").toUpperCase()==="BELUM"&&!String(x.keterangan||"").trim())) throw new Error("Setiap checklist yang dijawab Belum wajib disertai alasan pada kolom keterangan.");
     const catatan=String(data.keterangan||"").trim();
     const ringkasan=checks.map(x=>x.kegiatan+": "+String(x.status).toUpperCase()+(String(x.keterangan||"").trim()?" ("+String(x.keterangan).trim()+")":"")).join("; ");
     simpan(aset,kategori,"MONITORING "+kategori,ringkasan||"Seluruh checklist sudah dilakukan", "Pemeriksaan "+kategori+" selesai",JSON.stringify(checks),catatan);

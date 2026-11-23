@@ -73,9 +73,35 @@ footer strong{color:var(--navy)}
   <button class="doc" type="button" title="Dokumen akan segera tersedia"><span class="folder-icon" aria-hidden="true"><svg viewBox="0 0 96 78" role="img" aria-hidden="true"><ellipse cx="49" cy="68" rx="34" ry="5" fill="#183B5E" opacity=".10"/><path d="M9 19c0-4 3-7 7-7h23l9 9h32c4 0 7 3 7 7v8H9V19Z" fill="#83B7B0"/><path d="M29 24h35c3 0 5 2 5 5v8H25v-8c0-3 1-5 4-5Z" fill="#D8ECE7"/><path d="M34 30h29M34 35h23" stroke="#D5DDE5" stroke-width="2.2" stroke-linecap="round"/><path d="M7 32c0-3 2-5 5-5h72c4 0 6 3 5 7l-6 29c-.7 4-3.5 6-7 6H17c-4 0-7-2-8-6L7 32Z" fill="#285D7C"/><path d="M10 35h76l-5 25c-.5 3-2.5 4.5-5.5 4.5H19c-3 0-5-1.5-5.5-4.5L10 35Z" fill="#347D78"/><path d="M12 37h72" stroke="#B9DED5" stroke-width="2" stroke-linecap="round" opacity=".9"/><path d="M15 43c1 9 2 13 3 16" stroke="#B9DED5" stroke-width="2" stroke-linecap="round" opacity=".55"/></svg></span><strong>Laporan Keuangan</strong></button>
   <button class="doc" type="button" title="Dokumen akan segera tersedia"><span class="folder-icon" aria-hidden="true"><svg viewBox="0 0 96 78" role="img" aria-hidden="true"><ellipse cx="49" cy="68" rx="34" ry="5" fill="#183B5E" opacity=".10"/><path d="M9 19c0-4 3-7 7-7h23l9 9h32c4 0 7 3 7 7v8H9V19Z" fill="#83B7B0"/><path d="M29 24h35c3 0 5 2 5 5v8H25v-8c0-3 1-5 4-5Z" fill="#D8ECE7"/><path d="M34 30h29M34 35h23" stroke="#D5DDE5" stroke-width="2.2" stroke-linecap="round"/><path d="M7 32c0-3 2-5 5-5h72c4 0 6 3 5 7l-6 29c-.7 4-3.5 6-7 6H17c-4 0-7-2-8-6L7 32Z" fill="#285D7C"/><path d="M10 35h76l-5 25c-.5 3-2.5 4.5-5.5 4.5H19c-3 0-5-1.5-5.5-4.5L10 35Z" fill="#347D78"/><path d="M12 37h72" stroke="#B9DED5" stroke-width="2" stroke-linecap="round" opacity=".9"/><path d="M15 43c1 9 2 13 3 16" stroke="#B9DED5" stroke-width="2" stroke-linecap="round" opacity=".55"/></svg></span><strong>Penghapusan BMN</strong></button>
   <button class="doc" type="button" title="Dokumen akan segera tersedia"><span class="folder-icon" aria-hidden="true"><svg viewBox="0 0 96 78" role="img" aria-hidden="true"><ellipse cx="49" cy="68" rx="34" ry="5" fill="#183B5E" opacity=".10"/><path d="M9 19c0-4 3-7 7-7h23l9 9h32c4 0 7 3 7 7v8H9V19Z" fill="#83B7B0"/><path d="M29 24h35c3 0 5 2 5 5v8H25v-8c0-3 1-5 4-5Z" fill="#D8ECE7"/><path d="M34 30h29M34 35h23" stroke="#D5DDE5" stroke-width="2.2" stroke-linecap="round"/><path d="M7 32c0-3 2-5 5-5h72c4 0 6 3 5 7l-6 29c-.7 4-3.5 6-7 6H17c-4 0-7-2-8-6L7 32Z" fill="#285D7C"/><path d="M10 35h76l-5 25c-.5 3-2.5 4.5-5.5 4.5H19c-3 0-5-1.5-5.5-4.5L10 35Z" fill="#347D78"/><path d="M12 37h72" stroke="#B9DED5" stroke-width="2" stroke-linecap="round" opacity=".9"/><path d="M15 43c1 9 2 13 3 16" stroke="#B9DED5" stroke-width="2" stroke-linecap="round" opacity=".55"/></svg></span><strong>Dokumen Lainnya</strong></button>
+  <button class="doc" id="stockDocsButton" type="button" title="Informasi Kartu Stok, SPB, dan SBBK" aria-expanded="false" aria-controls="stockDocsInfo">
+    <span class="folder-icon" aria-hidden="true"><svg viewBox="0 0 96 78" role="img" aria-hidden="true">
+      <ellipse cx="49" cy="68" rx="34" ry="5" fill="#183B5E" opacity=".10"/>
+      <path d="M9 19c0-4 3-7 7-7h23l9 9h32c4 0 7 3 7 7v8H9V19Z" fill="#83B7B0"/>
+      <path d="M29 24h35c3 0 5 2 5 5v8H25v-8c0-3 1-5 4-5Z" fill="#D8ECE7"/>
+      <path d="M34 30h29M34 35h23" stroke="#D5DDE5" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M7 32c0-3 2-5 5-5h72c4 0 6 3 5 7l-6 29c-.7 4-3.5 6-7 6H17c-4 0-7-2-8-6L7 32Z" fill="#285D7C"/>
+      <path d="M10 35h76l-5 25c-.5 3-2.5 4.5-5.5 4.5H19c-3 0-5-1.5-5.5-4.5L10 35Z" fill="#347D78"/>
+      <path d="M12 37h72" stroke="#B9DED5" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+    </svg></span>
+    <strong>Kartu Stok / SPB / SBBK</strong>
+  </button>
 </main>
+<div class="note" id="stockDocsInfo" hidden><strong>Kartu Stok / SPB / SBBK:</strong> Menu ini dipindahkan dari Form Pengelolaan BMN. Tautan ke dokumen atau Spreadsheet administrasi persediaan akan ditambahkan setelah alur dan hak akses ditetapkan.</div>
 <div class="note"><strong>Informasi:</strong> Tautan Google Drive untuk masing-masing dokumen akan dipasang pada tahap berikutnya. Pengaturan akses file akan mengikuti ketentuan: administrator/pemilik file dapat mengedit, sedangkan pengguna lainnya hanya dapat melihat.</div>
 <footer><span><strong>Balai POM di Ende</strong> · Sistem Manajemen Barang Milik Negara</span><span>Dokumen BMN</span></footer>
 </div>
+<script>
+(function(){
+  const button = document.getElementById("stockDocsButton");
+  const info = document.getElementById("stockDocsInfo");
+  if (!button || !info) return;
+  button.addEventListener("click", function(){
+    const akanDibuka = info.hidden;
+    info.hidden = !akanDibuka;
+    button.setAttribute("aria-expanded", String(akanDibuka));
+    if (akanDibuka) info.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+})();
+</script>
 </body>
 </html>
