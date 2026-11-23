@@ -195,6 +195,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
         <div class="field"><label for="harga">Perkiraan Harga Satuan (Rp) *</label><input id="harga" type="text" inputmode="numeric" autocomplete="off" placeholder="Contoh: 258.000" required></div>
         <div class="field full"><label for="spesifikasi">Spesifikasi *</label><textarea id="spesifikasi" required placeholder="Tuliskan ukuran, merek/tipe, bahan, atau spesifikasi lain yang diperlukan"></textarea></div>
         <div class="field full"><label for="alasan">Alasan Kebutuhan Pengadaan *</label><textarea id="alasan" required></textarea></div>
+        <div class="field full"><label for="fotoProdukUsulan">Foto Produk / Referensi Harga dan Spesifikasi *</label><input id="fotoProdukUsulan" type="file" accept="image/jpeg,image/png,image/webp" required><div class="hint">Unggah gambar produk, misalnya foto dari Shopee atau gambar yang menampilkan harga dan spesifikasi barang. Format JPG, PNG, atau WEBP; maksimal 5 MB. Tidak perlu mengambil foto secara langsung.</div></div>
       </div><label class="statement"><input id="pernyataanUsulan" type="checkbox" required><span>Saya menyatakan bahwa usulan pengadaan ini disampaikan dengan sebenar-benarnya dan dapat dipertanggungjawabkan.</span></label>
       <button class="submit" type="submit">Kirim Usulan Pengadaan</button></form>
     </section>
@@ -373,7 +374,21 @@ $("usageForm").addEventListener("submit",function(e){e.preventDefault();
  const data={jenisForm:$("jenisForm").value,jenisATK:$("jenisATK").value,items,namaPemakai:$("namaPemakai").value.trim(),tanggal:$("tanggal").value};
  busy(this,true,"");google.script.run.withSuccessHandler(r=>{busy($("usageForm"),false,"Kirim Formulir Penggunaan");$("usageForm").reset();$("tanggal").value=today();updateBarang();message((r.pesan||"Berhasil disimpan.")+" Nomor: "+r.id,"ok");}).withFailureHandler(err=>{busy($("usageForm"),false,"Kirim Formulir Penggunaan");message(err.message||String(err),"err");}).kirimPenggunaanBarang(data);});
 $("harga").addEventListener("input",function(){const angka=this.value.replace(/[^0-9]/g,"");this.value=angka?Number(angka).toLocaleString("id-ID"):"";});
-$("proposalForm").addEventListener("submit",function(e){e.preventDefault();const data={namaPengusul:$("namaPengusul").value.trim(),namaBarang:$("barangUsulan").value.trim(),jumlah:$("jumlahUsulan").value,spesifikasi:$("spesifikasi").value.trim(),perkiraanHargaSatuan:$("harga").value,alasanKebutuhan:$("alasan").value.trim()};busy(this,true,"");google.script.run.withSuccessHandler(r=>{busy($("proposalForm"),false,"Kirim Usulan Pengadaan");$("proposalForm").reset();message((r.pesan||"Usulan berhasil disimpan.")+" Nomor: "+r.id,"ok");}).withFailureHandler(err=>{busy($("proposalForm"),false,"Kirim Usulan Pengadaan");message(err.message||String(err),"err");}).kirimUsulanATKOperasional(data);});
+$("proposalForm").addEventListener("submit",async function(e){
+ e.preventDefault();
+ const file=$("fotoProdukUsulan").files[0];
+ if(!file){message("Silakan unggah foto produk atau referensi harga dan spesifikasi.","err");return;}
+ if(file.size>5*1024*1024){message("Ukuran foto produk maksimal 5 MB.","err");return;}
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type)){message("Foto produk harus berformat JPG, PNG, atau WEBP.","err");return;}
+ busy(this,true,"");
+ try{
+  const base64=await fileToBase64(file);
+  const data={namaPengusul:$("namaPengusul").value.trim(),namaBarang:$("barangUsulan").value.trim(),jumlah:$("jumlahUsulan").value,spesifikasi:$("spesifikasi").value.trim(),perkiraanHargaSatuan:$("harga").value,alasanKebutuhan:$("alasan").value.trim(),fotoProduk:{mimeType:file.type,base64:base64}};
+  google.script.run.withSuccessHandler(r=>{busy($("proposalForm"),false,"Kirim Usulan Pengadaan");$("proposalForm").reset();message((r.pesan||"Usulan berhasil disimpan.")+" Nomor: "+r.id,"ok");})
+   .withFailureHandler(err=>{busy($("proposalForm"),false,"Kirim Usulan Pengadaan");message(err.message||String(err),"err");})
+   .kirimUsulanATKOperasional(data);
+ }catch(err){busy($("proposalForm"),false,"Kirim Usulan Pengadaan");message(err.message||String(err),"err");}
+ });
 function fileToBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]);reader.onerror=()=>reject(new Error("Foto tidak dapat dibaca."));reader.readAsDataURL(file);});}
 $("maintenanceForm").addEventListener("submit",async function(e){e.preventDefault();const file=$("foto").files[0];if(!file){message("Silakan pilih foto dokumentasi.","err");return;}if(file.size>5*1024*1024){message("Ukuran foto melebihi 5 MB. Silakan pilih foto yang lebih kecil.","err");return;}busy(this,true,"");try{const base64=await fileToBase64(file);const data={idAsetPemeliharaan:$("asetPemeliharaan").value,tanggalPemeliharaan:$("tanggalPemeliharaan").value,jenisPemeliharaan:$("jenisPemeliharaan").value,temuan:$("temuan").value.trim(),hasilPemeliharaan:$("hasilPemeliharaan").value.trim(),petugasPemeliharaan:$("petugas").value==="LAINNYA"?$("petugasLainnya").value.trim():$("petugas").value,dokumentasi:{mimeType:file.type,base64:base64}};google.script.run.withSuccessHandler(r=>{busy($("maintenanceForm"),false,"Kirim Laporan Pemeliharaan");$("maintenanceForm").reset();$("tanggalPemeliharaan").value=today();loadReferences();message((r.pesan||"Laporan berhasil disimpan.")+" Nomor: "+r.id,"ok");}).withFailureHandler(err=>{busy($("maintenanceForm"),false,"Kirim Laporan Pemeliharaan");message(err.message||String(err),"err");}).kirimPemeliharaanAset(data);}catch(err){busy($("maintenanceForm"),false,"Kirim Laporan Pemeliharaan");message(err.message||String(err),"err");}});
 function setLokasiBarang(selectId,lokasiId){const aset=(refs?.daftarAset||[]).find(x=>x.id===$(selectId).value);const sel=$(lokasiId);fill(sel,refs?.daftarLokasi||[],"Pilih lokasi");if(aset&&aset.lokasi)sel.value=aset.lokasi;}
