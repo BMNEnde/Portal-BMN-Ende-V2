@@ -199,7 +199,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="submit" type="submit">Kirim Usulan Pengadaan</button></form>
     </section>
     <section id="maintenance" class="hidden">
-      <h2>Formulir Pemeliharaan Aset</h2><p class="desc">Pilih jenis pemeliharaan. Daftar aset mengikuti kategori pada Master Pemeliharaan.</p>
+      <h2>Formulir Pemeliharaan Aset</h2><p class="desc">Pilih jenis pemeliharaan. Aset TIK dan Non-TIK diambil dari Master BMN, sedangkan APAR dan P3K tetap menggunakan Master Pemeliharaan.</p>
       <div class="maintenance-switch" style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px"><button type="button" class="tab" data-maintenance-kind="TIK">Pemeliharaan TIK</button><button type="button" class="tab active" data-maintenance-kind="NON_TIK">Pemeliharaan Non-TIK</button><button type="button" class="tab" data-maintenance-kind="MONITORING_APAR_P3K">Monitoring APAR &amp; P3K</button></div>
       <div id="panelTIK" class="hidden"><p class="hint">Pilih status pemeliharaan untuk setiap aset TIK. Jika memilih Ya, isi keterangan tindakan pemeliharaan.</p><div class="field"><label for="tanggalTIK">Tanggal Pemeriksaan *</label><input id="tanggalTIK" type="date" required></div><div class="field" style="margin-top:12px"><label for="petugasTIK">Petugas *</label><select id="petugasTIK" required><option value="">Pilih petugas</option><option>Anwar</option><option>Syaiful Abdul Gani</option><option>Viktorimus Sesarius Porkas</option><option>Teknisi</option><option value="LAINNYA">Lainnya</option></select><input id="petugasTIKLainnya" class="hidden" type="text" maxlength="150" placeholder="Tuliskan nama petugas" style="margin-top:8px"></div><div id="daftarAsetTIK" style="margin-top:16px"></div><button type="button" class="secondary" id="tambahAsetTIK" style="margin-top:12px">+ Tambah Aset TIK</button><button type="button" class="submit" id="kirimTIK" style="margin-top:16px">Kirim Pemeliharaan TIK</button></div>
       <div id="panelNonTIK"><form id="maintenanceForm"><div class="grid">
@@ -334,7 +334,7 @@ document.querySelectorAll("[data-maintenance-kind]").forEach(b=>b.addEventListen
 function renderAsetTIK(){
  const wrap=$("daftarAsetTIK");if(!wrap)return;wrap.innerHTML="";
  const items=refs?.daftarPemeliharaanTIK||[];
- if(!items.length){wrap.innerHTML='<p class="hint">Belum ada aset kategori TIK yang aktif pada Master Pemeliharaan.</p>';return;}
+ if(!items.length){wrap.innerHTML='<p class="hint">Belum ada aset dengan jenis MESIN PERALATAN KHUSUS TIK yang aktif pada Master BMN.</p>';return;}
  tambahBarisAsetTIK();
 }
 function tambahBarisAsetTIK(){
