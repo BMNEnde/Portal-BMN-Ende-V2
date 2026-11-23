@@ -340,7 +340,7 @@ function renderAsetTIK(){
 function tambahBarisAsetTIK(){
  const wrap=$("daftarAsetTIK"),items=refs?.daftarPemeliharaanTIK||[];
  if(!wrap||!items.length)return;
- const card=document.createElement("div");card.className="card-item";card.style.cssText="display:grid;grid-template-columns:minmax(220px,2fr) minmax(100px,.8fr) minmax(120px,1fr) minmax(180px,2fr) auto;gap:10px;align-items:end;padding:14px;margin-bottom:10px;border:1px solid #d8e4ed;border-radius:12px";
+ const card=document.createElement("div");card.className="card-item";card.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end;padding:14px;margin-bottom:10px;border:1px solid #d8e4ed;border-radius:12px";
  const field=(label)=>{const box=document.createElement("div");const l=document.createElement("label");l.textContent=label;l.style.display="block";l.style.marginBottom="6px";box.appendChild(l);return box;};
  const assetField=field("Nama Barang / NUP / Merk / Tipe / Nomor Seri *");const select=document.createElement("select");select.required=true;select.style.width="100%";select.innerHTML='<option value="">Pilih aset TIK</option>';
  items.forEach(x=>{const o=document.createElement("option");o.value=x.id;o.textContent=[x.nama,x.nup?"NUP "+x.nup:"",x.merk,x.tipeModel,x.nomorSeri].filter(Boolean).join(" / ");select.appendChild(o);});assetField.appendChild(select);
