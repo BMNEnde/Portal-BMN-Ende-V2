@@ -2069,7 +2069,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 
     function muatMasterBMN() {
       el("assetTableBody").innerHTML =
-        '<tr><td colspan="11" class="loading">Memuat data aset...</td></tr>';
+        '<tr><td colspan="12" class="loading">Memuat data aset...</td></tr>';
 
       const filter = {
         kataKunci: el("searchAsset").value || "",
@@ -2111,7 +2111,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
         })
         .withFailureHandler(function(error) {
           el("assetTableBody").innerHTML =
-            '<tr><td colspan="11" class="empty-state">' +
+            '<tr><td colspan="12" class="empty-state">' +
             escapeHTML(error.message) +
             '</td></tr>';
 
@@ -2130,7 +2130,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 
       if (!data || data.length === 0) {
         tbody.innerHTML =
-          '<tr><td colspan="11" class="empty-state">' +
+          '<tr><td colspan="12" class="empty-state">' +
           'Belum ada data aset yang sesuai dengan pencarian.' +
           '</td></tr>';
 
