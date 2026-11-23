@@ -589,6 +589,7 @@ function doPost(e) {
 
 function getDashboardData(token) {
   wajibAdminBMN_(token);
+  pastikanKolomNUPMasterBMN_();
 
   const ss = getDatabase();
   const sheet = ss.getSheetByName("Master_BMN");
@@ -1132,7 +1133,7 @@ function getReferensiBMN(token) {
    ========================================================= */
 
 function ambilAsetTersediaPublik() {
-  const sheet = pastikanKolomNUPMasterBMN_();
+  const sheet = getDatabase().getSheetByName("Master_BMN");
   if (!sheet || sheet.getLastRow() < 2) return [];
   const values = sheet.getDataRange().getValues();
   const header = values[0].map(String);
@@ -1497,7 +1498,7 @@ function getReferensiFormPublik() {
   }
 
   // Aset TIK dan Non-TIK diambil dari Master_BMN, memakai ID_Aset sebagai ID referensi.
-  const master = pastikanKolomNUPMasterBMN_();
+  const master = ss.getSheetByName("Master_BMN");
   const daftarAset = [], daftarLokasi = [];
   if (master && master.getLastRow() >= 2) {
     const values = master.getDataRange().getDisplayValues();
