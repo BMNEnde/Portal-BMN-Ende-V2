@@ -2472,7 +2472,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
     let jenisFormAdminAktif = "penggunaan";
     const kolomFormAdmin = {
       penggunaan:["ID_Penggunaan","Waktu_Input","Jenis_Form","Jenis_ATK","Nama_Barang","Nama_Pemakai","Tanggal","Jumlah","Status"],
-      usulan:["ID_Usulan","Waktu_Input","Nama_Pengusul","Nama_Barang","Jumlah","Spesifikasi","Perkiraan_Harga_Satuan","Alasan_Kebutuhan","Status"],
+      usulan:["ID_Usulan","Waktu_Input","Nama_Pengusul","Nama_Barang","Jumlah","Spesifikasi","Perkiraan_Harga_Satuan","Alasan_Kebutuhan","Foto_Produk_URL","Status"],
       pemeliharaan:["ID_Pemeliharaan","Waktu_Input","Tipe_Form","Kategori_Aset","ID_Aset_Pemeliharaan","Nama_Barang","Tanggal_Pemeliharaan","Jenis_Pemeliharaan","Temuan","Hasil_Pemeliharaan","Keterangan_Pemeriksaan","Checklist_JSON","Petugas_Pemeliharaan","Dokumentasi_URL","Status"],
       pemindahan:["ID_Pemindahan","Waktu_Input","Nama_Penanggung_Jawab_Ruang","NIP","Nama_Barang_Merk","Jumlah","Kondisi","Ruang_Asal","Ruang_Tujuan","Alasan_Pemindahan","Status"],
       rusak:["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Status"],
@@ -2517,11 +2517,11 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
     function formatRupiahAdmin(nilai){if(nilai===null||nilai===undefined||nilai==="")return "-";const raw=String(nilai).trim();const n=Number(raw.replace(/\./g,"").replace(",", "."));if(!Number.isFinite(n))return raw;return "Rp. "+new Intl.NumberFormat("id-ID",{maximumFractionDigits:0}).format(n);}
     function tampilkanFormAdmin(){
       const cols=kolomFormAdmin[jenisFormAdminAktif], rows=dataFormAdmin[jenisFormAdminAktif]||[];
-      el("formAdminHead").innerHTML="<tr>"+cols.map(c=>"<th>"+escapeHTML(({Dokumentasi_URL:"Foto Dokumentasi",Foto_URL:"Foto Barang",Foto_Peminjaman_URL:"Foto Peminjaman"})[c]||c.replace(/_/g," "))+"</th>").join("")+"</tr>";
+      el("formAdminHead").innerHTML="<tr>"+cols.map(c=>"<th>"+escapeHTML(({Dokumentasi_URL:"Foto Dokumentasi",Foto_URL:"Foto Barang",Foto_Peminjaman_URL:"Foto Peminjaman",Foto_Produk_URL:"Foto Produk / Referensi"})[c]||c.replace(/_/g," "))+"</th>").join("")+"</tr>";
       if(!rows.length){el("formAdminBody").innerHTML='<tr><td colspan="'+cols.length+'" class="empty-state">Belum ada data formulir yang masuk.</td></tr>';el("formAdminCount").textContent="0 data";return;}
       el("formAdminBody").innerHTML=rows.map(row=>"<tr>"+cols.map(c=>{
         const v=row[c];
-        if(["Dokumentasi_URL","Foto_URL","Foto_Peminjaman_URL","Foto_Barang_URL","Foto_URL_Pemeliharaan"].includes(c))return '<td class="bmn-photo-cell">'+buatThumbnailFotoAdmin(v,"Foto dokumentasi "+jenisFormAdminAktif)+'</td>';
+        if(["Dokumentasi_URL","Foto_URL","Foto_Peminjaman_URL","Foto_Barang_URL","Foto_URL_Pemeliharaan","Foto_Produk_URL"].includes(c))return '<td class="bmn-photo-cell">'+buatThumbnailFotoAdmin(v,"Foto dokumentasi "+jenisFormAdminAktif)+'</td>';
         if(c==="Perkiraan_Harga_Satuan")return "<td>"+escapeHTML(formatRupiahAdmin(v))+"</td>";return "<td>"+escapeHTML(v==null||v===""?"-":v)+"</td>";
       }).join("")+"</tr>").join("");
       el("formAdminCount").textContent="Menampilkan "+rows.length+" data";
