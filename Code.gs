@@ -1667,6 +1667,11 @@ function kirimUsulanATKOperasional(data) {
   const hargaTeks = String(data.perkiraanHargaSatuan == null ? "" : data.perkiraanHargaSatuan).trim().replace(/^Rp\.?\s*/i,"").replace(/\s/g,"");
   const hargaNormal = hargaTeks.includes(",") ? hargaTeks.replace(/\./g,"").replace(",",".") : hargaTeks.replace(/\./g,"");
   const harga = Number(hargaNormal);
+  // Simpan sebagai teks berformat Indonesia agar pemisah ribuan tidak
+  // ditafsirkan ulang oleh locale Google Sheets (contoh: "456.000").
+  const hargaTampilan = Number.isFinite(harga)
+    ? new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(harga)
+    : "";
   const alasan = String(data.alasanKebutuhan || "").trim();
   if (!nama || !barang || !(jumlah > 0) || !spesifikasi || !(harga >= 0) || !alasan || !data.fotoProduk) {
     throw new Error("Mohon lengkapi seluruh data usulan dan unggah foto produk.");
@@ -1682,7 +1687,7 @@ function kirimUsulanATKOperasional(data) {
   const id = "USL" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900);
   const record = {
     ID_Usulan:id, Waktu_Input:new Date(), Nama_Pengusul:nama, Nama_Barang:barang,
-    Jumlah:jumlah, Spesifikasi:spesifikasi, Perkiraan_Harga_Satuan:harga,
+    Jumlah:jumlah, Spesifikasi:spesifikasi, Perkiraan_Harga_Satuan:hargaTampilan,
     Alasan_Kebutuhan:alasan, Foto_Produk_URL:fotoProdukUrl,
     Pernyataan:PERNYATAAN_USULAN_, Status:"PROSES TELAAH", Keterangan_Admin:"", Admin_Pemeriksa:"", Waktu_Pemeriksaan:""
   };
