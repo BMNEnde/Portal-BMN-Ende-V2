@@ -1678,11 +1678,7 @@ function kirimUsulanATKOperasional(data) {
     "Spesifikasi","Perkiraan_Harga_Satuan","Alasan_Kebutuhan","Foto_Produk_URL","Pernyataan","Status"
   ]);
   // Tambahkan kolom pada sheet lama tanpa menimpa data yang sudah ada.
-  const headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getDisplayValues()[0].map(h => String(h).trim());
-  if (!headers.includes("Foto_Produk_URL")) {
-    sh.getRange(1, sh.getLastColumn() + 1).setValue("Foto_Produk_URL");
-    headers.push("Foto_Produk_URL");
-  }
+  const headers = pastikanKolomWorkflowBMN_(sh, ["Foto_Produk_URL","Keterangan_Admin","Admin_Pemeriksa","Waktu_Pemeriksaan"]);
   const id = "USL" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMddHHmmss") + Math.floor(100 + Math.random()*900);
   const record = {
     ID_Usulan:id, Waktu_Input:new Date(), Nama_Pengusul:nama, Nama_Barang:barang,
@@ -1874,9 +1870,11 @@ function kirimPelaporanBarangRusak(data) {
   if(aset.lokasi&&lokasi!==aset.lokasi) throw new Error("Lokasi barang harus sesuai Master BMN ("+aset.lokasi+").");
   const foto=simpanDokumentasiPemeliharaan_(data.foto);
   const sh=sheetBMN_("Data_Pelaporan_Barang_Rusak",["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","ID_Aset","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Pernyataan","Status"]);
+  const headers=pastikanKolomWorkflowBMN_(sh,["Keterangan_Admin","Admin_Pemeriksa","Waktu_Proses","Waktu_Selesai"]);
   const nomor="RSK"+Utilities.formatDate(new Date(),Session.getScriptTimeZone(),"yyyyMMddHHmmss")+Math.floor(100+Math.random()*900);
   const pernyataan="Saya menyatakan bahwa pengaduan ini disampaikan dengan sebenar-benarnya dan dapat dipertanggungjawabkan.";
-  sh.appendRow([nomor,new Date(),new Date(tanggal+"T12:00:00"),pelapor,id,aset.label,tingkat,detail,foto,lokasi,pernyataan,tingkat==="RUSAK BERAT"?"USUL PENGHAPUSAN":"PROSES TELAAH","","","",""]);
+  const record={ID_Pelaporan_Rusak:nomor,Waktu_Input:new Date(),Tanggal:new Date(tanggal+"T12:00:00"),Nama_Pelapor:pelapor,ID_Aset:id,Nama_Barang_Merk:aset.label,Tingkat_Kerusakan:tingkat,Detail_Kerusakan:detail,Foto_URL:foto,Lokasi_Barang:lokasi,Pernyataan:pernyataan,Status:tingkat==="RUSAK BERAT"?"USUL PENGHAPUSAN":"PROSES TELAAH",Keterangan_Admin:"",Admin_Pemeriksa:"",Waktu_Proses:"",Waktu_Selesai:""};
+  sh.appendRow(headers.map(h=>Object.prototype.hasOwnProperty.call(record,h)?record[h]:""));
   return {berhasil:true,pesan:"Laporan barang rusak berhasil dikirim.",id:nomor,foto:foto};
 }
 
