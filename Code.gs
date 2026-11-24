@@ -2018,20 +2018,17 @@ function prosesPengaduanRusakAdmin(token, idLaporan, tindakan, keterangan) {
     set("Waktu_Proses", new Date());
   } else if (aksi === "SELESAI") {
     if (status !== "SEDANG DIPERBAIKI") throw new Error("Hanya pengaduan yang sedang diperbaiki yang dapat diselesaikan.");
+    const master = getDatabase().getSheetByName("Master_BMN");
+    if (!master || master.getLastRow() < 2) throw new Error("Master_BMN tidak ditemukan atau belum memiliki data.");
+    const vals = master.getDataRange().getValues(), h = vals[0].map(x => String(x).trim()), ix = {};
+    h.forEach((x,i) => ix[x] = i);
+    if (ix.ID_Aset === undefined || ix.Kondisi === undefined) throw new Error("Kolom ID_Aset atau Kondisi tidak ditemukan pada Master_BMN.");
+    const pos = vals.findIndex((r,i) => i > 0 && String(r[ix.ID_Aset]).trim() === String(rec.ID_Aset || "").trim());
+    if (pos < 1) throw new Error("Aset pada Master_BMN tidak ditemukan. Status pengaduan belum diubah.");
+    master.getRange(pos+1, ix.Kondisi+1).setValue("BAIK");
+    if (ix.Terakhir_Diperbarui !== undefined) master.getRange(pos+1, ix.Terakhir_Diperbarui+1).setValue(new Date());
     set("Status", "SELESAI DIPERBAIKI"); set("Keterangan_Admin", catatan);
     set("Admin_Pemeriksa", admin.username || admin.nama || "ADMIN"); set("Waktu_Selesai", new Date());
-    const master = getDatabase().getSheetByName("Master_BMN");
-    if (master && master.getLastRow() >= 2) {
-      const vals = master.getDataRange().getValues(), h = vals[0].map(x => String(x).trim()), ix = {};
-      h.forEach((x,i) => ix[x] = i);
-      if (ix.ID_Aset !== undefined && ix.Kondisi !== undefined) {
-        const pos = vals.findIndex((r,i) => i > 0 && String(r[ix.ID_Aset]).trim() === String(rec.ID_Aset || "").trim());
-        if (pos > 0) {
-          master.getRange(pos+1, ix.Kondisi+1).setValue("BAIK");
-          if (ix.Terakhir_Diperbarui !== undefined) master.getRange(pos+1, ix.Terakhir_Diperbarui+1).setValue(new Date());
-        }
-      }
-    }
   } else throw new Error("Tindakan tidak dikenal.");
   SpreadsheetApp.flush();
   return {berhasil:true,pesan:aksi==="SELESAI"?"Perbaikan selesai. Kondisi aset pada Master BMN diperbarui menjadi BAIK.":aksi==="SETUJUI"?"Pengaduan disetujui untuk diperbaiki.":"Pengaduan ditolak."};
