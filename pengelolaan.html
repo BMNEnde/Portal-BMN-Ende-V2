@@ -178,7 +178,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="tab active" data-tab="usage" type="button">Form Pemakaian BMN</button>
       <button class="tab" data-tab="proposal" type="button">Usulan ATK & Operasional</button>
       <button class="tab" data-tab="maintenance" type="button">Form Pemeliharaan Aset</button>
-      <button class="tab" data-tab="transfer" type="button">Form Pemindahan Barang</button>
+      <button class="tab" data-tab="transfer" type="button">Form Pemindahan BMN</button>
       <button class="tab" data-tab="damage" type="button">Form Pengaduan BMN Rusak</button>
       <button class="tab" data-tab="glass" type="button">Form Pelaporan Alat Gelas Pecah</button>
       <button class="tab" data-tab="borrowing" type="button">Form Peminjaman BMN</button>
@@ -225,7 +225,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <div id="panelMonitoring" class="hidden"><div class="grid"><div class="field"><label for="kategoriMonitoring">Jenis Monitoring *</label><select id="kategoriMonitoring"><option value="APAR">APAR</option><option value="P3K">P3K</option></select></div><div class="field"><label for="asetMonitoring">Nama Aset *</label><select id="asetMonitoring" required><option value="">Pilih APAR</option></select></div><div class="field"><label for="tanggalMonitoring">Tanggal Pemeriksaan *</label><input id="tanggalMonitoring" type="date" required></div><div class="field"><label for="petugasMonitoring">Petugas *</label><select id="petugasMonitoring" required><option value="">Pilih petugas</option><option>Anwar</option><option>Syaiful Abdul Gani</option><option>Viktorimus Sesarius Porkas</option><option>Teknisi</option><option value="LAINNYA">Lainnya</option></select><input id="petugasMonitoringLainnya" class="hidden" type="text" maxlength="150" placeholder="Tuliskan nama petugas" style="margin-top:8px"></div></div><h3 style="margin-top:20px">Checklist Pemeriksaan</h3><div id="daftarChecklistMonitoring"></div><div class="field" style="margin-top:14px"><label for="catatanMonitoring">Catatan / Tindak Lanjut</label><textarea id="catatanMonitoring" placeholder="Tuliskan temuan atau tindak lanjut bila ada"></textarea></div><button type="button" class="submit" id="kirimMonitoring" style="margin-top:16px">Simpan Hasil Monitoring</button></div>
     </section>
     <section id="transfer" class="hidden">
-      <h2>Form Pemindahan Barang</h2><p class="desc">Ajukan pemindahan barang antar ruang. Data barang dan ruang mengikuti Master BMN.</p>
+      <h2>Form Pemindahan BMN</h2><p class="desc">Ajukan Pemindahan BMN antar ruang. Data barang dan ruang mengikuti Master BMN.</p>
       <form id="transferForm"><div class="grid">
         <div class="field"><label>Nama Penanggung Jawab Ruang *</label><input id="namaPJ" required maxlength="150"></div>
         <div class="field"><label>NIP *</label><input id="nipPJ" required maxlength="40"></div>
