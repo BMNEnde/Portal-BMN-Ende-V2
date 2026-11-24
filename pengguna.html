@@ -151,6 +151,9 @@
     html.embed-mode .card{padding:24px 28px;border-radius:14px;border-top:1px solid #e1eaf0;box-shadow:none}
     html.embed-mode .footer{display:none}
     @media(max-width:650px){html.embed-mode .card{padding:20px 15px}}
+
+    .asset-search-input{width:100%;margin:0 0 7px;padding:11px 13px;border:1px solid #cbd9e5;border-radius:9px;background:#fff;color:var(--text);font:inherit;font-size:13px;box-sizing:border-box}
+    .asset-search-input:focus{outline:none;border-color:#2476c7;box-shadow:0 0 0 3px rgba(36,118,199,.10)}
   </style>
 <script>if(new URLSearchParams(location.search).get("embed")==="1")document.documentElement.classList.add("embed-mode");</script>
   <link rel="stylesheet" href="./mobile-polish.css">
@@ -298,11 +301,24 @@
     $('nipHint').textContent=eksternal?'Isi NIP secara manual. Jika bukan ASN, silakan isi dengan angka 0.':'Wajib diisi oleh pegawai internal.';
     $('nip').placeholder=eksternal?'Isi NIP; bukan ASN isi 0':'Masukkan NIP';
   });
+  function setupAssetSearch(select){
+    if(!select)return;
+    let search=select._assetSearchInput;
+    if(!search){
+      search=document.createElement('input');search.type='search';search.className='asset-search-input';
+      search.placeholder='Cari aset berdasarkan NUP, nama, merk, atau tipe...';search.setAttribute('aria-label','Cari aset');search.autocomplete='off';
+      select.parentNode.insertBefore(search,select);select._assetSearchInput=search;
+      const apply=()=>{const q=search.value.trim().toLocaleLowerCase('id');[...select.options].forEach((option,index)=>{option.hidden=index>0&&q!==''&&!option.textContent.toLocaleLowerCase('id').includes(q);});};
+      search.addEventListener('input',apply);select.addEventListener('change',()=>{search.value='';apply();});
+    }
+    search.value='';[...select.options].forEach(option=>option.hidden=false);
+  }
   function loadAssets(){
     google.script.run.withSuccessHandler(function(items){
       const select=$('aset');select.innerHTML='<option value="">Pilih barang</option>';
       (items||[]).forEach(function(a){const op=document.createElement('option');op.value=a.id;op.textContent=a.label||[a.nup,a.nama,a.merk,a.tipeModel].filter(Boolean).join(' / ')||a.nama||'Aset tanpa nama';select.appendChild(op);});
       if(!items||!items.length){select.innerHTML='<option value="">Belum ada aset tersedia</option>';}
+      setupAssetSearch(select);
     }).withFailureHandler(function(err){$('aset').innerHTML='<option value="">Gagal memuat aset</option>';showMessage(err.message||String(err),'error');}).ambilAsetTersediaPublik();
   }
   $('tanggalPinjam').addEventListener('change',function(){$('rencanaKembali').min=this.value;if($('rencanaKembali').value&&$('rencanaKembali').value<this.value)$('rencanaKembali').value=this.value;});
