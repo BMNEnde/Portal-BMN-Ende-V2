@@ -293,23 +293,24 @@ function setupAssetSearch(select){
  let wrap=select._assetComboWrap;
  if(!wrap){
   wrap=document.createElement("div");wrap.className="asset-combobox";
-  const input=document.createElement("input");input.type="text";input.className="asset-combobox-input";input.placeholder=select.options[0]?.textContent||"Pilih aset";input.autocomplete="off";input.setAttribute("role","combobox");input.setAttribute("aria-autocomplete","list");input.setAttribute("aria-expanded","false");
+  const input=document.createElement("input");input.type="text";input.className="asset-combobox-input";input.placeholder=select.options[0]?.textContent||"Pilih aset";input.autocomplete="off";input.setAttribute("role","combobox");input.setAttribute("aria-autocomplete","list");input.setAttribute("aria-expanded","false");input.required=select.required;select.required=false;input.setCustomValidity(select.value?"":"Pilih aset dari daftar.");
   const menu=document.createElement("div");menu.className="asset-combobox-menu";menu.setAttribute("role","listbox");
   select.parentNode.insertBefore(wrap,select);wrap.append(input,menu,select);select.style.display="none";select._assetComboWrap=wrap;
   const close=()=>{menu.style.display="none";input.setAttribute("aria-expanded","false");};
   const render=(query="")=>{menu.innerHTML="";const q=query.trim().toLocaleLowerCase("id");let count=0;
    [...select.options].forEach((option,index)=>{if(index===0||!option.value)return;if(q&&!option.textContent.toLocaleLowerCase("id").includes(q))return;
     const item=document.createElement("button");item.type="button";item.className="asset-combobox-option";item.textContent=option.textContent;item.setAttribute("role","option");
-    item.addEventListener("click",()=>{select.value=option.value;select.dispatchEvent(new Event("change",{bubbles:true}));input.value=option.textContent;close();});menu.appendChild(item);count++;
+    item.addEventListener("click",()=>{select.value=option.value;select.dispatchEvent(new Event("change",{bubbles:true}));input.value=option.textContent;input.setCustomValidity("");close();});menu.appendChild(item);count++;
    });
    if(!count){const empty=document.createElement("div");empty.className="asset-combobox-empty";empty.textContent="Aset tidak ditemukan";menu.appendChild(empty);}
   };
   const open=()=>{render(input.value);menu.style.display="block";input.setAttribute("aria-expanded","true");};
   input.addEventListener("focus",()=>{input.value="";open();});
   input.addEventListener("click",open);
-  input.addEventListener("input",open);
+  input.addEventListener("input",()=>{if(select.value){select.value="";select.dispatchEvent(new Event("change",{bubbles:true}));}input.setCustomValidity(select.value?"":"Pilih aset dari daftar.");open();});
   input.addEventListener("keydown",e=>{if(e.key==="Escape"){close();input.blur();}else if(e.key==="ArrowDown"){open();menu.querySelector("button")?.focus();}});
-  wrap.addEventListener("focusout",()=>setTimeout(()=>{if(!wrap.contains(document.activeElement))close();},120));
+  wrap.addEventListener("focusout",()=>setTimeout(()=>{if(!wrap.contains(document.activeElement)){close();const chosen=select.options[select.selectedIndex];input.value=chosen&&chosen.value?chosen.textContent:"";input.setCustomValidity(select.value?"":"Pilih aset dari daftar.");}},120));
+  select.form?.addEventListener("reset",()=>setTimeout(()=>{input.value="";input.setCustomValidity(select.value?"":"Pilih aset dari daftar.");close();},0));
   select.addEventListener("change",()=>{const chosen=select.options[select.selectedIndex];if(chosen&&chosen.value)input.value=chosen.textContent;});
  }
  const chosen=select.options[select.selectedIndex];if(chosen&&chosen.value)wrap.querySelector("input").value=chosen.textContent;
