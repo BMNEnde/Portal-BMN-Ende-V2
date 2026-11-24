@@ -120,7 +120,8 @@ function setupDatabase() {
     Data_Usulan_ATK_Operasional: [
       "ID_Usulan", "Waktu_Input", "Nama_Pengusul", "Nama_Barang",
       "Jumlah", "Spesifikasi", "Perkiraan_Harga_Satuan",
-      "Alasan_Kebutuhan", "Foto_Produk_URL", "Pernyataan", "Status"
+      "Alasan_Kebutuhan", "Foto_Produk_URL", "Pernyataan", "Status",
+      "Keterangan_Admin", "Admin_Pemeriksa", "Waktu_Pemeriksaan"
     ],
 
     Master_Pemeliharaan: [
@@ -130,7 +131,7 @@ function setupDatabase() {
     ],
 
     Data_Pemindahan_Barang: ["ID_Pemindahan","Waktu_Input","Nama_Penanggung_Jawab_Ruang","NIP","ID_Aset","Nama_Barang_Merk","Jumlah","Kondisi","Ruang_Asal","Ruang_Tujuan","Alasan_Pemindahan","Pernyataan","Status"],
-    Data_Pelaporan_Barang_Rusak: ["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","ID_Aset","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Pernyataan","Status"],
+    Data_Pelaporan_Barang_Rusak: ["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","ID_Aset","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Pernyataan","Status","Keterangan_Admin","Admin_Pemeriksa","Waktu_Proses","Waktu_Selesai"],
     Data_Pelaporan_Alat_Gelas_Pecah: ["ID_Pelaporan_Pecah","Waktu_Input","Nama_Pelapor","Tanggal","Nama_Barang","Jumlah_Pecah","Pernyataan","Status"],
     Data_Pemeliharaan_Aset: [
       "ID_Pemeliharaan", "Waktu_Input", "ID_Aset_Pemeliharaan", "Nama_Barang",
@@ -563,6 +564,11 @@ function doPost(e) {
       hapusAset: hapusAset,
       getReferensiBMN: getReferensiBMN,
       getDaftarPeminjamanAdmin: getDaftarPeminjamanAdmin,
+      getDataBMNDipinjamPublik: getDataBMNDipinjamPublik,
+      getProgresUsulanATKPublik: getProgresUsulanATKPublik,
+      getProgresPengaduanRusakPublik: getProgresPengaduanRusakPublik,
+      prosesUsulanATKAdmin: prosesUsulanATKAdmin,
+      prosesPengaduanRusakAdmin: prosesPengaduanRusakAdmin,
       prosesPersetujuanPeminjaman: prosesPersetujuanPeminjaman,
       getDaftarPengembalianAdmin: getDaftarPengembalianAdmin,
       prosesPengembalianPeminjaman: prosesPengembalianPeminjaman,
@@ -1682,7 +1688,7 @@ function kirimUsulanATKOperasional(data) {
     ID_Usulan:id, Waktu_Input:new Date(), Nama_Pengusul:nama, Nama_Barang:barang,
     Jumlah:jumlah, Spesifikasi:spesifikasi, Perkiraan_Harga_Satuan:harga,
     Alasan_Kebutuhan:alasan, Foto_Produk_URL:fotoProdukUrl,
-    Pernyataan:PERNYATAAN_USULAN_, Status:"BARU"
+    Pernyataan:PERNYATAAN_USULAN_, Status:"PROSES TELAAH", Keterangan_Admin:"", Admin_Pemeriksa:"", Waktu_Pemeriksaan:""
   };
   sh.appendRow(headers.map(h => Object.prototype.hasOwnProperty.call(record, h) ? record[h] : ""));
   return {berhasil:true,pesan:"Usulan ATK dan operasional beserta foto produk berhasil dikirim.",id:id,fotoProduk:fotoProdukUrl};
@@ -1870,7 +1876,7 @@ function kirimPelaporanBarangRusak(data) {
   const sh=sheetBMN_("Data_Pelaporan_Barang_Rusak",["ID_Pelaporan_Rusak","Waktu_Input","Tanggal","Nama_Pelapor","ID_Aset","Nama_Barang_Merk","Tingkat_Kerusakan","Detail_Kerusakan","Foto_URL","Lokasi_Barang","Pernyataan","Status"]);
   const nomor="RSK"+Utilities.formatDate(new Date(),Session.getScriptTimeZone(),"yyyyMMddHHmmss")+Math.floor(100+Math.random()*900);
   const pernyataan="Saya menyatakan bahwa pengaduan ini disampaikan dengan sebenar-benarnya dan dapat dipertanggungjawabkan.";
-  sh.appendRow([nomor,new Date(),new Date(tanggal+"T12:00:00"),pelapor,id,aset.label,tingkat,detail,foto,lokasi,pernyataan,"BARU"]);
+  sh.appendRow([nomor,new Date(),new Date(tanggal+"T12:00:00"),pelapor,id,aset.label,tingkat,detail,foto,lokasi,pernyataan,tingkat==="RUSAK BERAT"?"USUL PENGHAPUSAN":"PROSES TELAAH","","","",""]);
   return {berhasil:true,pesan:"Laporan barang rusak berhasil dikirim.",id:nomor,foto:foto};
 }
 
@@ -1885,6 +1891,152 @@ function kirimPelaporanAlatGelasPecah(data) {
   const pernyataan="Saya bersedia melaporkan setiap kejadian alat gelas yang pecah secara jujur dan bertanggung jawab atas kerusakan yang terjadi akibat penggunaan yang tidak sesuai dengan prosedur.";
   sh.appendRow([nomor,new Date(),pelapor,new Date(tanggal+"T12:00:00"),barang,jumlah,pernyataan,"BARU"]);
   return {berhasil:true,pesan:"Laporan alat gelas pecah berhasil dikirim.",id:nomor};
+}
+
+function pastikanKolomWorkflowBMN_(sheet, names) {
+  if (!sheet) throw new Error("Sheet workflow tidak ditemukan.");
+  let headers = sheet.getLastColumn()
+    ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0].map(h => String(h).trim())
+    : [];
+  names.forEach(name => {
+    if (!headers.includes(name)) {
+      const col = sheet.getLastColumn() + 1;
+      sheet.getRange(1, col).setValue(name);
+      headers.push(name);
+    }
+  });
+  return headers;
+}
+
+function objekSheetWorkflowBMN_(sheet, idHeader) {
+  if (!sheet || sheet.getLastRow() < 2) return { sheet: sheet, headers: [], rows: [] };
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0].map(h => String(h).trim());
+  const values = sheet.getDataRange().getValues();
+  const idx = {}; headers.forEach((h,i) => idx[h] = i);
+  const rows = values.slice(1).map((r,n) => {
+    const o = { _row: n + 2 }; headers.forEach((h,i) => o[h] = r[i]); return o;
+  }).filter(o => String(o[idHeader] || "").trim());
+  return { sheet: sheet, headers: headers, idx: idx, rows: rows };
+}
+
+function getDataBMNDipinjamPublik() {
+  const ss = getDatabase(), sh = ss.getSheetByName("Data_Peminjaman");
+  if (!sh || sh.getLastRow() < 2) return [];
+  const data = objekSheetWorkflowBMN_(sh, "ID_Peminjaman");
+  const master = ss.getSheetByName("Master_BMN");
+  const map = {};
+  if (master && master.getLastRow() >= 2) {
+    const v = master.getDataRange().getDisplayValues(), h = v[0].map(String), ix = {};
+    h.forEach((x,i) => ix[x] = i);
+    v.slice(1).forEach(r => {
+      const id = String(r[ix.ID_Aset] || "").trim();
+      if (id) map[id] = { nup: ix.NUP === undefined ? "" : r[ix.NUP], merk: ix.Merk === undefined ? "" : r[ix.Merk], tipe: ix.Tipe_Model === undefined ? "" : r[ix.Tipe_Model], jenis: ix.Jenis_BMN === undefined ? "" : r[ix.Jenis_BMN] };
+    });
+  }
+  return data.rows.filter(r => String(r.Status_Pengajuan || "").trim().toUpperCase() === "DISETUJUI" && !r.Tanggal_Dikembalikan)
+    .map(r => {
+      const extra = map[String(r.ID_Aset || "").trim()] || {};
+      return {
+        id: String(r.ID_Peminjaman || ""), kode: String(r.Kode_BMN || ""),
+        nup: String(extra.nup || ""), barang: String(r.Nama_Aset || ""),
+        merk: String(extra.merk || ""), tipe: String(extra.tipe || ""),
+        jenis: String(extra.jenis || ""), tanggalPinjam: nilaiTanggalBMN_(r.Tanggal_Pinjam),
+        rencanaKembali: nilaiTanggalBMN_(r.Rencana_Kembali)
+      };
+    });
+}
+
+function getProgresUsulanATKPublik() {
+  const sh = getDatabase().getSheetByName("Data_Usulan_ATK_Operasional");
+  if (!sh || sh.getLastRow() < 2) return [];
+  const data = objekSheetWorkflowBMN_(sh, "ID_Usulan");
+  return data.rows.map(r => ({
+    id: String(r.ID_Usulan || ""), tanggal: nilaiTanggalBMN_(r.Waktu_Input),
+    barang: String(r.Nama_Barang || ""), jumlah: String(r.Jumlah || ""),
+    status: String(r.Status || "").toUpperCase() === "BARU" ? "PROSES TELAAH" : String(r.Status || "PROSES TELAAH"),
+    keterangan: String(r.Keterangan_Admin || "")
+  })).reverse();
+}
+
+function getProgresPengaduanRusakPublik() {
+  const sh = getDatabase().getSheetByName("Data_Pelaporan_Barang_Rusak");
+  if (!sh || sh.getLastRow() < 2) return [];
+  const data = objekSheetWorkflowBMN_(sh, "ID_Pelaporan_Rusak");
+  return data.rows.filter(r => String(r.Status || "").toUpperCase() !== "SELESAI DIPERBAIKI")
+    .map(r => {
+      const tingkat = String(r.Tingkat_Kerusakan || "").toUpperCase();
+      let status = String(r.Status || "").toUpperCase();
+      if (tingkat === "RUSAK BERAT") status = "USUL PENGHAPUSAN";
+      else if (status === "BARU") status = "PROSES TELAAH";
+      return {
+        id: String(r.ID_Pelaporan_Rusak || ""), tanggal: nilaiTanggalBMN_(r.Tanggal),
+        barang: String(r.Nama_Barang_Merk || ""), tingkat: tingkat,
+        lokasi: String(r.Lokasi_Barang || ""), status: status,
+        keterangan: String(r.Keterangan_Admin || "")
+      };
+    }).reverse();
+}
+
+function prosesUsulanATKAdmin(token, idUsulan, keputusan, keterangan) {
+  const admin = wajibAdminBMN_(token);
+  const sh = getDatabase().getSheetByName("Data_Usulan_ATK_Operasional");
+  const headers = pastikanKolomWorkflowBMN_(sh, ["Keterangan_Admin","Admin_Pemeriksa","Waktu_Pemeriksaan"]);
+  const data = objekSheetWorkflowBMN_(sh, "ID_Usulan");
+  const rec = data.rows.find(r => String(r.ID_Usulan) === String(idUsulan));
+  if (!rec) throw new Error("Data usulan tidak ditemukan.");
+  const status = String(rec.Status || "").toUpperCase();
+  if (!["BARU","PROSES TELAAH"].includes(status)) throw new Error("Usulan ini sudah diproses.");
+  const hasil = String(keputusan || "").toUpperCase();
+  if (!["DISETUJUI","DITOLAK"].includes(hasil)) throw new Error("Keputusan tidak valid.");
+  const catatan = String(keterangan || "").trim();
+  if (!catatan) throw new Error("Keterangan admin wajib diisi.");
+  const idx = {}; headers.forEach((h,i) => idx[h] = i);
+  const set = (h,v) => sh.getRange(rec._row, idx[h]+1).setValue(v);
+  set("Status", hasil); set("Keterangan_Admin", catatan);
+  set("Admin_Pemeriksa", admin.username || admin.nama || "ADMIN");
+  set("Waktu_Pemeriksaan", new Date()); SpreadsheetApp.flush();
+  return {berhasil:true,pesan:"Usulan berhasil "+(hasil==="DISETUJUI"?"disetujui.":"ditolak.")};
+}
+
+function prosesPengaduanRusakAdmin(token, idLaporan, tindakan, keterangan) {
+  const admin = wajibAdminBMN_(token);
+  const sh = getDatabase().getSheetByName("Data_Pelaporan_Barang_Rusak");
+  const headers = pastikanKolomWorkflowBMN_(sh, ["Keterangan_Admin","Admin_Pemeriksa","Waktu_Proses","Waktu_Selesai"]);
+  const data = objekSheetWorkflowBMN_(sh, "ID_Pelaporan_Rusak");
+  const rec = data.rows.find(r => String(r.ID_Pelaporan_Rusak) === String(idLaporan));
+  if (!rec) throw new Error("Data pengaduan tidak ditemukan.");
+  const tingkat = String(rec.Tingkat_Kerusakan || "").toUpperCase();
+  if (tingkat === "RUSAK BERAT") throw new Error("Kerusakan berat berstatus Usul Penghapusan dan tidak masuk proses perbaikan.");
+  const status = String(rec.Status || "").toUpperCase();
+  const aksi = String(tindakan || "").toUpperCase();
+  const catatan = String(keterangan || "").trim();
+  if (!catatan) throw new Error("Keterangan admin wajib diisi.");
+  const idx = {}; headers.forEach((h,i) => idx[h] = i);
+  const set = (h,v) => sh.getRange(rec._row, idx[h]+1).setValue(v);
+  if (aksi === "SETUJUI" || aksi === "TOLAK") {
+    if (!["BARU","PROSES TELAAH"].includes(status)) throw new Error("Pengaduan ini sudah diproses.");
+    set("Status", aksi === "SETUJUI" ? "SEDANG DIPERBAIKI" : "DITOLAK");
+    set("Keterangan_Admin", catatan); set("Admin_Pemeriksa", admin.username || admin.nama || "ADMIN");
+    set("Waktu_Proses", new Date());
+  } else if (aksi === "SELESAI") {
+    if (status !== "SEDANG DIPERBAIKI") throw new Error("Hanya pengaduan yang sedang diperbaiki yang dapat diselesaikan.");
+    set("Status", "SELESAI DIPERBAIKI"); set("Keterangan_Admin", catatan);
+    set("Admin_Pemeriksa", admin.username || admin.nama || "ADMIN"); set("Waktu_Selesai", new Date());
+    const master = getDatabase().getSheetByName("Master_BMN");
+    if (master && master.getLastRow() >= 2) {
+      const vals = master.getDataRange().getValues(), h = vals[0].map(x => String(x).trim()), ix = {};
+      h.forEach((x,i) => ix[x] = i);
+      if (ix.ID_Aset !== undefined && ix.Kondisi !== undefined) {
+        const pos = vals.findIndex((r,i) => i > 0 && String(r[ix.ID_Aset]).trim() === String(rec.ID_Aset || "").trim());
+        if (pos > 0) {
+          master.getRange(pos+1, ix.Kondisi+1).setValue("BAIK");
+          if (ix.Terakhir_Diperbarui !== undefined) master.getRange(pos+1, ix.Terakhir_Diperbarui+1).setValue(new Date());
+        }
+      }
+    }
+  } else throw new Error("Tindakan tidak dikenal.");
+  SpreadsheetApp.flush();
+  return {berhasil:true,pesan:aksi==="SELESAI"?"Perbaikan selesai. Kondisi aset pada Master BMN diperbarui menjadi BAIK.":aksi==="SETUJUI"?"Pengaduan disetujui untuk diperbaiki.":"Pengaduan ditolak."};
 }
 
 function getDataPemindahanBarangAdmin(token){return dataSheetKeObjekBMN_("Data_Pemindahan_Barang",token);}
