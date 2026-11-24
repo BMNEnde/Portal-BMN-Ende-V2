@@ -1955,6 +1955,7 @@ function getProgresUsulanATKPublik() {
   const data = objekSheetWorkflowBMN_(sh, "ID_Usulan");
   return data.rows.map(r => ({
     id: String(r.ID_Usulan || ""), tanggal: nilaiTanggalBMN_(r.Waktu_Input),
+    namaPengusul: String(r.Nama_Pengusul || ""),
     barang: String(r.Nama_Barang || ""), jumlah: String(r.Jumlah || ""),
     status: String(r.Status || "").toUpperCase() === "BARU" ? "PROSES TELAAH" : String(r.Status || "PROSES TELAAH"),
     keterangan: String(r.Keterangan_Admin || "")
