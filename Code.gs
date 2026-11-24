@@ -67,6 +67,17 @@ function setupDatabase() {
       "Dihapus"
     ],
 
+    // Daftar aset yang secara khusus diizinkan untuk dipinjam.
+    // Struktur kolom dibuat sama persis dengan Master_BMN.
+    Master_BMN_Peminjaman: [
+      "ID_Aset", "Jenis_BMN", "Kode_BMN", "NUP", "Nama_Aset",
+      "Kategori", "Merk", "Tipe_Model", "Nomor_Seri",
+      "Tahun_Perolehan", "Kondisi", "Lokasi",
+      "Status_Aset", "Status_Penggunaan", "Keterangan",
+      "Foto_Aset", "Tanggal_Input", "Terakhir_Diperbarui",
+      "Dihapus"
+    ],
+
     Data_Peminjaman: [
       "ID_Peminjaman", "Tanggal_Pengajuan", "Kategori_Pengguna",
       "Nama_Peminjam", "NIP", "Jabatan", "Instansi", "No_HP",
@@ -1148,25 +1159,44 @@ function getReferensiBMN(token) {
    ========================================================= */
 
 function ambilAsetTersediaPublik() {
-  const sheet = getDatabase().getSheetByName("Master_BMN");
-  if (!sheet || sheet.getLastRow() < 2) return [];
-  // Gunakan nilai tampilan agar NUP dengan angka nol di depan tetap terjaga.
+  const ss = getDatabase();
+  const sheet = ss.getSheetByName("Master_BMN_Peminjaman");
+  const master = ss.getSheetByName("Master_BMN");
+  if (!sheet) throw new Error("Sheet Master_BMN_Peminjaman belum tersedia. Jalankan setupDatabase terlebih dahulu.");
+  if (!master) throw new Error("Sheet Master_BMN tidak ditemukan.");
+  if (sheet.getLastRow() < 2 || master.getLastRow() < 2) return [];
+
+  // Pilihan peminjaman bersumber dari sheet khusus. Status terkini tetap
+  // diverifikasi dari Master_BMN utama agar persetujuan/pengembalian sinkron.
   const values = sheet.getDataRange().getDisplayValues();
-  const header = values[0].map(String);
-  const idx = {};
+  const masterValues = master.getDataRange().getDisplayValues();
+  const header = values[0].map(String), idx = {};
   header.forEach((h, i) => idx[h] = i);
-  ["ID_Aset", "Kode_BMN", "Nama_Aset", "Jenis_BMN", "Status_Aset", "Status_Penggunaan", "Dihapus"].forEach(h => {
-    if (idx[h] === undefined) throw new Error("Kolom " + h + " tidak ditemukan di Master_BMN.");
+  const masterHeader = masterValues[0].map(String), masterIdx = {};
+  masterHeader.forEach((h, i) => masterIdx[h] = i);
+  ["ID_Aset", "Kode_BMN", "Nama_Aset", "Jenis_BMN"].forEach(h => {
+    if (idx[h] === undefined) throw new Error("Kolom " + h + " tidak ditemukan di Master_BMN_Peminjaman.");
   });
+  ["ID_Aset", "Status_Aset", "Status_Penggunaan", "Dihapus"].forEach(h => {
+    if (masterIdx[h] === undefined) throw new Error("Kolom " + h + " tidak ditemukan di Master_BMN.");
+  });
+
+  const statusMaster = {};
+  masterValues.slice(1).forEach(row => {
+    const id = String(row[masterIdx.ID_Aset] || "").trim();
+    if (id) statusMaster[id] = {
+      statusAset: String(row[masterIdx.Status_Aset] || "").trim().toUpperCase(),
+      statusPenggunaan: String(row[masterIdx.Status_Penggunaan] || "").trim().toUpperCase(),
+      deleted: String(row[masterIdx.Dihapus] || "").trim().toLowerCase()
+    };
+  });
+
   return values.slice(1).filter(row => {
-    const deleted = String(row[idx.Dihapus] || "").trim().toLowerCase();
-    const statusAset = String(row[idx.Status_Aset] || "").trim().toUpperCase();
-    const statusPenggunaan = String(row[idx.Status_Penggunaan] || "").trim().toUpperCase();
-    // Data lama yang belum memiliki status penggunaan diperlakukan sebagai tersedia,
-    // selama aset aktif dan tidak ditandai telah dihapus.
-    return !["true", "ya", "1"].includes(deleted) &&
-      statusAset === "AKTIF" &&
-      (!statusPenggunaan || statusPenggunaan === "TERSEDIA");
+    const status = statusMaster[String(row[idx.ID_Aset] || "").trim()];
+    if (!status) return false;
+    return !["true", "ya", "1"].includes(status.deleted) &&
+      status.statusAset === "AKTIF" &&
+      (!status.statusPenggunaan || status.statusPenggunaan === "TERSEDIA");
   }).map(row => {
     const aset = {
       id: String(row[idx.ID_Aset] || "").trim(),
@@ -1181,7 +1211,6 @@ function ambilAsetTersediaPublik() {
     return aset;
   }).filter(a => a.id && a.nama);
 }
-
 function ajukanPeminjamanPublik(data) {
   if (!data || typeof data !== "object") throw new Error("Data pengajuan tidak valid.");
   const kategori = String(data.kategori || "").trim();
@@ -1442,8 +1471,7 @@ function tesKoneksiDatabaseV2() {
    ========================================================= */
 
 const JENIS_FORM_PENGGUNAAN_ = [
-  "ATK", "REAGEN DAN MEDIA", "BAKU PEMBANDING",
-  "BAKU MIKROBA", "SUKU CADANG", "ALAT GELAS"
+  "ATK", "BAKU MIKROBA", "BAKU PEMBANDING", "REAGEN MEDIA"
 ];
 const PERNYATAAN_PENGGUNAAN_ = "Saya bersedia menggunakan barang tersebut sesuai dengan kebutuhan dan ketentuan, mencatat setiap pemakaian dengan benar, serta bertanggung jawab atas penggunaan yang tidak sesuai prosedur.";
 const PERNYATAAN_USULAN_ = "Saya menyatakan bahwa usulan pengadaan ini disampaikan dengan sebenar-benarnya dan dapat dipertanggungjawabkan.";
@@ -1480,7 +1508,9 @@ function getReferensiFormPublik() {
   if (ref && ref.getLastRow() >= 2) {
     const values = ref.getRange(2, 1, ref.getLastRow() - 1, 5).getDisplayValues();
     values.forEach(r => {
-      const jenis = String(r[0] || "").trim().toUpperCase();
+      const jenisAsli = String(r[0] || "").trim().toUpperCase();
+      // Kompatibilitas data referensi lama: REAGEN DAN MEDIA menjadi REAGEN MEDIA.
+      const jenis = jenisAsli === "REAGEN DAN MEDIA" ? "REAGEN MEDIA" : jenisAsli;
       const atk = String(r[1] || "").trim();
       const barang = String(r[2] || "").trim();
       const aktif = String(r[4] || "YA").trim().toUpperCase();
@@ -1545,7 +1575,7 @@ function getReferensiFormPublik() {
       daftarAset.push(item);
       if (status === "AKTIF") {
         if (jenisBMN === "MESIN PERALATAN KHUSUS TIK") { daftarPemeliharaanTIK.push(item); daftarPemeliharaan.push(item); }
-        else if (jenisBMN === "MESIN PERALATAN NON TIK") { daftarPemeliharaanNonTIK.push(item); daftarPemeliharaan.push(item); }
+        else if (jenisBMN === "MESIN PERALATAN NON TIK" || jenisBMN === "ALAT ANGKUTAN BERMOTOR") { daftarPemeliharaanNonTIK.push(item); daftarPemeliharaan.push(item); }
         if (lokasi && !daftarLokasi.includes(lokasi)) daftarLokasi.push(lokasi);
       }
     });
