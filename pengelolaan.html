@@ -154,6 +154,9 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       .statement{padding:13px;font-size:11px}
       .submit{font-size:13px}
     }
+
+.asset-search-input{width:100%;margin:0 0 7px;padding:11px 13px;border:1px solid #cbd9e5;border-radius:9px;background:#fff;color:var(--text);font:inherit;font-size:13px;box-sizing:border-box}
+.asset-search-input:focus{outline:none;border-color:#2476c7;box-shadow:0 0 0 3px rgba(36,118,199,.10)}
 </style>
   <link rel="stylesheet" href="./mobile-polish.css">
 </head>
@@ -279,7 +282,8 @@ function busy(formOrButton,on,label){const b=formOrButton instanceof HTMLElement
 const heroContent={usage:["Formulir Penggunaan Barang","Catat penggunaan ATK, reagen dan media, baku pembanding, baku mikroba, suku cadang, serta alat gelas."],proposal:["Formulir Usulan ATK dan Operasional","Sampaikan usulan kebutuhan barang dan operasional untuk ditinjau petugas."],maintenance:["Formulir Pemeliharaan Aset","Catat pemeliharaan aset, termasuk barang yang tidak tersedia untuk dipinjam."],transfer:["Formulir Pemindahan Barang","Ajukan pemindahan barang antar ruang dengan data lokasi dari Master BMN."],damage:["Formulir Pelaporan Barang Rusak","Laporkan kerusakan barang BMN beserta dokumentasi foto."],glass:["Formulir Pelaporan Alat Gelas Pecah","Catat alat gelas yang pecah selama penggunaan."],borrowing:["Formulir Peminjaman BMN","Lengkapi identitas peminjam dan informasi barang yang akan dipinjam. Pengajuan akan diperiksa oleh petugas."]};
 document.querySelectorAll("button.tab[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("button.tab[data-tab]").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","transfer","damage","glass","borrowing"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("heroTitle").textContent=heroContent[btn.dataset.tab][0];$("heroDescription").textContent=heroContent[btn.dataset.tab][1];$("message").className="msg";}));
 let refs=null;
-function fill(select,items,placeholder,labelFn){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);(items||[]).forEach(item=>{const o=document.createElement("option");o.value=labelFn?labelFn(item).value:item;o.textContent=labelFn?labelFn(item).label:item;select.appendChild(o);});}
+function setupAssetSearch(select){if(!select)return;let search=select._assetSearchInput;if(!search){search=document.createElement("input");search.type="search";search.className="asset-search-input";search.placeholder="Cari aset berdasarkan NUP, nama, merk, atau tipe...";search.setAttribute("aria-label","Cari aset");search.autocomplete="off";select.parentNode.insertBefore(search,select);select._assetSearchInput=search;const apply=()=>{const q=search.value.trim().toLocaleLowerCase("id");[...select.options].forEach((option,index)=>{option.hidden=index>0&&q!==""&&!option.textContent.toLocaleLowerCase("id").includes(q);});};search.addEventListener("input",apply);select.addEventListener("change",()=>{search.value="";apply();});}search.value="";[...select.options].forEach(option=>option.hidden=false);}
+function fill(select,items,placeholder,labelFn){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);(items||[]).forEach(item=>{const o=document.createElement("option");o.value=labelFn?labelFn(item).value:item;o.textContent=labelFn?labelFn(item).label:item;select.appendChild(o);});if(["asetPindah","asetRusak","asetPemeliharaan","asetMonitoring"].includes(select.id))setupAssetSearch(select);}
 function buatItemPenggunaan(){
  const card=document.createElement("div");card.style.cssText="border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--surface)";
  const grid=document.createElement("div");grid.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px";
@@ -344,7 +348,7 @@ function tambahBarisAsetTIK(){
  const card=document.createElement("div");card.className="card-item";card.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end;padding:14px;margin-bottom:10px;border:1px solid #d8e4ed;border-radius:12px";
  const field=(label)=>{const box=document.createElement("div");const l=document.createElement("label");l.textContent=label;l.style.display="block";l.style.marginBottom="6px";box.appendChild(l);return box;};
  const assetField=field("NUP / Nama Aset / Merk / Type *");const select=document.createElement("select");select.required=true;select.style.width="100%";select.innerHTML='<option value="">Pilih aset TIK</option>';
- items.forEach(x=>{const o=document.createElement("option");o.value=x.id;o.textContent=[x.nup,x.nama,x.merk,x.tipeModel].filter(Boolean).join(" / ");select.appendChild(o);});assetField.appendChild(select);
+ items.forEach(x=>{const o=document.createElement("option");o.value=x.id;o.textContent=[x.nup,x.nama,x.merk,x.tipeModel].filter(Boolean).join(" / ");select.appendChild(o);});assetField.appendChild(select);setupAssetSearch(select);
  const nupField=field("NUP");const nupValue=document.createElement("input");nupValue.type="text";nupValue.readOnly=true;nupValue.placeholder="Otomatis dari Master BMN";nupValue.style.width="100%";nupField.appendChild(nupValue);
  select.addEventListener("change",()=>{const selected=items.find(x=>x.id===select.value);nupValue.value=selected?.nup||"";});
  const statusField=field("Pemeliharaan *");const status=document.createElement("select");status.innerHTML='<option value="TIDAK">Tidak</option><option value="YA">Ya</option>';statusField.appendChild(status);
