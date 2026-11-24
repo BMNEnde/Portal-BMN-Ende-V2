@@ -155,8 +155,14 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       .submit{font-size:13px}
     }
 
-.asset-search-input{width:100%;margin:0 0 7px;padding:11px 13px;border:1px solid #cbd9e5;border-radius:9px;background:#fff;color:var(--text);font:inherit;font-size:13px;box-sizing:border-box}
-.asset-search-input:focus{outline:none;border-color:#2476c7;box-shadow:0 0 0 3px rgba(36,118,199,.10)}
+
+.asset-combobox{position:relative;width:100%;min-width:0}
+.asset-combobox-input{width:100%;padding:12px 14px;border:1px solid var(--border,#cbd9e5);border-radius:9px;background:#fff;color:inherit;font:inherit;font-size:14px;box-sizing:border-box}
+.asset-combobox-input:focus{outline:none;border-color:#2476c7;box-shadow:0 0 0 3px rgba(36,118,199,.12)}
+.asset-combobox-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:230px;overflow-y:auto;background:#fff;border:1px solid #cbd9e5;border-radius:9px;box-shadow:0 10px 24px rgba(15,35,55,.16);z-index:1000}
+.asset-combobox-option{display:block;width:100%;margin:0;padding:11px 13px;text-align:left;border:0;border-radius:0;background:#fff;color:#1e293b;font:inherit;font-size:13px;cursor:pointer}
+.asset-combobox-option:hover,.asset-combobox-option:focus{background:#eef6fc;outline:none}
+.asset-combobox-empty{padding:12px;color:#64748b;font-size:13px}
 </style>
   <link rel="stylesheet" href="./mobile-polish.css">
 </head>
@@ -282,7 +288,32 @@ function busy(formOrButton,on,label){const b=formOrButton instanceof HTMLElement
 const heroContent={usage:["Formulir Penggunaan Barang","Catat penggunaan ATK, reagen dan media, baku pembanding, baku mikroba, suku cadang, serta alat gelas."],proposal:["Formulir Usulan ATK dan Operasional","Sampaikan usulan kebutuhan barang dan operasional untuk ditinjau petugas."],maintenance:["Formulir Pemeliharaan Aset","Catat pemeliharaan aset, termasuk barang yang tidak tersedia untuk dipinjam."],transfer:["Formulir Pemindahan Barang","Ajukan pemindahan barang antar ruang dengan data lokasi dari Master BMN."],damage:["Formulir Pelaporan Barang Rusak","Laporkan kerusakan barang BMN beserta dokumentasi foto."],glass:["Formulir Pelaporan Alat Gelas Pecah","Catat alat gelas yang pecah selama penggunaan."],borrowing:["Formulir Peminjaman BMN","Lengkapi identitas peminjam dan informasi barang yang akan dipinjam. Pengajuan akan diperiksa oleh petugas."]};
 document.querySelectorAll("button.tab[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("button.tab[data-tab]").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","transfer","damage","glass","borrowing"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("heroTitle").textContent=heroContent[btn.dataset.tab][0];$("heroDescription").textContent=heroContent[btn.dataset.tab][1];$("message").className="msg";}));
 let refs=null;
-function setupAssetSearch(select){if(!select)return;let search=select._assetSearchInput;if(!search){search=document.createElement("input");search.type="search";search.className="asset-search-input";search.placeholder="Cari aset berdasarkan NUP, nama, merk, atau tipe...";search.setAttribute("aria-label","Cari aset");search.autocomplete="off";select.parentNode.insertBefore(search,select);select._assetSearchInput=search;const apply=()=>{const q=search.value.trim().toLocaleLowerCase("id");[...select.options].forEach((option,index)=>{option.hidden=index>0&&q!==""&&!option.textContent.toLocaleLowerCase("id").includes(q);});};search.addEventListener("input",apply);select.addEventListener("change",()=>{search.value="";apply();});}search.value="";[...select.options].forEach(option=>option.hidden=false);}
+function setupAssetSearch(select){
+ if(!select)return;
+ let wrap=select._assetComboWrap;
+ if(!wrap){
+  wrap=document.createElement("div");wrap.className="asset-combobox";
+  const input=document.createElement("input");input.type="text";input.className="asset-combobox-input";input.placeholder=select.options[0]?.textContent||"Pilih aset";input.autocomplete="off";input.setAttribute("role","combobox");input.setAttribute("aria-autocomplete","list");input.setAttribute("aria-expanded","false");
+  const menu=document.createElement("div");menu.className="asset-combobox-menu";menu.setAttribute("role","listbox");
+  select.parentNode.insertBefore(wrap,select);wrap.append(input,menu,select);select.style.display="none";select._assetComboWrap=wrap;
+  const close=()=>{menu.style.display="none";input.setAttribute("aria-expanded","false");};
+  const render=(query="")=>{menu.innerHTML="";const q=query.trim().toLocaleLowerCase("id");let count=0;
+   [...select.options].forEach((option,index)=>{if(index===0||!option.value)return;if(q&&!option.textContent.toLocaleLowerCase("id").includes(q))return;
+    const item=document.createElement("button");item.type="button";item.className="asset-combobox-option";item.textContent=option.textContent;item.setAttribute("role","option");
+    item.addEventListener("click",()=>{select.value=option.value;select.dispatchEvent(new Event("change",{bubbles:true}));input.value=option.textContent;close();});menu.appendChild(item);count++;
+   });
+   if(!count){const empty=document.createElement("div");empty.className="asset-combobox-empty";empty.textContent="Aset tidak ditemukan";menu.appendChild(empty);}
+  };
+  const open=()=>{render(input.value);menu.style.display="block";input.setAttribute("aria-expanded","true");};
+  input.addEventListener("focus",()=>{input.value="";open();});
+  input.addEventListener("click",open);
+  input.addEventListener("input",open);
+  input.addEventListener("keydown",e=>{if(e.key==="Escape"){close();input.blur();}else if(e.key==="ArrowDown"){open();menu.querySelector("button")?.focus();}});
+  wrap.addEventListener("focusout",()=>setTimeout(()=>{if(!wrap.contains(document.activeElement))close();},120));
+  select.addEventListener("change",()=>{const chosen=select.options[select.selectedIndex];if(chosen&&chosen.value)input.value=chosen.textContent;});
+ }
+ const chosen=select.options[select.selectedIndex];if(chosen&&chosen.value)wrap.querySelector("input").value=chosen.textContent;
+}
 function fill(select,items,placeholder,labelFn){select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);(items||[]).forEach(item=>{const o=document.createElement("option");o.value=labelFn?labelFn(item).value:item;o.textContent=labelFn?labelFn(item).label:item;select.appendChild(o);});if(["asetPindah","asetRusak","asetPemeliharaan","asetMonitoring"].includes(select.id))setupAssetSearch(select);}
 function buatItemPenggunaan(){
  const card=document.createElement("div");card.style.cssText="border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--surface)";
