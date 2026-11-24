@@ -129,7 +129,7 @@ const $=id=>document.getElementById(id);
 let active="dipinjam";
 const views={
  dipinjam:{title:"Data BMN yang Dipinjam",method:"getDataBMNDipinjamPublik",cols:[["kode","Kode BMN"],["nup","NUP"],["barang","Nama Barang"],["merk","Merk"],["tipe","Tipe / Model"],["jenis","Jenis BMN"],["tanggalPinjam","Tanggal Pinjam"],["rencanaKembali","Rencana Kembali"]]},
- usulan:{title:"Data Usulan ATK dan Operasional",method:"getProgresUsulanATKPublik",cols:[["id","ID Usulan"],["tanggal","Tanggal Pengajuan"],["barang","Nama Barang"],["jumlah","Jumlah"],["status","Status Progres"],["keterangan","Keterangan Admin"]]},
+ usulan:{title:"Data Usulan ATK dan Operasional",method:"getProgresUsulanATKPublik",cols:[["id","ID Usulan"],["tanggal","Tanggal Pengajuan"],["namaPengusul","Nama Pengusul"],["barang","Nama Barang"],["jumlah","Jumlah"],["status","Status Progres"],["keterangan","Keterangan Admin"]]},
  rusak:{title:"Progres Pengaduan BMN Rusak",method:"getProgresPengaduanRusakPublik",cols:[["id","ID Pengaduan"],["tanggal","Tanggal"],["barang","Nama Barang / Merk"],["tingkat","Tingkat Kerusakan"],["lokasi","Lokasi"],["status","Status Progres"],["keterangan","Keterangan Admin"]]}
 };
 function esc(v){return String(v==null||v===""?"-":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
