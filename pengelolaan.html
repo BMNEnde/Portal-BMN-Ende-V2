@@ -175,17 +175,17 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
   </header>
   <main class="card">
     <div class="tabs">
-      <button class="tab active" data-tab="usage" type="button">Penggunaan Barang</button>
+      <button class="tab active" data-tab="usage" type="button">Form Pemakaian BMN</button>
       <button class="tab" data-tab="proposal" type="button">Usulan ATK & Operasional</button>
-      <button class="tab" data-tab="maintenance" type="button">Pemeliharaan Aset</button>
-      <button class="tab" data-tab="transfer" type="button">Pemindahan Barang</button>
-      <button class="tab" data-tab="damage" type="button">Pelaporan Barang Rusak</button>
-      <button class="tab" data-tab="glass" type="button">Alat Gelas Pecah</button>
-      <button class="tab" data-tab="borrowing" type="button">Formulir Peminjaman</button>
+      <button class="tab" data-tab="maintenance" type="button">Form Pemeliharaan Aset</button>
+      <button class="tab" data-tab="transfer" type="button">Form Pemindahan Barang</button>
+      <button class="tab" data-tab="damage" type="button">Form Pengaduan BMN Rusak</button>
+      <button class="tab" data-tab="glass" type="button">Form Pelaporan Alat Gelas Pecah</button>
+      <button class="tab" data-tab="borrowing" type="button">Form Peminjaman BMN</button>
     </div>
     <div id="message" class="msg"></div>
     <section id="usage">
-      <h2>Formulir Penggunaan Barang</h2><p class="desc">Pilih jenis barang yang digunakan. Daftar nama barang diambil dari referensi database BMN.</p>
+      <h2>Form Pemakaian BMN</h2><p class="desc">Pilih jenis barang yang digunakan. Daftar nama barang diambil dari referensi database BMN.</p>
       <form id="usageForm"><div class="grid">
         <div class="field full"><label for="jenisForm">Jenis Formulir *</label><select id="jenisForm" required><option value="">Memuat jenis formulir...</option></select></div>
         <div class="field hidden" id="atkWrap"><label for="jenisATK">Jenis ATK *</label><select id="jenisATK"><option value="">Pilih jenis ATK</option></select></div>
@@ -209,7 +209,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="submit" type="submit">Kirim Usulan Pengadaan</button></form>
     </section>
     <section id="maintenance" class="hidden">
-      <h2>Formulir Pemeliharaan Aset</h2><p class="desc">Pilih jenis pemeliharaan. Aset TIK dan Non-TIK diambil dari Master BMN, sedangkan APAR dan P3K tetap menggunakan Master Pemeliharaan.</p>
+      <h2>Form Pemeliharaan Aset</h2><p class="desc">Pilih jenis pemeliharaan. Aset TIK dan Non-TIK diambil dari Master BMN, sedangkan APAR dan P3K tetap menggunakan Master Pemeliharaan.</p>
       <div class="maintenance-switch" style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px"><button type="button" class="tab" data-maintenance-kind="TIK">Pemeliharaan TIK</button><button type="button" class="tab active" data-maintenance-kind="NON_TIK">Pemeliharaan Non-TIK</button><button type="button" class="tab" data-maintenance-kind="MONITORING_APAR_P3K">Monitoring APAR &amp; P3K</button></div>
       <div id="panelTIK" class="hidden"><p class="hint">Pilih status pemeliharaan untuk setiap aset TIK. Jika memilih Ya, isi keterangan tindakan pemeliharaan.</p><div class="field"><label for="tanggalTIK">Tanggal Pemeriksaan *</label><input id="tanggalTIK" type="date" required></div><div class="field" style="margin-top:12px"><label for="petugasTIK">Petugas *</label><select id="petugasTIK" required><option value="">Pilih petugas</option><option>Anwar</option><option>Syaiful Abdul Gani</option><option>Viktorimus Sesarius Porkas</option><option>Teknisi</option><option value="LAINNYA">Lainnya</option></select><input id="petugasTIKLainnya" class="hidden" type="text" maxlength="150" placeholder="Tuliskan nama petugas" style="margin-top:8px"></div><div id="daftarAsetTIK" style="margin-top:16px"></div><button type="button" class="secondary" id="tambahAsetTIK" style="margin-top:12px">+ Tambah Aset TIK</button><button type="button" class="submit" id="kirimTIK" style="margin-top:16px">Kirim Pemeliharaan TIK</button></div>
       <div id="panelNonTIK"><form id="maintenanceForm"><div class="grid">
@@ -225,7 +225,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <div id="panelMonitoring" class="hidden"><div class="grid"><div class="field"><label for="kategoriMonitoring">Jenis Monitoring *</label><select id="kategoriMonitoring"><option value="APAR">APAR</option><option value="P3K">P3K</option></select></div><div class="field"><label for="asetMonitoring">Nama Aset *</label><select id="asetMonitoring" required><option value="">Pilih APAR</option></select></div><div class="field"><label for="tanggalMonitoring">Tanggal Pemeriksaan *</label><input id="tanggalMonitoring" type="date" required></div><div class="field"><label for="petugasMonitoring">Petugas *</label><select id="petugasMonitoring" required><option value="">Pilih petugas</option><option>Anwar</option><option>Syaiful Abdul Gani</option><option>Viktorimus Sesarius Porkas</option><option>Teknisi</option><option value="LAINNYA">Lainnya</option></select><input id="petugasMonitoringLainnya" class="hidden" type="text" maxlength="150" placeholder="Tuliskan nama petugas" style="margin-top:8px"></div></div><h3 style="margin-top:20px">Checklist Pemeriksaan</h3><div id="daftarChecklistMonitoring"></div><div class="field" style="margin-top:14px"><label for="catatanMonitoring">Catatan / Tindak Lanjut</label><textarea id="catatanMonitoring" placeholder="Tuliskan temuan atau tindak lanjut bila ada"></textarea></div><button type="button" class="submit" id="kirimMonitoring" style="margin-top:16px">Simpan Hasil Monitoring</button></div>
     </section>
     <section id="transfer" class="hidden">
-      <h2>Formulir Pemindahan Barang</h2><p class="desc">Ajukan pemindahan barang antar ruang. Data barang dan ruang mengikuti Master BMN.</p>
+      <h2>Form Pemindahan Barang</h2><p class="desc">Ajukan pemindahan barang antar ruang. Data barang dan ruang mengikuti Master BMN.</p>
       <form id="transferForm"><div class="grid">
         <div class="field"><label>Nama Penanggung Jawab Ruang *</label><input id="namaPJ" required maxlength="150"></div>
         <div class="field"><label>NIP *</label><input id="nipPJ" required maxlength="40"></div>
@@ -240,7 +240,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="submit" type="submit">Kirim Formulir Pemindahan</button></form>
     </section>
     <section id="damage" class="hidden">
-      <h2>Formulir Pelaporan Barang Rusak</h2><p class="desc">Laporkan kerusakan barang BMN dan sertakan foto kondisi barang.</p>
+      <h2>Form Pengaduan BMN Rusak</h2><p class="desc">Laporkan kerusakan barang BMN dan sertakan foto kondisi barang.</p>
       <form id="damageForm"><div class="grid">
         <div class="field"><label>Tanggal *</label><input id="tanggalRusak" type="date" required></div>
         <div class="field"><label>Nama Pelapor *</label><input id="pelaporRusak" required maxlength="150"></div>
@@ -253,7 +253,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="submit" type="submit">Kirim Laporan Barang Rusak</button></form>
     </section>
     <section id="glass" class="hidden">
-      <h2>Formulir Pelaporan Alat Gelas Pecah</h2><p class="desc">Catat kejadian alat gelas yang pecah selama penggunaan.</p>
+      <h2>Form Pelaporan Alat Gelas Pecah</h2><p class="desc">Catat kejadian alat gelas yang pecah selama penggunaan.</p>
       <form id="glassForm"><div class="grid">
         <div class="field"><label>Nama Pelapor *</label><input id="pelaporGelas" required maxlength="150"></div>
         <div class="field"><label>Tanggal *</label><input id="tanggalGelas" type="date" required></div>
@@ -263,7 +263,7 @@ h2{font-size:18px;color:var(--navy);margin:0 0 6px}.desc{font-size:13px;color:va
       <button class="submit" type="submit">Kirim Laporan Alat Gelas Pecah</button></form>
     </section>
     <section id="borrowing" class="hidden">
-      <h2>Formulir Peminjaman BMN</h2>
+      <h2>Form Peminjaman BMN</h2>
       <p class="desc">Isi formulir peminjaman di bawah ini. Formulir ditampilkan langsung dalam menu Pengelolaan Aset dan Persediaan.</p>
       <iframe class="loan-frame" src="pengguna.html?embed=1" title="Formulir Peminjaman BMN" loading="lazy"></iframe>
     </section>
@@ -285,7 +285,7 @@ const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth
 $("tanggal").value=today();$("tanggalPemeliharaan").value=today();$("tanggalRusak").value=today();$("tanggalGelas").value=today();
 function message(t,type){const m=$("message");m.textContent=t;m.className="msg "+type;m.scrollIntoView({behavior:"smooth",block:"center"});}
 function busy(formOrButton,on,label){const b=formOrButton instanceof HTMLElement&&formOrButton.tagName==="BUTTON"?formOrButton:formOrButton.querySelector("button[type=submit]");if(!b)return;b.disabled=on;b.textContent=on?"Mengirim data...":label;}
-const heroContent={usage:["Formulir Penggunaan Barang","Catat penggunaan ATK, reagen dan media, baku pembanding, baku mikroba, suku cadang, serta alat gelas."],proposal:["Formulir Usulan ATK dan Operasional","Sampaikan usulan kebutuhan barang dan operasional untuk ditinjau petugas."],maintenance:["Formulir Pemeliharaan Aset","Catat pemeliharaan aset, termasuk barang yang tidak tersedia untuk dipinjam."],transfer:["Formulir Pemindahan Barang","Ajukan pemindahan barang antar ruang dengan data lokasi dari Master BMN."],damage:["Formulir Pelaporan Barang Rusak","Laporkan kerusakan barang BMN beserta dokumentasi foto."],glass:["Formulir Pelaporan Alat Gelas Pecah","Catat alat gelas yang pecah selama penggunaan."],borrowing:["Formulir Peminjaman BMN","Lengkapi identitas peminjam dan informasi barang yang akan dipinjam. Pengajuan akan diperiksa oleh petugas."]};
+const heroContent={usage:["Form Pemakaian BMN","Catat pemakaian ATK, baku mikroba, baku pembanding, dan reagen media."],proposal:["Formulir Usulan ATK dan Operasional","Sampaikan usulan kebutuhan barang dan operasional untuk ditinjau petugas."],maintenance:["Form Pemeliharaan Aset","Catat pemeliharaan aset, termasuk aset TIK, Non-TIK, dan alat angkutan bermotor."],transfer:["Formulir Pemindahan Barang","Ajukan pemindahan barang antar ruang dengan data lokasi dari Master BMN."],damage:["Form Pengaduan BMN Rusak","Laporkan kerusakan barang BMN beserta dokumentasi foto."],glass:["Form Pelaporan Alat Gelas Pecah","Catat alat gelas yang pecah selama penggunaan."],borrowing:["Form Peminjaman BMN","Lengkapi identitas peminjam dan informasi barang yang akan dipinjam. Pengajuan akan diperiksa oleh petugas."]};
 document.querySelectorAll("button.tab[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("button.tab[data-tab]").forEach(x=>x.classList.toggle("active",x===btn));["usage","proposal","maintenance","transfer","damage","glass","borrowing"].forEach(id=>$(id).classList.toggle("hidden",id!==btn.dataset.tab));$("heroTitle").textContent=heroContent[btn.dataset.tab][0];$("heroDescription").textContent=heroContent[btn.dataset.tab][1];$("message").className="msg";}));
 let refs=null;
 function setupAssetSearch(select){
