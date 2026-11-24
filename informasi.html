@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Informasi & Progres BMN | Balai POM di Ende</title>
+<link rel="stylesheet" href="./mobile-polish.css">
+<style>
+:root{--navy:#173b5e;--blue:#2563eb;--bg:#f3f6fa;--text:#1e293b;--muted:#64748b;--border:#dbe3ed}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}body{margin:0;background:var(--bg);color:var(--text)}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 18px 44px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.top a{color:var(--navy);text-decoration:none;font-weight:700}
+.hero{background:linear-gradient(120deg,#173b5e,#256b91);color:#fff;border-radius:18px;padding:26px;margin-bottom:20px}.hero h1{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:#e3edf5;line-height:1.55}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.tab{border:1px solid var(--border);border-radius:12px;background:#fff;padding:15px 12px;text-align:left;color:var(--navy);font-weight:700;cursor:pointer;min-height:76px}
+.tab.active{background:#e8f2f9;border-color:#8db6d0;box-shadow:0 3px 12px #173b5e14}
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 5px 18px #173b5e08}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.panel h2{font-size:19px;margin:0;color:var(--navy)}
+.refresh{border:1px solid var(--border);background:#fff;border-radius:9px;padding:9px 13px;cursor:pointer;color:var(--navy);font-weight:700}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:11px 12px;text-align:left;border-bottom:1px solid #e8eef3;font-size:13px;vertical-align:top}th{background:#f5f8fb;color:#526579;white-space:nowrap}
+.status{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;white-space:nowrap}.yellow{background:#fff4cc;color:#946200}.green{background:#dcfce7;color:#166534}.red{background:#fee2e2;color:#b91c1c}.blue{background:#dbeafe;color:#1d4ed8}.gray{background:#e2e8f0;color:#475569}
+.empty,.notice{padding:22px;text-align:center;color:var(--muted);font-size:14px}.notice{text-align:left;background:#f8fafc;border-radius:9px;margin-top:12px}
+@media(max-width:760px){.tabs{grid-template-columns:1fr}.wrap{padding:16px 12px 30px}.hero{padding:20px}.hero h1{font-size:21px}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><a href="./index.html">← Kembali ke Portal BMN</a><strong>Balai POM di Ende</strong></div>
+ <header class="hero"><h1>Informasi & Progres BMN</h1><p>Pantau informasi barang yang sedang dipinjam, progres usulan ATK dan operasional, serta tindak lanjut pengaduan BMN rusak.</p></header>
+ <div class="tabs" role="tablist">
+  <button class="tab active" data-view="dipinjam" type="button">1. Data BMN yang Dipinjam</button>
+  <button class="tab" data-view="usulan" type="button">2. Data Usulan ATK dan Operasional</button>
+  <button class="tab" data-view="rusak" type="button">3. Progres Pengaduan BMN Rusak</button>
+ </div>
+ <section class="panel">
+  <div class="panel-head"><h2 id="panelTitle">Data BMN yang Dipinjam</h2><button class="refresh" id="refreshBtn" type="button">↻ Muat Ulang</button></div>
+  <div class="table-wrap"><table><thead id="head"></thead><tbody id="body"><tr><td class="empty">Memuat data...</td></tr></tbody></table></div>
+  <div class="notice">Informasi ini menampilkan ringkasan progres. Data pribadi peminjam dan pelapor tidak ditampilkan pada halaman publik.</div>
+ </section>
+</div>
+<script>
+/* Jembatan API BMN untuk frontend GitHub Pages. */
+(function () {
+  "use strict";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxByexTJ4g5MB5chpm9CAnR4YJeq72tDIpvdIX6oGBteKEWTkvdL525Te9yYtz_FTzV/exec";
+  const pending = Object.create(null);
+  let sequence = 0;
+
+  function bersihkan(id) {
+    const item = pending[id];
+    if (!item) return;
+    clearTimeout(item.timer);
+    if (item.frame && item.frame.parentNode) item.frame.parentNode.removeChild(item.frame);
+    delete pending[id];
+  }
+
+  window.addEventListener("message", function (event) {
+    const message = event.data;
+    if (!message || message.__bmnApiResponse !== true || typeof message.id !== "string") return;
+    const item = pending[message.id];
+    if (!item) return;
+    // Apps Script dapat membungkus HtmlOutput dalam iframe googleusercontent.
+    // Karena itu event.source tidak selalu sama dengan iframe luar yang kita buat.
+    // ID acak per permintaan dipakai untuk mencocokkan respons.
+    bersihkan(message.id);
+    if (message.ok) {
+      if (typeof item.success === "function") item.success(message.result);
+    } else {
+      const error = new Error(message.error || "Permintaan ke server BMN gagal.");
+      if (typeof item.failure === "function") item.failure(error);
+      else console.error(error);
+    }
+  });
+
+  function send(method, args, success, failure) {
+    const id = "bmn_" + Date.now() + "_" + (++sequence) + "_" + Math.random().toString(36).slice(2);
+    const frame = document.createElement("iframe");
+    frame.name = "bmn_api_frame_" + id;
+    frame.setAttribute("aria-hidden", "true");
+    frame.style.cssText = "position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px";
+    pending[id] = {
+      success: success,
+      failure: failure,
+      frame: frame,
+      timer: setTimeout(function () {
+        const item = pending[id];
+        if (!item) return;
+        bersihkan(id);
+        const error = new Error("Server belum memberikan jawaban. Periksa koneksi dan pengaturan akses Web App Apps Script.");
+        if (typeof item.failure === "function") item.failure(error);
+      }, 45000)
+    };
+    document.body.appendChild(frame);
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = API_URL;
+    form.target = frame.name;
+    form.acceptCharset = "UTF-8";
+    form.style.display = "none";
+    const input = document.createElement("textarea");
+    input.name = "bmnApi";
+    input.value = JSON.stringify({ id: id, method: method, args: args });
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    window.setTimeout(function(){ if(form.parentNode)form.parentNode.removeChild(form); }, 1500);
+  }
+
+  function makeRunner(success, failure) {
+    return new Proxy({}, {
+      get: function (_target, property) {
+        if (property === "withSuccessHandler") return function (callback) { return makeRunner(callback, failure); };
+        if (property === "withFailureHandler") return function (callback) { return makeRunner(success, callback); };
+        if (property === "withUserObject") return function () { return makeRunner(success, failure); };
+        if (typeof property !== "string" || property === "then") return undefined;
+        return function () { send(property, Array.prototype.slice.call(arguments), success, failure); };
+      }
+    });
+  }
+
+  window.google = window.google || {};
+  window.google.script = window.google.script || {};
+  window.google.script.run = makeRunner(null, null);
+})();
+
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+let active="dipinjam";
+const views={
+ dipinjam:{title:"Data BMN yang Dipinjam",method:"getDataBMNDipinjamPublik",cols:[["kode","Kode BMN"],["nup","NUP"],["barang","Nama Barang"],["merk","Merk"],["tipe","Tipe / Model"],["jenis","Jenis BMN"],["tanggalPinjam","Tanggal Pinjam"],["rencanaKembali","Rencana Kembali"]]},
+ usulan:{title:"Data Usulan ATK dan Operasional",method:"getProgresUsulanATKPublik",cols:[["id","ID Usulan"],["tanggal","Tanggal Pengajuan"],["barang","Nama Barang"],["jumlah","Jumlah"],["status","Status Progres"],["keterangan","Keterangan Admin"]]},
+ rusak:{title:"Progres Pengaduan BMN Rusak",method:"getProgresPengaduanRusakPublik",cols:[["id","ID Pengaduan"],["tanggal","Tanggal"],["barang","Nama Barang / Merk"],["tingkat","Tingkat Kerusakan"],["lokasi","Lokasi"],["status","Status Progres"],["keterangan","Keterangan Admin"]]}
+};
+function esc(v){return String(v==null||v===""?"-":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
+function badge(v){const s=String(v||"").toUpperCase();const cls=s==="PROSES TELAAH"?"yellow":s==="DISETUJUI"||s==="SEDANG DIPERBAIKI"?"green":s==="DITOLAK"||s==="USUL PENGHAPUSAN"?"red":s==="SELESAI DIPERBAIKI"?"blue":"gray";return '<span class="status '+cls+'">'+esc(v)+'</span>';}
+function render(rows){
+ const d=views[active];$("panelTitle").textContent=d.title;
+ $("head").innerHTML="<tr>"+d.cols.map(c=>"<th>"+esc(c[1])+"</th>").join("")+"</tr>";
+ if(!rows||!rows.length){$("body").innerHTML='<tr><td class="empty" colspan="'+d.cols.length+'">Belum ada data untuk ditampilkan.</td></tr>';return;}
+ $("body").innerHTML=rows.map(r=>"<tr>"+d.cols.map(c=>"<td>"+(c[0]==="status"?badge(r[c[0]]):esc(r[c[0]]))+"</td>").join("")+"</tr>").join("");
+}
+function load(){
+ const d=views[active];$("body").innerHTML='<tr><td class="empty" colspan="'+d.cols.length+'">Memuat data...</td></tr>';
+ google.script.run.withSuccessHandler(render).withFailureHandler(e=>{$("body").innerHTML='<tr><td class="empty" colspan="'+d.cols.length+'">'+esc(e.message||"Gagal memuat data.")+'</td></tr>';})[d.method]();
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{active=b.dataset.view;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));load();}));
+$("refreshBtn").addEventListener("click",load);
+load();
+})();
+</script>
+</body></html>
