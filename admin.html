@@ -1020,6 +1020,45 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 </style>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <link rel="stylesheet" href="./mobile-polish.css">
+<style>
+
+/* ===== REDESAIN CANVA BMN: login, dashboard, master, peminjaman, pengembalian ===== */
+:root{--bmn-navy:#073b63;--bmn-deep:#062d4d;--bmn-blue:#0878c9;--bmn-green:#159b68;--bmn-pale:#eef6fb;--bmn-line:#dce7ef;--bmn-text:#17354b;--bmn-muted:#718397}
+body{background:#f3f7fb!important;color:var(--bmn-text)!important;font-family:Inter,"Segoe UI",Arial,sans-serif!important}
+#loginPage{min-height:100vh!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:36px clamp(20px,7vw,110px)!important;box-sizing:border-box;background:linear-gradient(90deg,rgba(239,247,252,.98) 0%,rgba(239,247,252,.96) 37%,rgba(239,247,252,.18) 70%),linear-gradient(135deg,#e5f2fb,#9fc9e5)!important;position:relative;overflow:hidden}
+#loginPage:after{content:"BALAI POM DI ENDE";position:absolute;right:5%;bottom:7%;font-size:clamp(22px,4vw,54px);font-weight:900;letter-spacing:.12em;color:rgba(7,59,99,.10);pointer-events:none}
+.login-card{position:relative;z-index:1;width:min(440px,100%)!important;max-width:440px!important;padding:38px!important;border:1px solid rgba(255,255,255,.8)!important;border-radius:18px!important;background:rgba(255,255,255,.97)!important;box-shadow:0 24px 70px rgba(6,45,77,.18)!important}
+.login-brand{margin-bottom:26px!important}.login-logo{margin-bottom:16px!important}.login-brand-name{color:var(--bmn-navy)!important;font-weight:850!important}.subtitle{color:#667d90!important}
+#loginForm .field label{font-weight:700!important;color:#29465d!important}#loginForm input{min-height:48px!important;border:1px solid #cbd9e4!important;border-radius:9px!important;background:#fbfdff!important}
+.btn-primary{background:linear-gradient(100deg,#0878c9,#075b9b)!important;border-radius:9px!important;box-shadow:0 6px 14px rgba(8,120,201,.18)!important;font-weight:750!important}
+#appPage{background:#f3f7fb!important;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,#073b63,#052d4d)!important;box-shadow:5px 0 24px rgba(5,45,77,.12)!important}
+.brand{border-bottom:1px solid rgba(255,255,255,.14)!important}.brand-logo-wrap{background:#fff!important;border-radius:10px!important}
+.menu-label{color:#a9c5d9!important;letter-spacing:.12em!important;font-weight:800!important}
+.menu-item{border-radius:9px!important;margin:3px 10px!important;color:#e8f2f8!important;transition:.18s ease}
+.menu-item:hover{background:rgba(255,255,255,.12)!important}.menu-item.active{background:linear-gradient(90deg,#159b68,#0b8257)!important;color:white!important;box-shadow:0 5px 14px rgba(0,0,0,.13)!important}
+.main{background:#f3f7fb!important}.topbar{background:rgba(255,255,255,.96)!important;border-bottom:1px solid var(--bmn-line)!important;box-shadow:0 3px 15px rgba(20,55,80,.04)!important}
+.topTitle{color:var(--bmn-navy)!important;font-weight:850!important}.admin-info{color:var(--bmn-text)!important}
+.content{padding:26px clamp(16px,2.5vw,34px)!important}.page-heading{color:var(--bmn-navy)!important;font-weight:850!important}
+.stats-grid{gap:15px!important}.stat-card{border:1px solid var(--bmn-line)!important;border-radius:13px!important;background:#fff!important;box-shadow:0 5px 18px rgba(18,58,86,.055)!important;position:relative;overflow:hidden}
+.stat-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--bmn-blue)}
+.stat-card:nth-child(2):before{background:#159b68}.stat-card:nth-child(3):before{background:#e6a23c}.stat-card:nth-child(4):before{background:#d65b70}
+.stat-title{color:#72869a!important;font-weight:700!important}.stat-value{color:var(--bmn-navy)!important;font-weight:900!important}
+.panel{border:1px solid var(--bmn-line)!important;border-radius:13px!important;background:#fff!important;box-shadow:0 5px 18px rgba(18,58,86,.045)!important}
+.panel h2,.panel h3{color:var(--bmn-navy)!important;font-weight:850!important}
+.filter-bar{background:#f6f9fc!important;border:1px solid var(--bmn-line)!important;border-radius:10px!important}
+input,select,textarea{border-color:#d2dee8!important;border-radius:8px!important}input:focus,select:focus,textarea:focus{border-color:#1685cc!important;box-shadow:0 0 0 3px rgba(22,133,204,.12)!important;outline:0!important}
+.btn{border-radius:8px!important;font-weight:700!important}.btn-light{background:#eef5fa!important;color:#17496b!important;border:1px solid #d6e4ed!important}
+.table-wrap{border:1px solid var(--bmn-line)!important;border-radius:11px!important;overflow:auto!important}
+table{border-collapse:separate!important;border-spacing:0!important}thead th{background:#eaf3f9!important;color:#174665!important;font-weight:800!important;border-bottom:1px solid #d4e2ec!important}
+tbody td{border-bottom:1px solid #edf1f5!important;color:#304b60!important}tbody tr:hover{background:#f6fbfe!important}
+.badge{border-radius:20px!important;font-weight:750!important}.modal-card{border-radius:15px!important;box-shadow:0 25px 70px rgba(6,45,77,.2)!important}
+.bmn-photo-cell{min-width:110px!important;text-align:center!important}.bmn-photo-thumb{display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:3px!important;border:1px solid #d4e2ec!important;border-radius:9px!important;background:#f4f9fc!important;cursor:zoom-in!important;max-width:94px!important;max-height:76px!important;overflow:hidden!important}
+.bmn-photo-thumb img{display:block!important;width:84px!important;height:66px!important;max-width:84px!important;max-height:66px!important;object-fit:cover!important;border-radius:6px!important}.bmn-photo-empty{display:inline-block!important;padding:7px!important;color:#8a9baa!important}
+.bmn-photo-modal{z-index:999999!important}
+@media(max-width:760px){#loginPage{justify-content:center!important;padding:18px!important;background:linear-gradient(135deg,#eaf4fa,#c8e0f0)!important}.login-card{padding:26px!important}.content{padding:16px!important}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+</style>
 </head>
 
 <body>
