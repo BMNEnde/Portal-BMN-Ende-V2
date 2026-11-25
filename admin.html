@@ -2529,10 +2529,18 @@ tbody td{border-bottom:1px solid #edf1f5!important;color:#304b60!important}tbody
       const drive=raw.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([A-Za-z0-9_-]+)/i)||raw.match(/[?&]id=([A-Za-z0-9_-]+)/i);
       return drive?"https://drive.google.com/thumbnail?id="+drive[1]+"&sz=w900":raw;
     }
+    function fallbackFotoAdmin(img){
+      const id=String(img.dataset.driveId||"");
+      const tahap=Number(img.dataset.fallback||0);
+      const alternatif=id?["https://drive.google.com/uc?export=view&id="+id,"https://lh3.googleusercontent.com/d/"+id]:[];
+      if(tahap<alternatif.length){img.dataset.fallback=String(tahap+1);img.src=alternatif[tahap];return;}
+      img.closest(".bmn-photo-thumb").outerHTML='<span class="bmn-photo-empty">Foto tidak dapat dimuat</span>';
+    }
     function buatThumbnailFotoAdmin(url,label){
       const src=sumberFotoAdmin(url);
       if(!src)return '<span class="bmn-photo-empty">-</span>';
-      return '<button type="button" class="bmn-photo-thumb" data-foto-url="'+escapeHTML(src)+'" data-foto-label="'+escapeHTML(label||"Dokumentasi foto")+'" title="Klik untuk melihat foto lebih besar"><img src="'+escapeHTML(src)+'" alt="'+escapeHTML(label||"Foto dokumentasi")+'" loading="lazy" onerror="this.closest(\'.bmn-photo-thumb\').outerHTML=\'<span class=\\\'bmn-photo-empty\\\'>Foto tidak tersedia</span>\'"></button>';
+      const driveId=(src.match(/[?&]id=([A-Za-z0-9_-]+)/)||[])[1]||"";
+      return '<button type="button" class="bmn-photo-thumb" data-foto-url="'+escapeHTML(src)+'" data-foto-label="'+escapeHTML(label||"Dokumentasi foto")+'" title="Klik untuk melihat foto lebih besar"><img src="'+escapeHTML(src)+'" data-drive-id="'+escapeHTML(driveId)+'" data-fallback="0" alt="'+escapeHTML(label||"Foto dokumentasi")+'" loading="lazy" referrerpolicy="no-referrer" onerror="fallbackFotoAdmin(this)"></button>';
     }
     function bukaFotoAdmin(url,label){
       const src=sumberFotoAdmin(url);if(!src)return;
