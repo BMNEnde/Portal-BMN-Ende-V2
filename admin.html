@@ -1018,7 +1018,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
     .bmn-photo-close{position:absolute;right:10px;top:10px;width:34px;height:34px;border:0;border-radius:50%;background:#edf2f6;color:#183b56;font-size:22px;line-height:1;cursor:pointer}
     @media(max-width:650px){.bmn-photo-modal{padding:10px}.bmn-photo-dialog{padding:8px}.bmn-photo-dialog img{max-width:88vw;max-height:76vh}}
 </style>
-  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <link rel="stylesheet" href="./mobile-polish.css">
 </head>
 
@@ -1338,7 +1338,7 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
 <div class="field" id="reportUsageTypeWrap" style="margin:0;min-width:190px;display:none"><label for="reportUsageType">Jenis Form Penggunaan</label><select id="reportUsageType"><option value="">Semua Jenis</option><option>ATK</option><option>REAGEN DAN MEDIA</option><option>BAKU PEMBANDING</option><option>BAKU MIKROBA</option><option>SUKU CADANG</option><option>ALAT GELAS</option></select></div>
 <div class="field" style="margin:0;min-width:150px"><label for="reportMonth">Bulan</label><select id="reportMonth"><option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option><option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option></select></div>
 <div class="field" style="margin:0;min-width:110px"><label for="reportYear">Tahun</label><input id="reportYear" type="number" min="2000" max="2100"></div>
-<button class="btn btn-primary" onclick="muatLaporanBulanan()">Tampilkan Laporan</button><button class="btn btn-light" onclick="eksporLaporanExcel()">Unduh Excel (.xlsx)</button><button class="btn btn-light" onclick="eksporLaporanPDF()">Cetak / Simpan PDF</button><button class="btn btn-success" onclick="unduhLaporanPDF()">⬇ Download PDF</button></div>
+<button class="btn btn-primary" onclick="muatLaporanBulanan()">Tampilkan Laporan</button><button class="btn btn-light" onclick="eksporLaporanExcel()">Unduh Excel (.xlsx)</button><button class="btn btn-light" onclick="eksporLaporanPDF()">Cetak / Simpan PDF</button></div>
 <div id="reportSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:16px"></div>
 <div class="table-wrap"><div class="table-scroll"><table><thead id="reportTableHead"></thead><tbody id="reportTableBody"><tr><td class="empty-state">Pilih jenis laporan dan periode, lalu tampilkan laporan.</td></tr></tbody></table></div></div>
 <p id="reportFootnote" style="font-size:12px;color:var(--muted);margin-top:10px">Laporan berdasarkan bulan dan tahun yang dipilih.</p></section>
@@ -2752,23 +2752,6 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       XLSX.writeFile(wb,safeName+".xlsx",{bookType:"xlsx",compression:true});
     }
 
-    /* Unduh PDF langsung, terpisah dari fungsi cetak browser */
-    async function unduhLaporanPDF(){
-      if(!laporanAktifCols.length){tampilToast("Tampilkan laporan terlebih dahulu.",true);return;}
-      if(typeof html2pdf==="undefined"){tampilToast("Komponen PDF belum termuat. Periksa koneksi internet lalu muat ulang halaman.",true);return;}
-      const title=laporanAktifTitle||"Laporan BMN";
-      const period=laporanMatriksMonitoring?el("reportYear").value:el("reportMonth").selectedOptions[0].text+" "+el("reportYear").value;
-      const container=document.createElement("div");container.style.cssText="padding:18px;background:#fff;color:#172b3a;font-family:Arial,sans-serif;width:100%;";
-      const h=document.createElement("h2");h.textContent=title;h.style.cssText="text-align:center;font-size:16px;margin:0 0 8px;";container.appendChild(h);
-      const info=document.createElement("p");info.textContent="Periode: "+period+" · Jumlah data: "+(laporanAktifRows||[]).length;info.style.cssText="font-size:10px;margin:0 0 12px;text-align:center;";container.appendChild(info);
-      const table=document.createElement("table");table.style.cssText="width:100%;border-collapse:collapse;font-size:9px;table-layout:auto;";
-      const thead=document.createElement("thead"),trh=document.createElement("tr");laporanAktifCols.forEach(col=>{const th=document.createElement("th");th.textContent=col[1];th.style.cssText="background:"+(laporanMatriksMonitoring?"#ffff00":"#eaf0f5")+";border:1px solid #738394;padding:5px;text-align:center;";trh.appendChild(th);});thead.appendChild(trh);table.appendChild(thead);
-      const tbody=document.createElement("tbody");(laporanAktifRows||[]).forEach((row,ri)=>{const tr=document.createElement("tr");laporanAktifCols.forEach(col=>{const td=document.createElement("td");let value=row[col[0]];if(col[0]==="Perkiraan_Harga_Satuan")value=formatRupiahAdmin(value);td.textContent=value==null?"":String(value);td.style.cssText="border:1px solid #9aa8b5;padding:5px;vertical-align:top;white-space:pre-wrap;word-break:break-word;background:"+(ri%2?"#f6f9fb":"#fff")+";";if(laporanMatriksMonitoring)td.style.textAlign=col[0]==="Kegiatan"||col[0]==="Keterangan_Belum"?"left":"center";tr.appendChild(td);});tbody.appendChild(tr);});table.appendChild(tbody);container.appendChild(table);
-      document.body.appendChild(container);tampilToast("Menyiapkan file PDF...");
-      try{await html2pdf().set({margin:8,filename:(title+"_"+period).replace(/[^a-z0-9_-]/gi,"_")+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["avoid-all","css","legacy"]}}).from(container).save();tampilToast("PDF berhasil diunduh.");}
-      catch(err){tampilToast("PDF gagal dibuat. Silakan coba kembali atau gunakan Cetak / Simpan PDF.",true);console.error(err);}
-      finally{container.remove();}
-    }
     function eksporLaporanPDF(){
       if(!laporanAktifCols.length){tampilToast("Tampilkan laporan terlebih dahulu.",true);return;}
       const w=window.open("","_blank");if(!w){tampilToast("Izinkan pop-up browser untuk membuat PDF.",true);return;}
@@ -2777,10 +2760,10 @@ input,select,textarea,.filter-bar input,.filter-bar select{border-radius:10px!im
       const heads=laporanAktifCols.map(c=>"<th>"+escapeHTML(c[1])+"</th>").join("");
       const body=(laporanAktifRows||[]).map(r=>"<tr>"+laporanAktifCols.map(c=>"<td>"+escapeHTML(c[0]==="Perkiraan_Harga_Satuan"?formatRupiahAdmin(r[c[0]]):(r[c[0]]==null?"":r[c[0]]))+"</td>").join("")+"</tr>").join("");
       if(laporanMatriksMonitoring){
-        w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#000}h1{text-align:center;font-size:17px}p{text-align:center;font-size:11px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #000;padding:6px;text-align:center}th{background:#ffff00}td:first-child{text-align:left;width:22%}th:last-child,td:last-child{text-align:left;min-width:260px;white-space:pre-line}td{white-space:pre-line}@page{size:landscape;margin:10mm}</style></head><body><h1>MONITORING PEMELIHARAAN APAR &amp; KOTAK P3K</h1><p>Tahun '+escapeHTML(period)+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
+        w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:0;color:#000}h1{text-align:center;font-size:16px}p{text-align:center;font-size:10px}table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:8px}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}th,td{border:1px solid #000;padding:4px;text-align:center;vertical-align:top;overflow-wrap:anywhere;word-break:break-word}th{background:#ffff00;print-color-adjust:exact;-webkit-print-color-adjust:exact}td:first-child{text-align:left;width:22%}th:last-child,td:last-child{text-align:left;white-space:pre-line}td{white-space:pre-line}@page{size:A4 landscape;margin:8mm}@media print{html,body{width:100%;margin:0}}</style></head><body><h1>MONITORING PEMELIHARAAN APAR &amp; KOTAK P3K</h1><p>Tahun '+escapeHTML(period)+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
         w.document.close();return;
       }
-      w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:22px;color:#172b3a}h1{font-size:20px}p{font-size:12px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #9aa8b5;padding:6px;text-align:left;vertical-align:top}th{background:#eaf0f5}tr{page-break-inside:avoid}@page{size:landscape;margin:12mm}</style></head><body><h1>'+escapeHTML(title)+'</h1><p>Periode: '+escapeHTML(period)+' · Jumlah data: '+(laporanAktifRows||[]).length+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
+      w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+escapeHTML(title)+'</title><style>body{font-family:Arial,sans-serif;padding:0;color:#172b3a}h1{font-size:18px;text-align:center}p{font-size:10px}table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:8px}thead{display:table-header-group}th,td{border:1px solid #9aa8b5;padding:4px;text-align:left;vertical-align:top;overflow-wrap:anywhere;word-break:break-word}th{background:#eaf0f5;print-color-adjust:exact;-webkit-print-color-adjust:exact}tr{break-inside:avoid;page-break-inside:avoid}@page{size:A4 landscape;margin:8mm}@media print{html,body{width:100%;margin:0}}</style></head><body><h1>'+escapeHTML(title)+'</h1><p>Periode: '+escapeHTML(period)+' · Jumlah data: '+(laporanAktifRows||[]).length+'</p><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table><script>window.onload=function(){window.print();};<\/script></body></html>');
       w.document.close();
     }
     el("reportKind").addEventListener("change",function(){el("reportUsageTypeWrap").style.display=this.value==="penggunaan"?"block":"none";el("reportMaintenanceTypeWrap").style.display=this.value==="pemeliharaan"?"block":"none";});
