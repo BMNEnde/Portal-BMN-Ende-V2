@@ -2860,23 +2860,23 @@ tbody td{border-bottom:1px solid #edf1f5!important;color:#304b60!important}tbody
       }).join("");
       el("formAdminCount").textContent="Menampilkan "+rows.length+" data";
     }
-    function aksiUsulanAdmin(id, keputusan){
-      const label=keputusan==="DISETUJUI"?"setujui":"tolak";
-      const catatan=window.prompt("Masukkan keterangan admin untuk "+label+" usulan ini:");
-      if(catatan===null)return;
-      if(!catatan.trim()){tampilToast("Keterangan wajib diisi.",true);return;}
+    async function aksiUsulanAdmin(id, keputusan){
+      const label=keputusan==="DISETUJUI"?"persetujuan":"penolakan";
+      const data=await dialogAplikasi({title:keputusan==="DISETUJUI"?"Persetujuan Usulan ATK":"Penolakan Usulan ATK",description:"Masukkan keterangan admin untuk "+label+" usulan ini.",icon:keputusan==="DISETUJUI"?"✓":"!",danger:keputusan!=="DISETUJUI",okText:keputusan==="DISETUJUI"?"Setujui Usulan":"Tolak Usulan",withValues:true,html:'<label>Keterangan Admin *</label><textarea data-dialog-field="catatan" rows="4" required placeholder="Tuliskan keterangan admin"></textarea>'});
+      if(!data)return;
+      if(!String(data.catatan||"").trim()){tampilToast("Keterangan wajib diisi.",true);return;}
       google.script.run.withSuccessHandler(r=>{tampilToast(r.pesan||"Status usulan diperbarui.");muatSemuaFormulirAdmin();})
         .withFailureHandler(e=>tampilToast(e.message||"Gagal memproses usulan.",true))
-        .prosesUsulanATKAdmin(tokenAdmin,id,keputusan,catatan.trim());
+        .prosesUsulanATKAdmin(tokenAdmin,id,keputusan,String(data.catatan).trim());
     }
-    function aksiRusakAdmin(id, tindakan){
-      const pertanyaan=tindakan==="SETUJUI"?"Masukkan catatan persetujuan perbaikan:":tindakan==="TOLAK"?"Masukkan alasan penolakan perbaikan:":"Masukkan catatan penyelesaian perbaikan:";
-      const catatan=window.prompt(pertanyaan);
-      if(catatan===null)return;
-      if(!catatan.trim()){tampilToast("Keterangan wajib diisi.",true);return;}
+    async function aksiRusakAdmin(id, tindakan){
+      const pertanyaan=tindakan==="SETUJUI"?"catatan persetujuan perbaikan":tindakan==="TOLAK"?"alasan penolakan perbaikan":"catatan penyelesaian perbaikan";
+      const data=await dialogAplikasi({title:tindakan==="SETUJUI"?"Persetujuan Perbaikan":tindakan==="TOLAK"?"Penolakan Perbaikan":"Penyelesaian Perbaikan",description:"Masukkan "+pertanyaan+".",icon:tindakan==="TOLAK"?"!":"✓",danger:tindakan==="TOLAK",okText:tindakan==="SETUJUI"?"Setujui Perbaikan":tindakan==="TOLAK"?"Tolak Pengajuan":"Tandai Selesai",withValues:true,html:'<label>Catatan Admin *</label><textarea data-dialog-field="catatan" rows="4" required placeholder="Tuliskan catatan admin"></textarea>'});
+      if(!data)return;
+      if(!String(data.catatan||"").trim()){tampilToast("Keterangan wajib diisi.",true);return;}
       google.script.run.withSuccessHandler(r=>{tampilToast(r.pesan||"Progres pengaduan diperbarui.");muatSemuaFormulirAdmin();if(typeof muatDashboard==="function")muatDashboard();})
         .withFailureHandler(e=>tampilToast(e.message||"Gagal memproses pengaduan.",true))
-        .prosesPengaduanRusakAdmin(tokenAdmin,id,tindakan,catatan.trim());
+        .prosesPengaduanRusakAdmin(tokenAdmin,id,tindakan,String(data.catatan).trim());
     }
 
     function muatSemuaFormulirAdmin(){
