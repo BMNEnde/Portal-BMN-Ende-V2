@@ -1,202 +1,149 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173b5e">
-<link rel="manifest" href="./manifest.json">
-<meta name="description" content="Portal layanan Sistem Manajemen Barang Milik Negara Balai POM di Ende.">
-<link rel="icon" type="image/webp" href="data:image/webp;base64,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">
-<title>Portal Layanan BMN | Balai POM di Ende</title>
+<meta name="theme-color" content="#163b59">
+<title>Portal BMN | Balai POM di Ende</title>
 <style>
-:root{--navy:#173b5e;--navy-deep:#102d49;--blue:#2563eb;--green:#15803d;--green-bright:#22a34a;--ink:#1e293b;--muted:#64748b;--line:#dbe3ed;--paper:#fff;--bg:#f3f6fa;--shadow:0 24px 65px rgba(16,45,73,.12)}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;min-height:100vh;font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden}
-a{color:inherit}
-.top-accent{height:7px;background:linear-gradient(90deg,var(--navy-deep),var(--blue) 48%,var(--green) 82%,#8bcf75)}
-.site-header{width:min(1200px,calc(100% - 48px));margin:auto;min-height:100px;display:flex;align-items:center;gap:15px}
-.agency-logo{width:65px;height:65px;padding:8px;display:grid;place-items:center;background:white;border:1px solid #e4ebf2;border-radius:18px;box-shadow:0 7px 22px rgba(16,45,73,.07)}
-.agency-logo img{width:100%;height:100%;object-fit:contain}
-.agency-name{font-size:13px;letter-spacing:.12em;font-weight:900;color:var(--navy)}
-.agency-caption{font-size:12px;color:var(--muted);margin-top:5px}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.status-pill{display:flex;align-items:center;gap:9px;padding:10px 15px;border:1px solid #dce8e4;background:#fff;border-radius:99px;color:#246345;font-size:11px;font-weight:800;letter-spacing:.07em}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#20a45a;box-shadow:0 0 0 4px #e4f5eb}
-main{width:min(1200px,calc(100% - 48px));margin:10px auto 58px}
-.hero{position:relative;overflow:hidden;isolation:isolate;min-height:450px;display:grid;grid-template-columns:1fr;align-items:center;gap:35px;padding:clamp(35px,6vw,75px);border-radius:34px;background:linear-gradient(125deg,#36556f 0%,#496d83 56%,#5c8582 100%);box-shadow:var(--shadow);color:white}
-.hero:before,.hero:after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none}
-.hero:before{width:510px;height:510px;right:-160px;top:-270px;border:1px solid rgba(255,255,255,.15);box-shadow:0 0 0 35px rgba(255,255,255,.035),0 0 0 80px rgba(255,255,255,.025)}
-.hero:after{width:390px;height:390px;left:-230px;bottom:-290px;border:45px solid rgba(34,163,74,.14)}
-.hero-copy{max-width:640px;position:relative;z-index:1}
-.kicker{display:inline-flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);border-radius:99px;color:#c9f3d7;font-size:11px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}
-.kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#65d48b;box-shadow:0 0 0 4px rgba(101,212,139,.14)}
-h1{margin:23px 0 15px;font-size:clamp(37px,5.4vw,63px);line-height:1.04;letter-spacing:-.045em;font-weight:850}
-h1 span{color:#8be0a6}
-.hero-description{max-width:590px;margin:0;color:#d2deea;font-size:15px;line-height:1.9}
-.hero-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:29px}
-.primary-link,.secondary-link{min-height:47px;padding:0 19px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:850;transition:transform .2s,box-shadow .2s,background .2s}
-.primary-link{background:#fff;color:var(--navy);box-shadow:0 8px 22px rgba(0,0,0,.13)}
-.secondary-link{color:white;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.07)}
-.primary-link:hover,.secondary-link:hover{transform:translateY(-3px)}
-.primary-link:focus-visible,.secondary-link:focus-visible,.access-card:focus-visible{outline:3px solid #8be0a6;outline-offset:4px}
-.hero-visual{display:none}
-.logo-orbit{display:none}
-.logo-orbit:before,.logo-orbit:after{content:"";position:absolute;border-radius:50%;border:1px dashed rgba(255,255,255,.18)}
-.logo-orbit:before{inset:25px}.logo-orbit:after{inset:52px}
-.bmn-logo{position:relative;width:112px;height:112px;padding:13px;margin:0 0 22px;border-radius:50%;background:linear-gradient(145deg,#fff,#eaf2f7);box-shadow:0 12px 32px rgba(0,0,0,.22);display:grid;place-items:center}
-.bmn-logo img{width:100%;height:100%;object-fit:contain;border-radius:12px}
-.visual-caption{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#d3e5ef;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-.section-intro{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:42px 2px 18px}
-.section-label{color:var(--green);font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}
-.section-intro h2{margin:7px 0 0;color:var(--navy);font-size:clamp(22px,3vw,29px);letter-spacing:-.03em}
-.section-intro p{margin:0;color:var(--muted);font-size:12px}
-#akses{display:none}#akses.is-open{display:block;animation:reveal .35s ease both}@keyframes reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.access-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
-.access-card{min-height:220px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;padding:27px;border:1px solid #e2ebef;border-radius:22px;background:#fff;text-decoration:none;color:inherit;box-shadow:0 10px 28px rgba(13,57,78,.055);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
-.access-card:hover{transform:translateY(-4px);border-color:rgba(8,126,170,.35);box-shadow:0 18px 36px rgba(13,57,78,.11)}
-.card-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:#eaf5f8;color:var(--blue)}
-.user .card-icon{background:#e8f7f3;color:#078c82}
-.docs .card-icon{background:#eef2ff;color:#5367b8}
-.docs .card-cta{color:#5367b8}
-.card-icon svg{width:24px;height:24px}
-.access-card h3{margin:20px 0 7px;color:var(--navy);font-size:20px}
-.access-card p{max-width:390px;margin:0 0 22px;color:var(--muted);font-size:13px;line-height:1.7}
-.card-cta{display:inline-flex;align-items:center;gap:9px;margin-top:auto;color:var(--blue);font-size:13px;font-weight:800}
-.user .card-cta{color:#078c82}
-.card-cta span{font-size:19px;transition:transform .2s}
-.access-card:hover .card-cta span{transform:translateX(5px)}
-.info-strip{display:flex;align-items:flex-start;gap:13px;margin-top:20px;padding:17px 19px;border:1px solid #dce8e4;border-radius:16px;background:#f8fcf9;color:#526c80;font-size:12px;line-height:1.75}
-.info-icon{flex:0 0 28px;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:#e7f5eb;color:var(--green)}
-.info-strip strong{color:var(--navy)}
-.site-footer{width:min(1200px,calc(100% - 48px));margin:0 auto;padding:20px 0 26px;border-top:1px solid #dce5ed;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#74869a;font-size:11px}
-.site-footer strong{color:var(--navy)}
-@media(max-width:980px){.access-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){
-.site-header,main,.site-footer{width:calc(100% - 30px)}
-.site-header{min-height:82px}
-.agency-logo{width:55px;height:55px;border-radius:15px}
-.agency-name{font-size:11px}
-.agency-caption{font-size:10px}
-.status-pill{font-size:9px;padding:8px 10px}
-.hero{grid-template-columns:1fr;gap:10px;padding:36px 25px 30px;border-radius:25px}
-.hero-visual,.logo-orbit{display:none}
-.bmn-logo{width:100px;height:100px;margin:0 0 19px}
-.visual-caption{bottom:0}
-.hero-copy{text-align:left}
-.hero-description{margin:0}
-.hero-actions{justify-content:flex-start}
-.section-intro{align-items:flex-start;flex-direction:column;margin-top:33px}
-.access-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.access-card{min-height:190px;padding:17px;border-radius:18px}
-.card-icon{width:42px;height:42px;border-radius:13px}
-.card-icon svg{width:21px;height:21px}
-.access-card h3{font-size:16px;line-height:1.25;margin:13px 0 6px}
-.access-card p{font-size:11px;line-height:1.5;margin:0 0 12px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
-.card-cta{font-size:11px;line-height:1.3;gap:5px}
-.card-cta span{font-size:16px}
-.info-strip{padding:13px 14px;font-size:11px}
-.site-footer{flex-direction:column}
-}
-@media(max-width:420px){
-.header-right{display:none}
-.hero{padding:30px 19px}
-.hero-visual,.logo-orbit{display:none}
-.bmn-logo{width:90px;height:90px}
-h1{font-size:39px}
-.hero-description{font-size:13px}
-.primary-link,.secondary-link{width:100%}
-.access-grid{grid-template-columns:1fr;gap:10px}
-.access-card{display:grid;grid-template-columns:42px minmax(0,1fr);column-gap:12px;align-items:start;min-height:0;padding:15px}
-.access-card .card-icon{grid-column:1;grid-row:1 / span 3}
-.access-card h3{grid-column:2;margin:1px 0 4px;font-size:15px}
-.access-card p{grid-column:2;-webkit-line-clamp:2;margin:0;font-size:11px}
-.access-card .card-cta{grid-column:2;margin-top:8px;font-size:11px}
-}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+:root{--navy:#163b59;--deep:#102d45;--green:#21845a;--ink:#203547;--muted:#63788a;--paper:#fff;--line:#e1e9ef;--bg:#f3f7fa}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.topline{height:5px;background:linear-gradient(90deg,#163b59,#2986a5,#34a66b)}
+header{max-width:1180px;margin:auto;padding:22px 24px;display:flex;align-items:center;gap:13px}
+.brandmark{width:54px;height:54px;border-radius:16px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;color:var(--navy);font-weight:900;box-shadow:0 5px 18px #183b5910}
+.brandmark span{font-size:13px;letter-spacing:-.5px}.brandtitle{font-size:13px;font-weight:850;letter-spacing:.1em;color:var(--navy)}.brandsub{font-size:12px;color:var(--muted);margin-top:4px}
+.badge{margin-left:auto;border:1px solid #d5e8df;background:#f5fbf8;color:#317457;border-radius:99px;padding:9px 13px;font-size:10px;font-weight:800;letter-spacing:.08em}
+main{max-width:1180px;margin:8px auto 55px;padding:0 24px}
+.hero{min-height:390px;border-radius:30px;padding:clamp(32px,5vw,62px);position:relative;overflow:hidden;color:white;background:linear-gradient(120deg,#12334f 0%,#255d78 58%,#3c817b 100%);box-shadow:0 24px 55px #153b591c}
+.hero:before{content:"";position:absolute;width:450px;height:450px;border-radius:50%;border:1px solid #ffffff25;right:-130px;top:-240px;box-shadow:0 0 0 40px #ffffff08,0 0 0 80px #ffffff06}
+
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;z-index:0;overflow:hidden}.hero-photo img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 48%;opacity:1;mask-image:none}.hero-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,45,69,.82) 0%,rgba(18,51,79,.72) 38%,rgba(18,51,79,.43) 67%,rgba(18,51,79,.18) 100%)}.hero-content{position:relative;max-width:760px;z-index:2}.hero{background:linear-gradient(105deg,#244f70 0%,#326987 39%,rgba(55,112,143,.78) 51%,rgba(65,139,151,.12) 100%),linear-gradient(120deg,#244f70 0%,#397b9b 58%,#56a18e 100%)}
+.tag{display:inline-flex;align-items:center;gap:8px;border:1px solid #ffffff30;background:#ffffff12;border-radius:99px;padding:9px 12px;color:#c9f3dd;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.tag i{width:7px;height:7px;border-radius:50%;background:#65d48b}
+.titleline{display:flex;align-items:center;gap:17px;margin:25px 0 15px}
+.bmn-symbol{flex:none;width:72px;height:72px;border-radius:19px;background:#ffffff;display:grid;place-items:center;color:#173b5e;box-shadow:0 8px 24px #0002;font-weight:900;letter-spacing:-1px}
+.bmn-symbol small{display:block;font-size:10px;text-align:center;color:#32835c;letter-spacing:1px}
+h1{margin:0;font-size:clamp(32px,5vw,56px);line-height:1.08;letter-spacing:-.045em}h1 em{font-style:normal;color:#8de1ad}
+.hero p{max-width:650px;color:#d8e6ed;font-size:15px;line-height:1.8;margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:25px}
+button,.button{font:inherit;text-decoration:none;border:0;cursor:pointer;border-radius:12px;padding:13px 18px;font-size:13px;font-weight:800;display:inline-flex;align-items:center;gap:10px}
+.primary{background:white;color:var(--navy)}.secondary{background:#ffffff12;border:1px solid #ffffff35;color:white}
+button:hover,.button:hover{transform:translateY(-1px)}
+section.access{display:none}section.access.open{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.intro{margin:38px 2px 18px;display:flex;align-items:end;justify-content:space-between;gap:15px}.eyebrow{color:var(--green);font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.intro h2{margin:6px 0 0;color:var(--navy);font-size:26px;letter-spacing:-.03em}.intro p{font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.card{display:flex;flex-direction:column;min-height:205px;padding:23px;border-radius:20px;background:white;border:1px solid var(--line);text-decoration:none;color:inherit;box-shadow:0 8px 25px #153b5908;transition:.18s}
+.card:hover{transform:translateY(-3px);box-shadow:0 15px 35px #153b5914;border-color:#c8dce7}
+.icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#eaf3f8;color:#27749a;font-size:20px}.card:nth-child(2) .icon{background:#e8f7f0;color:#22805a}.card:nth-child(3) .icon{background:#f0f2fc;color:#586bb0}.card:nth-child(4) .icon{background:#fff4e7;color:#aa7434}
+.card h3{font-size:18px;color:var(--navy);margin:17px 0 7px}.card p{font-size:12px;line-height:1.65;color:var(--muted);margin:0 0 17px}.cta{margin-top:auto;color:#28759a;font-size:12px;font-weight:850}.card:nth-child(2) .cta{color:#22805a}
+.note{margin-top:18px;padding:15px 18px;border:1px solid #d9e9df;background:#f7fcf9;border-radius:14px;font-size:12px;line-height:1.7;color:#526c7e}
+footer{max-width:1180px;margin:auto;padding:20px 24px 28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:#738698;font-size:11px}footer strong{color:var(--navy)}
+@media(max-width:650px){.hero-photo{width:100%;opacity:.38}.hero-photo:after{background:linear-gradient(100deg,rgba(18,51,79,.82),rgba(18,51,79,.48))}.hero{background:linear-gradient(100deg,rgba(18,51,79,.96),rgba(18,51,79,.78)),linear-gradient(120deg,#12334f,#255d78)}header,main,footer{padding-left:16px;padding-right:16px}header{padding-top:15px;padding-bottom:15px}.badge{display:none}.hero{padding:28px 21px;border-radius:23px}.titleline{gap:12px}.bmn-symbol{width:55px;height:55px;border-radius:15px}h1{font-size:clamp(28px,8vw,39px)}.hero p{font-size:13px}.intro{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:1fr;gap:12px}.card{min-height:0;padding:19px}.card h3{margin-top:13px}.intro h2{font-size:23px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Penyelarasan identitas visual SVG: logo berdampingan, ukuran proporsional */
+header{gap:16px}
+.brandmark{width:64px;height:64px;padding:7px;overflow:hidden;border-radius:14px}
+.brandmark img{width:100%;height:100%;object-fit:contain;display:block}
+.brandmark.bmnmark{padding:6px}
+.brandmark.bmnmark img{object-fit:contain}
+.brandtitle{font-size:14px;letter-spacing:.06em}
+.brandsub{font-size:12px;line-height:1.5}
+.titleline{gap:20px}
+.bmn-symbol{padding:9px;width:88px;height:88px;border-radius:20px;overflow:hidden}
+.bmn-symbol img{width:100%;height:100%;object-fit:contain}
+@media(max-width:650px){header{gap:10px}.brandmark{width:49px;height:49px;padding:5px}.brandtitle{font-size:11px}.brandsub{font-size:10px}.titleline{gap:12px}.bmn-symbol{width:58px;height:58px;padding:6px}}
+
+/* Tampilan beranda mengikuti referensi desain portal */
+body{background:#f5faff;color:#153d70}
+.site-header{width:100%;max-width:none;margin:0;padding:10px clamp(18px,4vw,68px);min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:20px;background:linear-gradient(100deg,#f8fcff 0%,#e5f3ff 55%,#d9edff 100%);border-bottom:1px solid #cfe3f5;box-shadow:0 5px 20px #1a5a9410;position:relative;z-index:5}
+.logo-pair{display:flex;align-items:center;gap:14px;flex:none;text-decoration:none;max-width:250px}
+.site-header .brandmark{width:100px;height:76px;padding:5px;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible;flex:none}
+.site-header .brandmark:first-child{width:96px;height:76px;border-right:1px solid #1d5c9a;padding-right:12px}
+.site-header .brandmark.bmnmark{width:82px;height:68px;padding:5px}
+.site-header .brandmark img{width:100%;height:100%;object-fit:contain;overflow:visible;display:block}
+.main-nav{display:flex;align-items:center;justify-content:center;gap:clamp(8px,1.7vw,28px);flex:1;min-width:0}
+.nav-link{display:inline-flex;align-items:center;gap:9px;padding:13px 14px;border-radius:30px;text-decoration:none;color:#12427a;font-size:15px;font-weight:750;white-space:nowrap;transition:.18s}
+.nav-link svg,.admin-login svg,.mobile-menu svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.nav-link.active{color:white;background:#0867ca;box-shadow:0 5px 13px #0867ca30}
+.nav-link:hover:not(.active){background:#e4f1ff;color:#075db5}
+.chevron{font-size:17px;margin-left:1px}
+.admin-login{margin-left:auto;display:inline-flex;align-items:center;gap:9px;padding:13px 20px;background:#0867ca;color:white;border-radius:28px;text-decoration:none;font-weight:800;white-space:nowrap;box-shadow:0 5px 14px #0867ca25}
+.admin-login:hover{background:#0755aa}
+.mobile-menu{display:none;background:#0867ca;color:white;border-radius:12px;padding:11px}
+.page-main{max-width:none;width:100%;margin:0 auto;padding:0;background:linear-gradient(180deg,#eaf6ff 0%,#f8fcff 70%,#fff 100%);position:relative}
+.hero{width:100%;min-height:500px;border-radius:0;padding:clamp(38px,4.2vw,70px) clamp(28px,4.2vw,70px);display:flex;align-items:center;box-shadow:none;background:#cceaff;isolation:isolate}
+.hero-photo{z-index:0}
+.hero-photo img{width:100%;height:100%;margin:0;display:block;object-fit:fill;object-position:center center}
+.hero-photo:after{background:linear-gradient(90deg,rgba(236,248,255,.98) 0%,rgba(229,245,255,.94) 28%,rgba(215,239,255,.65) 47%,rgba(179,220,249,.16) 100%)}
+.hero-content{max-width:790px}
+.tag{background:#ffffffa8;border:1px solid #b6d8f3;color:#1761a5;letter-spacing:.12em}
+.tag i{background:#20a86b}
+.titleline{margin:24px 0 18px;gap:0}
+h1{color:#103b78;font-size:clamp(36px,4vw,62px);line-height:1.08;letter-spacing:-.045em;font-weight:850}
+h1 em{color:#086dcc}
+h1 span{color:#086dcc}
+.hero .hero-subtitle{font-size:clamp(16px,1.6vw,24px);font-weight:750;font-style:italic;line-height:1.45;color:#153f78;max-width:590px}
+.actions{margin-top:27px}
+.primary{background:#0867ca;color:white;border-radius:28px;padding:14px 25px;box-shadow:0 6px 15px #0867ca25;font-size:16px}
+.round-arrow{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:white;color:#0867ca;font-size:19px}
+section.access{display:block;padding:36px clamp(20px,4vw,66px) 42px;background:linear-gradient(180deg,#fff 0%,#f8fcff 75%,#eaf6ff 100%);position:relative;overflow:hidden}
+section.access:after{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;height:110px;opacity:.48;background:
+linear-gradient(180deg,transparent 0 40%,#b9ddfa 40% 100%);
+clip-path:polygon(0 60%,2% 60%,2% 47%,4% 47%,4% 63%,7% 63%,7% 39%,9% 39%,9% 62%,12% 62%,12% 50%,14% 50%,14% 65%,18% 65%,18% 28%,20% 28%,20% 65%,25% 65%,25% 43%,27% 43%,27% 65%,33% 65%,33% 35%,35% 35%,35% 65%,40% 65%,40% 48%,43% 48%,43% 65%,49% 65%,49% 38%,52% 38%,52% 65%,58% 65%,58% 43%,60% 43%,60% 65%,67% 65%,67% 30%,70% 30%,70% 65%,76% 65%,76% 44%,79% 44%,79% 65%,85% 65%,85% 38%,88% 38%,88% 65%,94% 65%,94% 47%,97% 47%,97% 65%,100% 65%,100% 100%,0 100%)}
+.cards{position:relative;z-index:1;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{min-height:148px;padding:20px 18px;display:grid;grid-template-columns:70px minmax(0,1fr) 42px;align-items:center;gap:14px;border:1px solid #d8e9fb;border-radius:17px;background:#ffffffed;box-shadow:0 5px 14px #1d5b9410}
+.card:hover{transform:translateY(-3px);border-color:#b6d6f5;box-shadow:0 12px 24px #1d5b9418}
+.icon{width:68px;height:68px;border-radius:50%;display:grid;place-items:center}
+.icon svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.icon.blue{background:#1687ed;color:#fff}.icon.green{background:#0eb66a;color:#fff}.icon.orange{background:#ff9d12;color:#fff}.icon.purple{background:#8650e9;color:#fff}
+.card-copy h3{font-size:19px;margin:0 0 7px;color:#123e78}
+.card-copy p{font-size:14px;line-height:1.45;color:#31557e;margin:0}
+.card-arrow{width:42px;height:42px;border-radius:50%;background:#e8f2ff;color:#075db5;display:grid;place-items:center;font-size:25px;font-weight:700}
+.note{position:relative;z-index:1;max-width:1180px;margin:20px auto 0}
+footer{max-width:none;padding:22px clamp(20px,4vw,66px);background:#eaf5ff;border-top:1px solid #d8e9f8;display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:center;gap:16px}footer .footer-note{text-align:center;font-size:11px;color:#738698}footer .footer-right{text-align:right}@media(max-width:760px){footer{grid-template-columns:1fr;gap:8px;text-align:center}footer .footer-note,footer .footer-right{text-align:center}}
+@media(max-width:1100px){.site-header{gap:15px}.site-header .brandmark{width:82px;height:68px}.site-header .brandmark:first-child{width:78px;height:68px}.site-header .brandmark.bmnmark{width:70px;height:62px}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.site-header{min-height:76px;padding:8px 16px;justify-content:space-between}.logo-pair{gap:8px}.site-header .brandmark{width:62px;height:56px}.site-header .brandmark:first-child{width:58px;height:56px;padding-right:7px}.site-header .brandmark.bmnmark{width:50px;height:48px;padding:3px}.admin-login{margin-left:auto;padding:10px 13px;font-size:13px}.mobile-menu{display:none}.hero{min-height:480px;padding:34px 22px;align-items:flex-start}.hero-photo img{width:100%;height:100%;object-fit:fill;object-position:center center}.hero-photo:after{background:linear-gradient(90deg,rgba(236,248,255,.97),rgba(229,245,255,.82) 58%,rgba(215,239,255,.28))}.hero-content{max-width:100%}h1{font-size:clamp(33px,8vw,46px)}.hero .hero-subtitle{font-size:16px}.titleline{margin:28px 0 16px}section.access{padding:24px 16px 38px}.cards{grid-template-columns:1fr;gap:12px}.card{min-height:112px;padding:15px;grid-template-columns:58px minmax(0,1fr) 36px;gap:12px}.icon{width:56px;height:56px}.icon svg{width:27px;height:27px}.card-copy h3{font-size:17px}.card-copy p{font-size:12px}.card-arrow{width:36px;height:36px;font-size:21px}.note{font-size:11px}}
+@media(max-width:390px){.site-header .brandmark{width:52px;height:50px}.site-header .brandmark:first-child{width:48px;height:50px}.site-header .brandmark.bmnmark{width:44px;height:46px}.logo-pair{gap:6px}.admin-login{padding:9px 10px}.hero{min-height:450px}}
+section.access[hidden]{display:none!important}
 </style>
+<link rel="stylesheet" href="./mobile-polish.css">
 </head>
 <body>
-<div class="top-accent"></div>
+<div class="topline"></div>
 <header class="site-header">
-  <div class="agency-logo"><img src="data:image/webp;base64,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" alt="Logo Badan POM"></div>
-  <div>
-    <div class="agency-name">BALAI POM DI ENDE</div>
-    <div class="agency-caption">Sistem Manajemen Barang Milik Negara</div>
-  </div>
-  <div class="header-right"><div class="status-pill"><span class="status-dot"></span>PORTAL LAYANAN DIGITAL</div></div>
+  <a class="logo-pair" href="index.html" aria-label="Beranda Portal BMN">
+    <span class="brandmark" aria-label="Logo Badan POM"><img src="data:image/webp;base64,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" alt="Badan POM"></span>
+    <span class="brandmark bmnmark"><img src="https://raw.githubusercontent.com/BMNEnde/Portal-BMN-Ende-V2/main/logo-bmn.png.png" alt="Logo BMN"></span>
+  </a>
+  <!-- Menu navigasi atas dihilangkan; akses Admin tetap tersedia. -->
+  <a class="admin-login" href="admin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/></svg><span>Admin</span><span class="chevron">⌄</span></a>
 </header>
-<main>
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-copy">
-      <div class="bmn-logo"><img src="logo-bmn.png.png" alt="Logo BMN Balai POM di Ende"></div>
-      <div class="kicker">Portal Layanan BMN</div>
-      <h1 id="hero-title">Selamat Datang</h1>
-      <p class="hero-description">Selamat datang di Portal Sistem Manajemen Barang Milik Negara Balai POM di Ende. Satu pintu layanan untuk pengelolaan aset dan pengajuan peminjaman BMN yang tertib, transparan, dan mudah diakses.</p>
-      <div class="hero-actions">
-        <button class="primary-link" id="exploreButton" type="button" aria-controls="akses" aria-expanded="false">Jelajahi Layanan <span aria-hidden="true">↓</span></button>
-      </div>
-    </div>
-  </section>
-  <section id="akses" aria-labelledby="access-title">
-    <div class="section-intro">
-      <div><div class="section-label">Mulai dari sini</div><h2 id="access-title">Pilih Jenis Akses</h2></div>
-      <p>Akses layanan sesuai kebutuhan dan kewenangan Anda.</p>
-    </div>
-    <div class="access-grid">
-      <a class="access-card admin" href="admin.html">
-        <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v3m0 14v3M4.93 4.93l2.12 2.12m9.9 9.9 2.12 2.12M2 12h3m14 0h3M4.93 19.07l2.12-2.12m9.9-9.9 2.12-2.12"/><circle cx="12" cy="12" r="4"/></svg></div>
-        <h3>Login Admin</h3>
-        <p>Akses pengelolaan data BMN, verifikasi pengajuan, pemeliharaan aset, serta pemantauan seluruh layanan.</p>
-        <span class="card-cta">Masuk sebagai Admin <span aria-hidden="true">→</span></span>
-      </a>
-      <a class="access-card user" href="pengelolaan.html">
-        <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-        <h3>Formulir Pengelolaan BMN (Aset dan Persediaan)</h3>
-        <p>Akses seluruh layanan formulir pengelolaan aset, persediaan, penggunaan barang, usulan pengadaan, pemeliharaan, dan peminjaman BMN.</p>
-        <span class="card-cta">Buka Formulir Pengelolaan <span aria-hidden="true">→</span></span>
-      </a>
-      <a class="access-card docs" href="informasi.html">
-        <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-        <h3>Informasi & Progres BMN</h3>
-        <p>Lihat daftar BMN yang sedang dipinjam, progres usulan ATK dan operasional, serta progres pengaduan BMN rusak.</p>
-        <span class="card-cta">Lihat Informasi BMN <span aria-hidden="true">→</span></span>
-      </a>
-      <a class="access-card docs" href="dokumen.html">
-        <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v6h5M9 13h7M9 17h7"/></svg></div>
-        <h3>Dokumen BMN</h3>
-        <p>Akses pusat dokumen Stock Opname, Sensus/Pra-Sensus, Sarana dan Prasarana, RKBMN, laporan BMN, laporan keuangan, dan dokumen lainnya.</p>
-        <span class="card-cta">Buka Dokumen BMN <span aria-hidden="true">→</span></span>
-      </a>
-    </div>
-    <div class="info-strip">
-      <div class="info-icon" aria-hidden="true">i</div>
-      <div><strong>Informasi akses:</strong> Menu Admin hanya digunakan oleh petugas yang memiliki akun dan kewenangan administrator. Pegawai atau pemohon peminjaman dapat menggunakan menu Pengguna.</div>
-    </div>
-  </section>
+<main class="page-main">
+<section class="hero" aria-labelledby="hero-title"><div class="hero-photo" aria-hidden="true"><img src="./ilustrasi-pengelolaan-bmn.png" alt=""></div><div class="hero-content">
+<div class="tag"><i></i> Portal Layanan BMN</div>
+<div class="titleline"><h1 id="hero-title">Portal Manajemen<br>Barang Milik Negara <em>(BMN)</em><br><span>Balai POM di Ende</span></h1></div>
+<p class="hero-subtitle">Transparan, Akuntabel, dan Profesional<br>dalam Pengelolaan BMN</p>
+<div class="actions"><button class="primary" id="explore" aria-expanded="false" aria-controls="akses"><span class="round-arrow">➜</span> Akses Layanan</button></div>
+</div></section>
+<section class="access" id="akses" hidden>
+<div class="cards">
+<a class="card" href="informasi.html"><div class="icon blue"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 3 6-7"/><path d="M7 18v-4M11 18v-8M15 18v-5M19 18V8"/></svg></div><div class="card-copy"><h3>Informasi</h3><p>Akses informasi terkini seputar BMN.</p></div><span class="card-arrow">→</span></a>
+<a class="card" href="dokumen.html"><div class="icon green"><svg viewBox="0 0 24 24"><path d="M4.5 4.5 8 3l2 16-3.5 1.5z"/><path d="M10.5 3.5 14 2.5l2 16-3.5 1.5z"/><path d="M16.5 4 20 3l1 16-3.5 1.5z"/><path d="M6.5 5.5 7.5 5M12.5 4.5 13.5 4M18.5 5 19.5 4.5"/></svg></div><div class="card-copy"><h3>Dokumen</h3><p>Unduh dokumen penting terkait BMN.</p></div><span class="card-arrow">→</span></a>
+<a class="card" href="pengelolaan.html"><div class="icon orange"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 4V2h6v2M8 10h8M8 14h8M8 18h5"/><path d="M6.5 10h.01M6.5 14h.01M6.5 18h.01"/></svg></div><div class="card-copy"><h3>Pengelolaan</h3><p>Kelola data dan aset BMN secara terintegrasi.</p></div><span class="card-arrow">→</span></a>
+
+</div></section>
 </main>
-<footer class="site-footer">
-  <span><strong>Balai POM di Ende</strong> · Sistem Manajemen Barang Milik Negara</span>
-  <span>Portal Layanan BMN</span>
-</footer>
+<footer><span class="footer-left"><strong>Balai POM di Ende</strong> · Sistem Manajemen Barang Milik Negara</span><span class="footer-note"><strong>Informasi akses:</strong> Menu Admin hanya digunakan oleh petugas yang memiliki akun dan kewenangan administrator.</span><span class="footer-right">Portal Layanan BMN</span></footer>
 <script>
-document.getElementById("exploreButton").addEventListener("click",function(){const section=document.getElementById("akses");const opened=section.classList.toggle("is-open");this.setAttribute("aria-expanded",String(opened));this.querySelector("span").textContent=opened?"↑":"↓";if(opened){section.scrollIntoView({behavior:"smooth",block:"start"});}});
-
+const explore=document.getElementById('explore');
+const access=document.getElementById('akses');
+explore.addEventListener('click',function(){
+  const willOpen=access.hidden;
+  access.hidden=!willOpen;
+  this.setAttribute('aria-expanded',String(willOpen));
+  if(willOpen){access.scrollIntoView({behavior:'smooth',block:'start'});}
+});
 </script>
-
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./service-worker.js")
-      .then(function (registration) {
-        console.log("PWA aktif:", registration.scope);
-      })
-      .catch(function (error) {
-        console.error("PWA gagal diaktifkan:", error);
-      });
-  });
-}
-</script>
-
-</body>
-</html>
+</body></html>
