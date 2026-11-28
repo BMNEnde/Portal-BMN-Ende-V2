@@ -3069,18 +3069,25 @@ tbody td{border-bottom:1px solid #edf1f5!important;color:#304b60!important}tbody
       const safeName=(title+"_"+period).replace(/[^a-z0-9_-]/gi,"_");
       XLSX.writeFile(wb,safeName+".xlsx",{bookType:"xlsx",compression:true});
     }
-    function eksporLaporanPDF(){
+    async function eksporLaporanPDF(){
       if(!laporanAktifCols.length){tampilToast("Tampilkan laporan terlebih dahulu.",true);return;}
-      const w=window.open("","_blank");if(!w){tampilToast("Izinkan pop-up browser untuk membuat PDF.",true);return;}
       const title=laporanAktifTitle||"Laporan BMN";
       const period=laporanMatriksMonitoring?el("reportYear").value:el("reportMonth").selectedOptions[0].text+" "+el("reportYear").value;
       const photoCols=["Dokumentasi_URL","Foto_URL","Foto_Peminjaman_URL","Foto_Barang_URL","Foto_URL_Pemeliharaan","Foto_Produk_URL"];
+      const photoValues=(laporanAktifRows||[]).flatMap(r=>laporanAktifCols.filter(c=>photoCols.includes(c[0])).map(c=>r[c[0]]).filter(Boolean));
+      let photoMap={};
+      if(photoValues.length){
+        try{
+          photoMap=await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getFotoPDFAdmin(tokenAdmin,photoValues));
+        }catch(err){tampilToast("Foto gagal diambil dari Drive. PDF tetap dapat dibuat, tetapi foto mungkin tidak tampil.",true);}
+      }
+      const w=window.open("","_blank");if(!w){tampilToast("Izinkan pop-up browser untuk membuat PDF.",true);return;}
       const heads=laporanAktifCols.map(c=>"<th>"+escapeHTML(c[1])+"</th>").join("");
       const body=(laporanAktifRows||[]).map(r=>"<tr>"+laporanAktifCols.map(c=>{
         const v=r[c[0]];
         if(photoCols.includes(c[0])){
-          const src=sumberFotoAdmin(v);
-          return src?'<td class="photo-cell"><img class="report-photo" src="'+escapeHTML(src)+'" alt="'+escapeHTML(c[1])+'" crossorigin="anonymous" loading="eager" referrerpolicy="no-referrer"></td>':'<td class="photo-cell">Foto tidak tersedia</td>';
+          const src=photoMap[String(v||"")]||sumberFotoAdmin(v);
+          return src?'<td class="photo-cell"><img class="report-photo" src="'+escapeHTML(src)+'" alt="'+escapeHTML(c[1])+'" loading="eager"></td>':'<td class="photo-cell">Foto tidak tersedia</td>';
         }
         return "<td>"+escapeHTML(c[0]==="Perkiraan_Harga_Satuan"?formatRupiahAdmin(v):(v==null?"":v))+"</td>";
       }).join("")+"</tr>").join("");
