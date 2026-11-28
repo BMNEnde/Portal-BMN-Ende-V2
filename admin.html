@@ -3095,7 +3095,7 @@ tbody td{border-bottom:1px solid #edf1f5!important;color:#304b60!important}tbody
         function formatTanggalPDF(v){
           if(v==null||v==="")return "";
           const raw=String(v).trim();
-          const iso=raw.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})/);
+          const iso=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
           if(iso)return String(iso[3]).padStart(2,"0")+"/"+String(iso[2]).padStart(2,"0")+"/"+iso[1];
           const d=new Date(raw);
           return isNaN(d.getTime())?raw:d.toLocaleDateString("id-ID");
