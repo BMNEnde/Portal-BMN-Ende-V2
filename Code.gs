@@ -2093,13 +2093,13 @@ function getFotoPDFAdmin(token, urls) {
   list.forEach(function(url) {
     const raw = String(url || "").trim();
     if (!raw || result[raw]) return;
-    const m = raw.match(/(?:drive\\.google\\.com\\/(?:file\\/d\\/|open\\?id=|uc\\?id=)|[?&]id=)([A-Za-z0-9_-]+)/i);
+    const m = raw.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)|[?&]id=)([A-Za-z0-9_-]+)/i);
     if (!m) return;
     try {
       const file = DriveApp.getFileById(m[1]);
       const blob = file.getBlob();
       const mime = String(blob.getContentType() || "");
-      if (!/^image\\/(jpeg|png|webp|gif)$/i.test(mime)) return;
+      if (!/^image\/(jpeg|png|webp|gif)$/i.test(mime)) return;
       const bytes = blob.getBytes();
       if (bytes.length > 3 * 1024 * 1024) return;
       result[raw] = "data:" + mime + ";base64," + Utilities.base64Encode(bytes);
