@@ -589,6 +589,7 @@ function doPost(e) {
       getDataPemindahanBarangAdmin: getDataPemindahanBarangAdmin,
       getDataPelaporanBarangRusakAdmin: getDataPelaporanBarangRusakAdmin,
       getDataPelaporanAlatGelasAdmin: getDataPelaporanAlatGelasAdmin,
+      getFotoPDFAdmin: getFotoPDFAdmin,
       getRingkasanFormPengelolaanAdmin: getRingkasanFormPengelolaanAdmin
     };
 
@@ -2081,4 +2082,28 @@ function getRingkasanFormPengelolaanAdmin(token) {
     usulanATKOperasional:count("Data_Usulan_ATK_Operasional"),
     pemeliharaanAset:count("Data_Pemeliharaan_Aset")
   };
+}
+
+
+/** Mengambil foto Drive khusus untuk ekspor PDF. Diakses hanya oleh admin aktif. */
+function getFotoPDFAdmin(token, urls) {
+  wajibAdminBMN_(token);
+  const list = Array.isArray(urls) ? urls : [];
+  const result = {};
+  list.forEach(function(url) {
+    const raw = String(url || "").trim();
+    if (!raw || result[raw]) return;
+    const m = raw.match(/(?:drive\\.google\\.com\\/(?:file\\/d\\/|open\\?id=|uc\\?id=)|[?&]id=)([A-Za-z0-9_-]+)/i);
+    if (!m) return;
+    try {
+      const file = DriveApp.getFileById(m[1]);
+      const blob = file.getBlob();
+      const mime = String(blob.getContentType() || "");
+      if (!/^image\\/(jpeg|png|webp|gif)$/i.test(mime)) return;
+      const bytes = blob.getBytes();
+      if (bytes.length > 3 * 1024 * 1024) return;
+      result[raw] = "data:" + mime + ";base64," + Utilities.base64Encode(bytes);
+    } catch (err) { /* Foto individual yang gagal diakses tidak menghentikan seluruh laporan. */ }
+  });
+  return result;
 }
